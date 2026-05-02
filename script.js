@@ -1413,7 +1413,10 @@ async function runSePaySync() {
         if (!res.ok) throw new Error('Lỗi kết nối API SePay. Vui lòng kiểm tra lại API Token.');
         
         const json = await res.json();
-        if (json.status !== 200) throw new Error(json.messages || 'Lỗi lấy dữ liệu từ SePay');
+        console.log('SePay raw response:', json);
+        logBox.innerHTML += `Phản hồi: status=${json.status}, error="${json.error || 'none'}"<br>`;
+        
+        if (json.status !== 200 && json.status !== '200') throw new Error(json.messages || json.error || 'Lỗi lấy dữ liệu từ SePay');
         
         const records = json.transactions || [];
         logBox.innerHTML += `Tìm thấy ${records.length} giao dịch gần đây.<br>`;
@@ -1426,7 +1429,10 @@ async function runSePaySync() {
             const txIdStr = String(tx.id);
             if (sepayConfig.lastSyncIds.includes(txIdStr)) return;
             
-            const map = sepayConfig.mappings.find(m => m.bankAcc && m.bankAcc.trim() === String(tx.account_number));
+            console.log('Processing tx:', tx.id, 'account:', tx.account_number, 'mappings:', sepayConfig.mappings.map(m => m.bankAcc));
+            logBox.innerHTML += `TX ${tx.id}: tài khoản="${tx.account_number}"<br>`;
+            
+            const map = sepayConfig.mappings.find(m => m.bankAcc && m.bankAcc.trim() === String(tx.account_number).trim());
             if (!map) return;
             
             const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
