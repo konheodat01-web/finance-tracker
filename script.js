@@ -1956,8 +1956,19 @@ function renderReceivingInfoList() {
         return;
     }
     
-    listEl.innerHTML = filteredInfos.map((info) => {
-        const originalIndex = infos.indexOf(info);
+    // For Infinite Loop, we clone items if no search query is active
+    let displayInfos = [...filteredInfos];
+    let isLooping = !query && filteredInfos.length > 1;
+    
+    if (isLooping) {
+        // Add clones: [Last] + [Originals] + [First]
+        const firstClone = { ...filteredInfos[0], isClone: true };
+        const lastClone = { ...filteredInfos[filteredInfos.length - 1], isClone: true };
+        displayInfos = [lastClone, ...filteredInfos, firstClone];
+    }
+
+    listEl.innerHTML = displayInfos.map((info, dIdx) => {
+        const originalIndex = infos.indexOf(infos.find(i => i.accountNumber === info.accountNumber));
         const tagsHtml = (info.tags || []).length > 0 
             ? `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
                 ${info.tags.map(t => `<span style="background:#e0e7ff; color:#4f46e5; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600;">${t}</span>`).join('')}
@@ -1980,18 +1991,63 @@ function renderReceivingInfoList() {
         `;
     }).join('');
 
-    // Render dots
+    // Render dots (only for real items)
     dotsEl.innerHTML = filteredInfos.map((_, i) => `
         <div class="recv-dot ${i === 0 ? 'active' : ''}"></div>
     `).join('');
 
-    // Scroll listener for dots
+    // Handle initial scroll for loop
+    if (isLooping) {
+        setTimeout(() => {
+            listEl.scrollLeft = listEl.offsetWidth;
+        }, 10);
+    }
+
+    // Scroll listener for dots and infinite loop jump
+    let isJumping = false;
     listEl.onscroll = () => {
-        const index = Math.round(listEl.scrollLeft / listEl.offsetWidth);
-        const dots = dotsEl.querySelectorAll('.recv-dot');
-        dots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === index);
-        });
+        if (isJumping) return;
+        
+        const width = listEl.offsetWidth;
+        const scrollX = listEl.scrollLeft;
+        let index = Math.round(scrollX / width);
+        
+        if (isLooping) {
+            // Index 0 is LastClone, Index 1 is RealFirst... Index length+1 is FirstClone
+            if (scrollX <= 0) {
+                // At LastClone, jump to RealLast
+                isJumping = true;
+                listEl.style.scrollBehavior = 'auto';
+                listEl.scrollLeft = width * filteredInfos.length;
+                setTimeout(() => { 
+                    listEl.style.scrollBehavior = 'smooth';
+                    isJumping = false;
+                }, 50);
+                index = filteredInfos.length;
+            } else if (scrollX >= width * (filteredInfos.length + 1)) {
+                // At FirstClone, jump to RealFirst
+                isJumping = true;
+                listEl.style.scrollBehavior = 'auto';
+                listEl.scrollLeft = width;
+                setTimeout(() => { 
+                    listEl.style.scrollBehavior = 'smooth';
+                    isJumping = false;
+                }, 50);
+                index = 1;
+            }
+            
+            // Map display index back to real dot index
+            const realIndex = (index - 1 + filteredInfos.length) % filteredInfos.length;
+            const dots = dotsEl.querySelectorAll('.recv-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === realIndex);
+            });
+        } else {
+            const dots = dotsEl.querySelectorAll('.recv-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
     };
 }
 
