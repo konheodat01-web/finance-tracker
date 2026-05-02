@@ -137,7 +137,10 @@ function loadData() {
         wallets = data.wallets || [];
         transactions = data.transactions || [];
         isBalanceVisible = data.isBalanceVisible !== undefined ? data.isBalanceVisible : true;
-        if (data.settings) settings = { ...settings, ...data.settings };
+        if (data.settings) {
+            settings = { ...settings, ...data.settings };
+            initCurrentPeriod();
+        }
         if (data.userCategories) userCategories = data.userCategories;
         if (data.sepayConfig) sepayConfig = data.sepayConfig;
     }
@@ -148,7 +151,10 @@ function loadData() {
                 wallets = data.wallets || [];
                 transactions = data.transactions || [];
                 isBalanceVisible = data.isBalanceVisible !== undefined ? data.isBalanceVisible : true;
-                if (data.settings) settings = { ...settings, ...data.settings };
+                if (data.settings) {
+                    settings = { ...settings, ...data.settings };
+                    initCurrentPeriod();
+                }
                 if (data.userCategories) userCategories = data.userCategories;
                 if (data.sepayConfig) sepayConfig = data.sepayConfig;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
