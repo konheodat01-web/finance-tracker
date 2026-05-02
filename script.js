@@ -1881,10 +1881,4 @@ async function runSePaySync(silent = false) {
     }
 }
 
-// Auto-sync polling
-setInterval(() => {
-    // Only auto-sync if app is visible and API token is configured
-    if (document.visibilityState === 'visible' && sepayConfig && sepayConfig.apiToken) {
-        runSePaySync(true);
-    }
-}, 15000);
+
