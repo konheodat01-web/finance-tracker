@@ -1321,7 +1321,38 @@ function removeSePayMapping(index) {
 
 function updateSePayMapping(index, field, value) {
     sepayConfig.mappings[index][field] = value.trim();
+    if (field === 'categoryId') {
+        retroUpdateSepayTxns(index);
+    }
     syncData();
+}
+
+function retroUpdateSepayTxns(mappingIndex) {
+    const map = sepayConfig.mappings[mappingIndex];
+    if (!map || !map.bankAcc) return;
+    
+    const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+    const cat = allCats.find(c => c.id === map.categoryId);
+    
+    let updatedCount = 0;
+    transactions.forEach(t => {
+        if (t.sepayBankAcc && t.sepayBankAcc === map.bankAcc) {
+            if (cat) {
+                t.category = cat.name;
+                t.categoryIcon = cat.icon;
+                t.categoryColor = cat.color;
+                // Re-determine type from category
+                const expCat = (userCategories.expense||[]).find(c => c.id === cat.id);
+                const incCat = (userCategories.income||[]).find(c => c.id === cat.id);
+                if (expCat) t.type = 'expense';
+                else if (incCat) t.type = 'income';
+            }
+            updatedCount++;
+        }
+    });
+    if (updatedCount > 0) {
+        renderAll();
+    }
 }
 
 let activeSePayMappingIndex = -1;
@@ -1464,6 +1495,7 @@ async function runSePaySync() {
             const newTxn = {
                 id: 'sepay_' + tx.id,
                 walletId: map.walletId,
+                sepayBankAcc: map.bankAcc,
                 type: type,
                 amount: amount,
                 category: cat ? cat.name : (isIncome ? 'Nạp quỹ' : 'Chưa phân loại'),
