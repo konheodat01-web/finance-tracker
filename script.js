@@ -43,6 +43,12 @@ const INCOME_CATS = [
     { name: 'Bán hàng', icon: '🛒', color: '#8b5cf6' },
     { name: 'Thu nhập khác', icon: '💵', color: '#6b7280' },
 ];
+const DEBT_CATS = [
+    { name: 'Đi vay', icon: '🤝', color: '#8b5cf6' },
+    { name: 'Cho vay', icon: '💸', color: '#0ea5e9' },
+    { name: 'Trả nợ', icon: '💳', color: '#ef4444' },
+    { name: 'Thu nợ', icon: '💰', color: '#22c55e' },
+];
 
 const SETTING_OPTIONS = {
     dateFormat: {
@@ -449,33 +455,48 @@ function txnNextWallet() {
 function txnCycleWallet() { txnNextWallet(); }
 
 // === ADD TRANSACTION ===
+let txnSelectedWalletId = null;
+
 function openAddTransaction() {
     currentTxnType = 'expense';
     selectedCategory = null;
+    txnSelectedWalletId = wallets.length > 0 ? wallets[0].id : null;
+    
     document.getElementById('editTxnId').value = '';
     document.getElementById('txnAmount').value = '';
     document.getElementById('txnNote').value = '';
     document.getElementById('txnDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('deleteTxnRow').style.display = 'none';
+    
     setTxnType('expense');
-    renderCategoryGrid();
-    renderTxnWalletSelect();
+    updateTxnDateDisplay();
+    updateSelectedWalletDisplay();
+    updateSelectedCategoryDisplay();
+    checkTxnValid();
+    
     switchPage('add-transaction');
 }
 
 function openEditTransaction(id) {
     const t = transactions.find(x => x.id === id);
     if (!t) return;
+    
     currentTxnType = t.type;
     selectedCategory = { name: t.category, icon: t.categoryIcon, color: t.categoryColor };
+    txnSelectedWalletId = t.walletId;
+    
     document.getElementById('editTxnId').value = t.id;
     document.getElementById('txnAmount').value = t.amount;
     document.getElementById('txnNote').value = t.note || '';
     document.getElementById('txnDate').value = t.date;
     document.getElementById('deleteTxnRow').style.display = 'block';
+    
     setTxnType(t.type);
-    renderCategoryGrid();
-    renderTxnWalletSelect(t.walletId);
+    updateTxnDateDisplay();
+    updateSelectedWalletDisplay();
+    updateSelectedCategoryDisplay();
+    checkTxnValid();
+    
     switchPage('add-transaction');
 }
 
@@ -485,53 +506,174 @@ function closeAddTransaction() {
 
 function setTxnType(type) {
     currentTxnType = type;
-    const color = type === 'expense' ? '#ef4444' : '#22c55e';
-    const hdr = document.getElementById('addTxnHeader');
-    if (hdr) hdr.style.background = color;
+    
     const expBtn = document.getElementById('typeExpenseBtn');
     const incBtn = document.getElementById('typeIncomeBtn');
-    if (expBtn && incBtn) {
-        if (type === 'expense') {
-            expBtn.style.cssText = `padding:6px 18px;border:none;cursor:pointer;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;background:#ef4444;color:white;border-radius:20px;`;
-            incBtn.style.cssText = `padding:6px 18px;border:none;cursor:pointer;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;background:transparent;color:rgba(255,255,255,0.7);`;
-        } else {
-            expBtn.style.cssText = `padding:6px 18px;border:none;cursor:pointer;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;background:transparent;color:rgba(255,255,255,0.7);`;
-            incBtn.style.cssText = `padding:6px 18px;border:none;cursor:pointer;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;background:#22c55e;color:white;border-radius:20px;`;
-        }
-    }
+    const debtBtn = document.getElementById('typeDebtBtn');
+    
+    const activeStyle = `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);`;
+    const inactiveStyle = `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;`;
+    
+    if (expBtn) expBtn.style.cssText = type === 'expense' ? activeStyle : inactiveStyle;
+    if (incBtn) incBtn.style.cssText = type === 'income' ? activeStyle : inactiveStyle;
+    if (debtBtn) debtBtn.style.cssText = type === 'debt' ? activeStyle : inactiveStyle;
+    
     selectedCategory = null;
-    renderCategoryGrid();
+    updateSelectedCategoryDisplay();
+    checkTxnValid();
 }
 
-function renderCategoryGrid() {
-    const grid = document.getElementById('categoryGrid');
+function updateTxnDateDisplay() {
+    const dateVal = document.getElementById('txnDate').value;
+    if (!dateVal) return;
+    
+    const d = new Date(dateVal);
+    const today = new Date();
+    
+    const isToday = d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+    
+    if (isToday) {
+        document.getElementById('txnDateDisplay').innerText = 'Hôm nay';
+    } else {
+        const DAY_NAMES = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        document.getElementById('txnDateDisplay').innerText = `${DAY_NAMES[d.getDay()]}, ${dd}/${mm}/${yyyy}`;
+    }
+}
+
+function changeTxnDate(delta) {
+    const dateInput = document.getElementById('txnDate');
+    if (!dateInput.value) return;
+    
+    const d = new Date(dateInput.value);
+    d.setDate(d.getDate() + delta);
+    dateInput.value = d.toISOString().split('T')[0];
+    updateTxnDateDisplay();
+}
+
+function updateSelectedWalletDisplay() {
+    const w = wallets.find(x => x.id === txnSelectedWalletId);
+    const iconEl = document.getElementById('selectedWalletIconTxn');
+    const nameEl = document.getElementById('selectedWalletNameTxn');
+    const currEl = document.getElementById('txnCurrencyLabel');
+    
+    if (w) {
+        if(iconEl) iconEl.innerText = w.emoji || '💰';
+        if(nameEl) {
+            nameEl.innerText = w.name;
+            nameEl.style.color = '#000';
+        }
+        if(currEl) currEl.innerText = w.currency || 'VND';
+    } else {
+        if(iconEl) iconEl.innerText = '💰';
+        if(nameEl) {
+            nameEl.innerText = 'Chọn ví';
+            nameEl.style.color = '#9ca3af';
+        }
+        if(currEl) currEl.innerText = settings.totalCurrency || 'VND';
+    }
+}
+
+function updateSelectedCategoryDisplay() {
+    const iconEl = document.getElementById('selectedCatIconTxn');
+    const nameEl = document.getElementById('selectedCatNameTxn');
+    
+    if (selectedCategory) {
+        if(iconEl) {
+            iconEl.innerText = selectedCategory.icon;
+            iconEl.style.background = selectedCategory.color;
+        }
+        if(nameEl) {
+            nameEl.innerText = selectedCategory.name;
+            nameEl.style.color = '#000';
+        }
+    } else {
+        if(iconEl) {
+            iconEl.innerText = '';
+            iconEl.style.background = '#e5e7eb';
+        }
+        if(nameEl) {
+            nameEl.innerText = 'Chọn nhóm';
+            nameEl.style.color = '#9ca3af';
+        }
+    }
+}
+
+function openTxnWalletPicker() {
+    const list = document.getElementById('txnWalletPickerList');
+    if (!list) return;
+    
+    list.innerHTML = wallets.map(w => `
+        <div onclick="selectTxnWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${w.id === txnSelectedWalletId ? '#f0fdf4' : 'transparent'};">
+            <div style="font-size:24px;">${w.emoji||'💰'}</div>
+            <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
+            ${w.id === txnSelectedWalletId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
+        </div>
+    `).join('');
+    
+    document.getElementById('txnWalletPickerOverlay').style.display = 'flex';
+}
+
+function closeTxnWalletPicker() {
+    document.getElementById('txnWalletPickerOverlay').style.display = 'none';
+}
+
+function selectTxnWallet(id) {
+    txnSelectedWalletId = id;
+    updateSelectedWalletDisplay();
+    closeTxnWalletPicker();
+    checkTxnValid();
+}
+
+function openTxnCategoryPicker() {
+    const grid = document.getElementById('txnCategoryPickerGrid');
     if (!grid) return;
-    const cats = currentTxnType === 'expense' ? EXPENSE_CATS : INCOME_CATS;
+    
+    const cats = currentTxnType === 'expense' ? EXPENSE_CATS : (currentTxnType === 'income' ? INCOME_CATS : DEBT_CATS);
+    
     grid.innerHTML = cats.map(cat => {
         const isSelected = selectedCategory && selectedCategory.name === cat.name;
         return `<div onclick="selectCategory(${JSON.stringify(cat).replace(/"/g,'&quot;')})" style="
-            display:flex; flex-direction:column; align-items:center; gap:5px; padding:8px 4px;
+            display:flex; flex-direction:column; align-items:center; gap:8px; padding:12px 4px;
             border-radius:12px; cursor:pointer;
             background:${isSelected ? cat.color + '20' : 'transparent'};
             border:${isSelected ? '2px solid ' + cat.color : '2px solid transparent'};
             transition:0.15s;">
-            <div style="width:40px;height:40px;border-radius:50%;background:${cat.color};display:flex;align-items:center;justify-content:center;font-size:18px;">${cat.icon}</div>
-            <span style="font-size:10px;text-align:center;color:${isSelected ? cat.color : '#6b7280'};font-weight:${isSelected?'600':'400'};line-height:1.2;">${cat.name}</span>
+            <div style="width:48px;height:48px;border-radius:50%;background:${cat.color};display:flex;align-items:center;justify-content:center;font-size:24px;">${cat.icon}</div>
+            <span style="font-size:11px;text-align:center;color:${isSelected ? cat.color : '#4b5563'};font-weight:${isSelected?'600':'500'};line-height:1.2;">${cat.name}</span>
         </div>`;
     }).join('');
+    
+    document.getElementById('txnCategoryPickerOverlay').style.display = 'flex';
+}
+
+function closeTxnCategoryPicker() {
+    document.getElementById('txnCategoryPickerOverlay').style.display = 'none';
 }
 
 function selectCategory(cat) {
     selectedCategory = cat;
-    renderCategoryGrid();
+    updateSelectedCategoryDisplay();
+    closeTxnCategoryPicker();
+    checkTxnValid();
 }
 
-function renderTxnWalletSelect(selectedWId) {
-    const sel = document.getElementById('txnWallet');
-    if (!sel) return;
-    sel.innerHTML = wallets.map(w =>
-        `<option value="${w.id}" ${w.id === selectedWId ? 'selected' : ''}>${w.emoji||'💰'} ${w.name}</option>`
-    ).join('');
+function checkTxnValid() {
+    const amount = parseFloat(document.getElementById('txnAmount').value) || 0;
+    const isValid = amount > 0 && txnSelectedWalletId && selectedCategory;
+    
+    const btn = document.getElementById('saveTxnBtn');
+    if (btn) {
+        if (isValid) {
+            btn.style.background = '#10b981';
+            btn.disabled = false;
+        } else {
+            btn.style.background = '#d1d5db';
+            btn.disabled = true;
+        }
+    }
 }
 
 function saveTransaction() {
@@ -539,32 +681,34 @@ function saveTransaction() {
     const amount = parseFloat(document.getElementById('txnAmount').value) || 0;
     const note = document.getElementById('txnNote').value.trim();
     const date = document.getElementById('txnDate').value;
-    const walletId = document.getElementById('txnWallet').value;
-    if (!amount || !date || !walletId) return;
-    const cat = selectedCategory || (currentTxnType === 'expense' ? EXPENSE_CATS[EXPENSE_CATS.length-1] : INCOME_CATS[INCOME_CATS.length-1]);
+    const walletId = txnSelectedWalletId;
+    
+    if (!amount || !date || !walletId || !selectedCategory) return;
+
+    const isIncome = currentTxnType === 'income' || (currentTxnType === 'debt' && (selectedCategory.name === 'Đi vay' || selectedCategory.name === 'Thu nợ'));
 
     const txn = {
         id: id || 'txn_' + Date.now(),
         walletId, type: currentTxnType,
-        amount, category: cat.name, categoryIcon: cat.icon, categoryColor: cat.color,
+        amount, category: selectedCategory.name, categoryIcon: selectedCategory.icon, categoryColor: selectedCategory.color,
         note, date
     };
 
     if (id) {
         const oldTxn = transactions.find(t => t.id === id);
         if (oldTxn) {
-            // Reverse old effect on wallet balance
+            const oldIsIncome = oldTxn.type === 'income' || (oldTxn.type === 'debt' && (oldTxn.category === 'Đi vay' || oldTxn.category === 'Thu nợ'));
             const w = wallets.find(x => x.id === oldTxn.walletId);
-            if (w) w.balance += oldTxn.type==='income' ? -oldTxn.amount : oldTxn.amount;
+            if (w) w.balance += oldIsIncome ? -oldTxn.amount : oldTxn.amount;
         }
         transactions = transactions.filter(t => t.id !== id);
     }
 
-    // Apply new effect on wallet balance
     const targetWallet = wallets.find(x => x.id === walletId);
     if (targetWallet) {
-        targetWallet.balance += currentTxnType === 'income' ? amount : -amount;
+        targetWallet.balance += isIncome ? amount : -amount;
     }
+    
     transactions.push(txn);
     syncData();
     switchPage('transactions');
@@ -576,8 +720,9 @@ function deleteTransaction() {
     if (!id || !confirm('Xóa giao dịch này?')) return;
     const t = transactions.find(x => x.id === id);
     if (t) {
+        const isIncome = t.type === 'income' || (t.type === 'debt' && (t.category === 'Đi vay' || t.category === 'Thu nợ'));
         const w = wallets.find(x => x.id === t.walletId);
-        if (w) w.balance += t.type === 'income' ? -t.amount : t.amount;
+        if (w) w.balance += isIncome ? -t.amount : t.amount;
     }
     transactions = transactions.filter(x => x.id !== id);
     syncData();
