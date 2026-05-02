@@ -804,12 +804,20 @@ body {
     width: 20px;
 }
 
-/* Hide arrows on mobile, keep swipe */
-@media (max-width: 768px) {
+/* Hide arrows only on touch-only devices (phones), show on PC even if window is small */
+@media (hover: none) {
     .recv-nav-controls button {
         display: none !important;
     }
     .recv-nav-controls {
         gap: 0 !important;
+    }
+}
+
+/* Ensure arrows are visible and clickable on PC */
+@media (hover: hover) {
+    .recv-nav-controls button {
+        display: block !important;
+        cursor: pointer;
     }
 }
