@@ -511,12 +511,15 @@ function setTxnType(type) {
     const incBtn = document.getElementById('typeIncomeBtn');
     const debtBtn = document.getElementById('typeDebtBtn');
     
-    const activeStyle = `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);`;
+    const colors = { expense: '#ef4444', income: '#10b981', debt: '#8b5cf6' };
+    const activeBg = colors[type];
+    
+    const activeStyle = (bg) => `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:${bg}; color:white; box-shadow:0 1px 3px rgba(0,0,0,0.15);`;
     const inactiveStyle = `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;`;
     
-    if (expBtn) expBtn.style.cssText = type === 'expense' ? activeStyle : inactiveStyle;
-    if (incBtn) incBtn.style.cssText = type === 'income' ? activeStyle : inactiveStyle;
-    if (debtBtn) debtBtn.style.cssText = type === 'debt' ? activeStyle : inactiveStyle;
+    if (expBtn) expBtn.style.cssText = type === 'expense' ? activeStyle('#ef4444') : inactiveStyle;
+    if (incBtn) incBtn.style.cssText = type === 'income' ? activeStyle('#10b981') : inactiveStyle;
+    if (debtBtn) debtBtn.style.cssText = type === 'debt' ? activeStyle('#8b5cf6') : inactiveStyle;
     
     selectedCategory = null;
     updateSelectedCategoryDisplay();
