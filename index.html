@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.3</div>
+                <div class="version-tag">Phiên bản v1.0.4</div>
             </main>
         </div>
 
@@ -251,18 +251,108 @@
             </main>
         </div>
 
+        <!-- ===================== PAGE: SỔ GIAO DỊCH ===================== -->
+        <div id="page-transactions" class="page">
+            <!-- Header -->
+            <div style="background:white; flex-shrink:0; border-bottom:1px solid #f3f4f6;">
+                <!-- Top bar -->
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 16px 10px;">
+                    <button style="background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;width:36px;"><i class="fas fa-question-circle"></i></button>
+                    <!-- Wallet switcher -->
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <button onclick="txnPrevWallet()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px;"><i class="fas fa-chevron-left"></i></button>
+                        <div id="txnWalletSelector" style="display:flex;align-items:center;gap:6px;cursor:pointer;" onclick="txnCycleWallet()">
+                            <span id="txnWalletIcon" style="font-size:20px;">💰</span>
+                            <span id="txnWalletName" style="font-size:13px;font-weight:600;color:#1f2937;">Tất cả</span>
+                            <i class="fas fa-chevron-down" style="font-size:10px;color:#9ca3af;"></i>
+                        </div>
+                        <button onclick="txnNextWallet()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px;"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div style="display:flex; gap:14px;">
+                        <button style="background:none;border:none;cursor:pointer;font-size:18px;color:#1f2937;"><i class="fas fa-search"></i></button>
+                        <button style="background:none;border:none;cursor:pointer;font-size:18px;color:#1f2937;"><i class="fas fa-ellipsis-h"></i></button>
+                    </div>
+                </div>
+                <!-- Balance -->
+                <div style="text-align:center; padding:0 16px 10px;">
+                    <div style="font-size:11px; color:#9ca3af; margin-bottom:2px;">Số dư</div>
+                    <div id="txnBalance" style="font-size:22px; font-weight:700; color:#1f2937;">0 đ</div>
+                </div>
+                <!-- Period tabs -->
+                <div id="periodTabs" style="display:flex; overflow-x:auto; scrollbar-width:none; border-top:1px solid #f3f4f6;"></div>
+            </div>
+            <!-- Transaction list -->
+            <main style="flex:1; overflow-y:auto; background:#f4f5f7; padding:10px 12px 20px;">
+                <div id="txnList"></div>
+            </main>
+        </div>
+
+        <!-- ===================== PAGE: THÊM GIAO DỊCH ===================== -->
+        <div id="page-add-transaction" class="page page-light">
+            <!-- Header (color changes with type) -->
+            <div id="addTxnHeader" style="background:#ef4444; flex-shrink:0; padding:16px 16px 0;">
+                <!-- Type toggle -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <button onclick="closeAddTransaction()" style="background:none;border:none;color:white;font-size:15px;cursor:pointer;">Hủy</button>
+                    <div style="display:flex; background:rgba(0,0,0,0.15); border-radius:20px; overflow:hidden;">
+                        <button id="typeExpenseBtn" onclick="setTxnType('expense')" style="padding:6px 18px;border:none;cursor:pointer;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;background:#ef4444;color:white;border-radius:20px;">Chi tiêu</button>
+                        <button id="typeIncomeBtn" onclick="setTxnType('income')" style="padding:6px 18px;border:none;cursor:pointer;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;background:transparent;color:rgba(255,255,255,0.7);">Thu nhập</button>
+                    </div>
+                    <button onclick="saveTransaction()" style="background:none;border:none;color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Lưu</button>
+                </div>
+                <!-- Amount -->
+                <div style="text-align:center; padding-bottom:16px;">
+                    <input type="number" id="txnAmount" placeholder="0"
+                        style="border:none;outline:none;background:transparent;font-size:36px;font-weight:700;color:white;text-align:center;width:100%;font-family:'Inter',sans-serif;">
+                    <div style="font-size:13px;color:rgba(255,255,255,0.8);margin-top:4px;">VND</div>
+                </div>
+            </div>
+            <!-- Form body -->
+            <main class="content">
+                <input type="hidden" id="editTxnId">
+
+                <!-- Category -->
+                <div class="card aw-card" style="padding:0;">
+                    <div style="padding:10px 12px 6px; font-size:11px; color:#9ca3af; font-weight:600; letter-spacing:0.5px;">DANH MỤC</div>
+                    <div id="categoryGrid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:0 12px 14px;"></div>
+                </div>
+
+                <!-- Note + Date + Wallet -->
+                <div class="card aw-card">
+                    <div class="aw-field-row" style="border-bottom:1px solid var(--border-color);">
+                        <span class="aw-field-icon">📝</span>
+                        <input type="text" id="txnNote" class="aw-name-input" placeholder="Ghi chú...">
+                    </div>
+                    <div class="aw-field-row" style="border-bottom:1px solid var(--border-color);">
+                        <span class="aw-field-icon">📅</span>
+                        <input type="date" id="txnDate" class="aw-name-input" style="color:var(--text-primary);">
+                    </div>
+                    <div class="aw-field-row">
+                        <span class="aw-field-icon">💳</span>
+                        <select id="txnWallet" style="flex:1;border:none;outline:none;background:transparent;font-size:15px;font-family:'Inter',sans-serif;color:var(--text-primary);">
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Delete button (when editing) -->
+                <div id="deleteTxnRow" style="display:none; margin-top:10px;">
+                    <button onclick="deleteTransaction()" class="aw-delete-btn">🗑 Xóa giao dịch này</button>
+                </div>
+            </main>
+        </div>
+
         <!-- ===================== BOTTOM NAV ===================== -->
         <nav class="bottom-nav">
             <a href="#" class="nav-item active" id="nav-home" onclick="switchPage('home'); return false;">
                 <i class="fas fa-home"></i>
                 <span>Tổng quan</span>
             </a>
-            <a href="#" class="nav-item" onclick="return false;">
+            <a href="#" class="nav-item" id="nav-transactions" onclick="switchPage('transactions'); return false;">
                 <i class="fas fa-wallet"></i>
                 <span>Sổ giao dịch</span>
             </a>
             <div class="nav-fab-wrapper">
-                <button class="fab-btn">
+                <button class="fab-btn" onclick="openAddTransaction()">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
