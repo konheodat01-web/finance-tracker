@@ -709,24 +709,80 @@ function selectTxnWallet(id) {
     checkTxnValid();
 }
 
+function generateCategoryListHTML(cats, selectedId, clickHandlerName) {
+    if (!cats || cats.length === 0) return '<div style="padding:20px; text-align:center; color:#9ca3af; font-size:13px;">Chưa có nhóm nào.</div>';
+
+    const parents = cats.filter(c => !c.parentId);
+    const children = cats.filter(c => c.parentId);
+    const orphans = children.filter(c => !cats.find(p => p.id === c.parentId));
+
+    let html = '';
+    const allItems = [];
+
+    parents.forEach(parent => {
+        const myChildren = children.filter(c => c.parentId === parent.id);
+        allItems.push({ cat: parent, isChild: false, childCount: myChildren.length });
+        myChildren.forEach(child => allItems.push({ cat: child, isChild: true, parentName: parent.name }));
+    });
+    orphans.forEach(child => allItems.push({ cat: child, isChild: true, parentName: '(Không có nhóm cha)' }));
+
+    allItems.forEach((item, idx) => {
+        const { cat, isChild, childCount, parentName } = item;
+        const isLast = idx === allItems.length - 1;
+        const isSelected = selectedId === cat.id || selectedId === cat.name;
+
+        let subtitle = '';
+        if (isChild) {
+            subtitle = `<div style="font-size:12px; color:#6b7280; margin-top:1px;">${parentName}</div>`;
+        } else if (childCount > 0) {
+            subtitle = `<div style="font-size:12px; color:#9ca3af; margin-top:1px;">${childCount} nhóm con</div>`;
+        }
+
+        const indent = isChild ? 'padding-left:28px;' : '';
+        const iconSize = isChild ? '34px' : '40px';
+        const fontSize = isChild ? '17px' : '20px';
+        const nameSize = isChild ? '14px' : '15px';
+        const nameWeight = isChild ? '400' : '500';
+        
+        let bgColor = isChild ? '#fafafa' : 'white';
+        let borderColor = isLast ? 'none' : '1px solid #f3f4f6';
+        let checkMark = '';
+        
+        if (isSelected) {
+            bgColor = cat.color + '15';
+            checkMark = `<i class="fas fa-check" style="color:${cat.color}; font-size:16px;"></i>`;
+        }
+
+        let onClickAttr = '';
+        if (clickHandlerName === 'selectCategory') {
+            onClickAttr = `onclick="selectCategory(${JSON.stringify(cat).replace(/"/g,'&quot;')})"`;
+        } else if (clickHandlerName === 'selectSePayCategory') {
+            onClickAttr = `onclick="selectSePayCategory('${cat.id}')"`;
+        }
+
+        html += `
+            <div ${onClickAttr} style="display:flex; align-items:center; padding:12px 16px; ${indent} border-bottom:${borderColor}; cursor:pointer; background:${bgColor}; transition:0.15s;">
+                <div style="width:${iconSize}; height:${iconSize}; border-radius:50%; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:${fontSize}; margin-right:12px; color:${cat.color}; flex-shrink:0;">${cat.icon}</div>
+                <div style="flex:1; min-width:0;">
+                    <div style="font-size:${nameSize}; font-weight:${nameWeight}; color:#1f2937;">${cat.name}</div>
+                    ${subtitle}
+                </div>
+                ${checkMark}
+            </div>
+        `;
+    });
+
+    return html;
+}
+
 function openTxnCategoryPicker() {
-    const grid = document.getElementById('txnCategoryPickerGrid');
-    if (!grid) return;
+    const list = document.getElementById('txnCategoryPickerList');
+    if (!list) return;
     
     const cats = userCategories[currentTxnType] || [];
+    const selectedId = selectedCategory ? selectedCategory.name : null;
     
-    grid.innerHTML = cats.map(cat => {
-        const isSelected = selectedCategory && selectedCategory.name === cat.name;
-        return `<div onclick="selectCategory(${JSON.stringify(cat).replace(/"/g,'&quot;')})" style="
-            display:flex; flex-direction:column; align-items:center; gap:8px; padding:12px 4px;
-            border-radius:12px; cursor:pointer;
-            background:${isSelected ? cat.color + '20' : 'transparent'};
-            border:${isSelected ? '2px solid ' + cat.color : '2px solid transparent'};
-            transition:0.15s;">
-            <div style="width:48px;height:48px;border-radius:50%;background:${cat.color};display:flex;align-items:center;justify-content:center;font-size:24px;">${cat.icon}</div>
-            <span style="font-size:11px;text-align:center;color:${isSelected ? cat.color : '#4b5563'};font-weight:${isSelected?'600':'500'};line-height:1.2;">${cat.name}</span>
-        </div>`;
-    }).join('');
+    list.innerHTML = generateCategoryListHTML(cats, selectedId, 'selectCategory');
     
     document.getElementById('txnCategoryPickerOverlay').style.display = 'flex';
 }
@@ -1573,21 +1629,14 @@ function selectSePayWallet(id) {
 
 function openSePayCategoryPicker(index) {
     activeSePayMappingIndex = index;
-    const grid = document.getElementById('txnCategoryPickerGrid');
-    if(!grid) return;
+    const list = document.getElementById('txnCategoryPickerList');
+    if(!list) return;
     
     const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[])];
+    const currentMapping = sepayConfig.mappings[index];
+    const selectedId = currentMapping ? currentMapping.categoryId : null;
     
-    let html = '';
-    allCats.forEach(cat => {
-        html += `
-            <div onclick="selectSePayCategory('${cat.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer;">
-                <div style="width:48px; height:48px; border-radius:14px; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:24px; color:${cat.color}; margin-bottom:6px;">${cat.icon}</div>
-                <div style="font-size:12px; font-weight:500; color:#4b5563; text-align:center;">${cat.name}</div>
-            </div>
-        `;
-    });
-    grid.innerHTML = html;
+    list.innerHTML = generateCategoryListHTML(allCats, selectedId, 'selectSePayCategory');
     document.getElementById('txnCategoryPickerOverlay').style.display = 'flex';
 }
 
