@@ -114,14 +114,14 @@
                         <span class="action-text green">Thêm ví</span>
                     </button>
                     <div class="divider-thin"></div>
-                    <button class="wallet-action-row">
-                        <span class="action-icon green"><i class="fas fa-link"></i></span>
-                        <span class="action-text green">Liên kết dịch vụ</span>
+                    <button class="wallet-action-row" onclick="openReceivingInfoPage()">
+                        <span class="action-icon green"><i class="fas fa-qrcode"></i></span>
+                        <span class="action-text green">Thông tin nhận tiền</span>
                     </button>
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.56</div>
+                <div class="version-tag">Phiên bản v1.0.57</div>
             </main>
         </div>
 
@@ -204,6 +204,66 @@
                         </div>
                     </div>
                 </div>
+            </main>
+        </div>
+
+        <!-- ===================== PAGE: RECEIVING INFO ===================== -->
+        <div id="page-receiving-info" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('accounts')">Đóng</button>
+                    <h2 class="page-title">Thông tin nhận tiền</h2>
+                    <button class="btn-link" onclick="openAddReceivingInfo()" style="color:#10b981; font-weight:600;"><i class="fas fa-plus"></i> Thêm</button>
+                </div>
+            </header>
+            <main class="content" style="padding-top:16px;">
+                <div id="receivingInfoList" style="display:flex; flex-direction:column; gap:16px;">
+                    <!-- Items -->
+                </div>
+            </main>
+        </div>
+
+        <!-- ===================== PAGE: ADD/EDIT RECEIVING INFO ===================== -->
+        <div id="page-add-receiving" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('receiving-info')">Hủy</button>
+                    <h2 class="page-title" id="addReceivingTitle">Thêm thông tin</h2>
+                    <button class="btn-link" onclick="saveReceivingInfo()" style="color:#10b981; font-weight:600;">Lưu</button>
+                </div>
+            </header>
+            <main class="content" style="padding-top:16px;">
+                <input type="hidden" id="editReceivingId">
+                <div class="card aw-card">
+                    <div class="aw-field-row">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Ngân hàng / Ví</div>
+                            <input type="text" id="recvBank" class="aw-balance-input" style="font-size:16px; width:100%;" placeholder="Ví dụ: VietinBank">
+                        </div>
+                    </div>
+                    <div class="aw-field-row">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Số tài khoản</div>
+                            <input type="text" id="recvNumber" class="aw-balance-input" style="font-size:16px; font-family:monospace; width:100%;" placeholder="Nhập số tài khoản">
+                        </div>
+                    </div>
+                    <div class="aw-field-row">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Tên chủ tài khoản</div>
+                            <input type="text" id="recvName" class="aw-balance-input" style="font-size:16px; text-transform:uppercase; width:100%;" placeholder="Tên in hoa không dấu">
+                        </div>
+                    </div>
+                    <div class="aw-field-row" style="border-bottom:none;">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Link ảnh QR (Gyazo, Imgur...)</div>
+                            <input type="text" id="recvImageLink" class="aw-balance-input" style="font-size:14px; color:#3b82f6; width:100%;" placeholder="Dán link ảnh vào đây" oninput="previewReceivingImage(this.value)">
+                        </div>
+                    </div>
+                </div>
+                <div id="recvImagePreviewContainer" style="margin-top:16px; text-align:center; display:none;">
+                    <img id="recvImagePreview" style="max-width:100%; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1);" src="">
+                </div>
+                <button id="deleteReceivingRow" class="btn-link" style="color:#ef4444; width:100%; text-align:center; margin-top:24px; padding:12px; background:white; border-radius:12px; display:none;" onclick="deleteReceivingInfo()">Xóa thông tin này</button>
             </main>
         </div>
 
@@ -681,6 +741,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.56"></script>
+    <script src="script.js?v=1.0.57"></script>
 </body>
 </html>

@@ -1926,3 +1926,137 @@ function formatTxnAmount(input) {
     }
     checkTxnValid();
 }
+
+// ================= RECEIVING INFO LOGIC =================
+function openReceivingInfoPage() {
+    renderReceivingInfoList();
+    switchPage('receiving-info');
+}
+
+function renderReceivingInfoList() {
+    const listEl = document.getElementById('receivingInfoList');
+    const infos = userData.receivingInfos || [];
+    
+    if (infos.length === 0) {
+        listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px;">
+            <div style="font-size:40px; margin-bottom:12px;">📇</div>
+            Chưa có thông tin nhận tiền nào
+        </div>`;
+        return;
+    }
+    
+    listEl.innerHTML = infos.map((info, idx) => `
+        <div class="card aw-card" style="padding:16px;" onclick="openEditReceivingInfo(${idx})">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span style="font-weight:600; font-size:16px;">${info.bankName || 'Ngân hàng'}</span>
+                <span style="color:#6b7280; font-size:14px;">Chạm để sửa <i class="fas fa-chevron-right" style="font-size:10px; margin-left:4px;"></i></span>
+            </div>
+            <div style="font-size:20px; font-weight:700; font-family:monospace; margin-bottom:4px; letter-spacing:1px;">${info.accountNumber || ''}</div>
+            <div style="font-size:14px; color:#6b7280; text-transform:uppercase; margin-bottom:12px;">${info.accountName || ''}</div>
+            ${info.imageUrl ? `<img src="${info.imageUrl}" style="width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">` : ''}
+        </div>
+    `).join('');
+}
+
+function openAddReceivingInfo() {
+    document.getElementById('addReceivingTitle').innerText = 'Thêm thông tin';
+    document.getElementById('editReceivingId').value = '';
+    document.getElementById('recvBank').value = '';
+    document.getElementById('recvNumber').value = '';
+    document.getElementById('recvName').value = '';
+    document.getElementById('recvImageLink').value = '';
+    document.getElementById('recvImagePreviewContainer').style.display = 'none';
+    document.getElementById('deleteReceivingRow').style.display = 'none';
+    switchPage('add-receiving');
+}
+
+function openEditReceivingInfo(idx) {
+    const info = userData.receivingInfos[idx];
+    if (!info) return;
+    
+    document.getElementById('addReceivingTitle').innerText = 'Sửa thông tin';
+    document.getElementById('editReceivingId').value = idx;
+    document.getElementById('recvBank').value = info.bankName || '';
+    document.getElementById('recvNumber').value = info.accountNumber || '';
+    document.getElementById('recvName').value = info.accountName || '';
+    
+    // Reverse logic: show the original URL if possible, or just the direct URL
+    document.getElementById('recvImageLink').value = info.originalUrl || info.imageUrl || '';
+    
+    previewReceivingImage(info.originalUrl || info.imageUrl || '');
+    document.getElementById('deleteReceivingRow').style.display = 'block';
+    switchPage('add-receiving');
+}
+
+function previewReceivingImage(url) {
+    const previewContainer = document.getElementById('recvImagePreviewContainer');
+    const previewImg = document.getElementById('recvImagePreview');
+    if (!url.trim()) {
+        previewContainer.style.display = 'none';
+        return;
+    }
+    
+    let finalUrl = url.trim();
+    if (finalUrl.includes('gyazo.com') && !finalUrl.includes('i.gyazo.com')) {
+        const hash = finalUrl.split('gyazo.com/')[1];
+        if (hash) {
+            finalUrl = `https://i.gyazo.com/${hash}.png`;
+        }
+    }
+    
+    previewImg.src = finalUrl;
+    previewContainer.style.display = 'block';
+    
+    // Handle error if image fails to load
+    previewImg.onerror = function() {
+        this.src = 'https://placehold.co/400x200?text=Lỗi+tải+ảnh';
+    };
+}
+
+function saveReceivingInfo() {
+    const bankName = document.getElementById('recvBank').value.trim();
+    const accountNumber = document.getElementById('recvNumber').value.trim();
+    const accountName = document.getElementById('recvName').value.trim();
+    const url = document.getElementById('recvImageLink').value.trim();
+    
+    if (!bankName && !accountNumber) {
+        alert('Vui lòng nhập Ngân hàng hoặc Số tài khoản!');
+        return;
+    }
+    
+    let imageUrl = url;
+    if (url.includes('gyazo.com') && !url.includes('i.gyazo.com')) {
+        const hash = url.split('gyazo.com/')[1];
+        if (hash) {
+            imageUrl = `https://i.gyazo.com/${hash}.png`;
+        }
+    }
+    
+    if (!userData.receivingInfos) {
+        userData.receivingInfos = [];
+    }
+    
+    const info = { bankName, accountNumber, accountName, imageUrl, originalUrl: url };
+    
+    const idxStr = document.getElementById('editReceivingId').value;
+    if (idxStr !== '') {
+        userData.receivingInfos[parseInt(idxStr)] = info;
+    } else {
+        userData.receivingInfos.push(info);
+    }
+    
+    syncData();
+    openReceivingInfoPage();
+}
+
+function deleteReceivingInfo() {
+    const confirmDelete = confirm('Bạn có chắc chắn muốn xóa thông tin nhận tiền này?');
+    if (!confirmDelete) return;
+    
+    const idxStr = document.getElementById('editReceivingId').value;
+    if (idxStr !== '') {
+        userData.receivingInfos.splice(parseInt(idxStr), 1);
+        syncData();
+        openReceivingInfoPage();
+    }
+}
