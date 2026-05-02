@@ -970,6 +970,40 @@ function renderChart() {
     const firstLabel = labels[0] ? labels[0].split('-').slice(1).reverse().join('/') : '';
     const lastLabel = labels[labels.length-1] ? labels[labels.length-1].split('-').slice(1).reverse().join('/') : '';
 
+    // Update Home Report Summary Values
+    const currentPeriod = periods[currentPeriodIndex] || periods[3];
+    const sStr = currentPeriod.start.toISOString().split('T')[0];
+    const eStr = currentPeriod.end.toISOString().split('T')[0];
+    
+    let totalExp = 0;
+    let totalInc = 0;
+    transactions.forEach(t => {
+        if (t.date >= sStr && t.date <= eStr) {
+            if (t.type === 'expense') totalExp += t.amount;
+            else if (t.type === 'income') totalInc += t.amount;
+        }
+    });
+
+    const expValEl = document.querySelector('.tab-value.expense');
+    const incValEl = document.querySelector('.tab-value.income');
+    if (expValEl) expValEl.innerText = new Intl.NumberFormat('vi-VN').format(totalExp);
+    if (incValEl) incValEl.innerText = new Intl.NumberFormat('vi-VN').format(totalInc);
+
+    // Update Chart Date Label (Today's spend)
+    const chartDateEl = document.querySelector('.chart-date');
+    if (chartDateEl) {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todaySpend = dailyMap[todayStr] || 0;
+        const todayDateFormatted = new Date().toLocaleDateString('vi-VN');
+        chartDateEl.innerHTML = `${todayDateFormatted}: <strong class="${type === 'expense' ? 'expense-text' : 'income-text'}">${new Intl.NumberFormat('vi-VN').format(todaySpend)}</strong>`;
+    }
+
+    // Update Report Title with Date Range
+    const reportTitleEl = document.querySelector('.section-title');
+    if (reportTitleEl && reportTitleEl.innerText.includes('Báo cáo')) {
+        reportTitleEl.innerText = `Báo cáo (${firstLabel} - ${lastLabel})`;
+    }
+
     chartInstance = new Chart(ctx.getContext('2d'), {
         type: 'line',
         data: {
