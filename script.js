@@ -159,6 +159,11 @@ function loadData() {
                 if (data.sepayConfig) sepayConfig = data.sepayConfig;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
                 renderAll();
+                
+                // Auto-sync SePay on first load
+                if (sepayConfig && sepayConfig.apiToken) {
+                    setTimeout(() => runSePaySync(true), 2000);
+                }
             }
         });
     }
@@ -1703,25 +1708,27 @@ function selectSePayCategory(id) {
     closeTxnCategoryPicker();
 }
 
-async function runSePaySync() {
+async function runSePaySync(silent = false) {
     const btn = document.getElementById('btnRunSePaySync');
     const logBox = document.getElementById('sepaySyncLog');
     const apiToken = sepayConfig.apiToken;
     
     if (!apiToken) {
-        alert('Vui lòng nhập API Token SePay trước!');
+        if (!silent) alert('Vui lòng nhập API Token SePay trước!');
         return;
     }
     if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
-        alert('Vui lòng thêm ít nhất 1 liên kết ngân hàng!');
+        if (!silent) alert('Vui lòng thêm ít nhất 1 liên kết ngân hàng!');
         return;
     }
 
     try {
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...';
-        btn.disabled = true;
-        logBox.style.display = 'block';
-        logBox.innerHTML = 'Đang kết nối SePay qua Proxy...<br>';
+        if (!silent) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...';
+            btn.disabled = true;
+            logBox.style.display = 'block';
+            logBox.innerHTML = 'Đang kết nối SePay qua Proxy...<br>';
+        }
         
         let url = 'https://my.sepay.vn/api/transactions/list?limit=50';
         let options = {
@@ -1835,9 +1842,7 @@ async function runSePaySync() {
             }
             
             sendTelegramNotification(newTxn, w);
-            
             newCount++;
-            logBox.innerHTML += `<span style="color:#10b981;">+ ${newTxn.category} (${newTxn.amount.toLocaleString()})</span><br>`;
         });
         
         if (sepayConfig.lastSyncIds.length > 200) {
@@ -1847,12 +1852,24 @@ async function runSePaySync() {
         syncData();
         renderAll();
         
-        logBox.innerHTML += `<strong style="color:#10b981;">Hoàn tất! Đã đồng bộ ${newCount} giao dịch mới.</strong>`;
+        if (!silent) {
+            logBox.innerHTML += `<strong style="color:#10b981;">Hoàn tất! Đã đồng bộ ${newCount} giao dịch mới.</strong>`;
+        }
         
     } catch (e) {
-        logBox.innerHTML += `<strong style="color:#ef4444;">Lỗi: ${e.message}</strong>`;
+        if (!silent) logBox.innerHTML += `<strong style="color:#ef4444;">Lỗi: ${e.message}</strong>`;
     } finally {
-        btn.innerHTML = '<i class="fas fa-sync-alt"></i> Đồng bộ ngay';
-        btn.disabled = false;
+        if (!silent) {
+            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Đồng bộ ngay';
+            btn.disabled = false;
+        }
     }
 }
+
+// Auto-sync polling
+setInterval(() => {
+    // Only auto-sync if app is visible and API token is configured
+    if (document.visibilityState === 'visible' && sepayConfig && sepayConfig.apiToken) {
+        runSePaySync(true);
+    }
+}, 15000);
