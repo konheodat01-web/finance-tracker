@@ -685,19 +685,21 @@ body {
     padding: 15px 16px;
     cursor: pointer;
     transition: background 0.15s;
+    min-height: 54px;
 }
 .settings-row:hover { background: #f9fafb; }
 
 .settings-label {
     font-size: 15px;
     color: var(--text-primary);
-    font-weight: 400;
+    font-weight: 500;
 }
 
 .settings-value {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    text-align: right;
 }
 
 .settings-val-text {
@@ -707,8 +709,8 @@ body {
 }
 
 .settings-arrow {
-    font-size: 12px;
-    color: #d1d5db;
+    font-size: 13px;
+    color: #cbd5e1;
 }
 
 /* Settings picker list items */
