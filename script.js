@@ -757,8 +757,9 @@ function saveTransaction() {
     const txn = {
         id: id || 'txn_' + Date.now(),
         walletId, type: currentTxnType,
-        categoryId: selectedCategory.id || (oldTxn ? oldTxn.categoryId : null),
-        sepayBankAcc: oldTxn ? oldTxn.sepayBankAcc : null,
+        categoryId: selectedCategory.id || (oldTxn ? (oldTxn.categoryId || null) : null),
+        sepayBankAcc: oldTxn ? (oldTxn.sepayBankAcc || null) : null,
+        manuallyEdited: true, // Mark as manually edited - never auto-overwrite
         amount, category: selectedCategory.name, categoryIcon: selectedCategory.icon, categoryColor: selectedCategory.color,
         note, date
     };
@@ -1347,6 +1348,16 @@ function updateSePayMapping(index, field, value) {
     if (field === 'categoryId') {
         retroUpdateSepayTxns(index);
     }
+    // Also retro-update walletId for auto-synced txns when wallet mapping changes
+    if (field === 'walletId') {
+        const map = sepayConfig.mappings[index];
+        transactions.forEach(t => {
+            if (t.sepayBankAcc && t.sepayBankAcc === map.bankAcc && !t.manuallyEdited) {
+                t.walletId = value.trim();
+            }
+        });
+        renderAll();
+    }
     syncData();
 }
 
@@ -1360,6 +1371,8 @@ function retroUpdateSepayTxns(mappingIndex) {
     let updatedCount = 0;
     transactions.forEach(t => {
         if (t.sepayBankAcc && t.sepayBankAcc === map.bankAcc) {
+            // Respect manual edits - never overwrite user's manual changes
+            if (t.manuallyEdited) return;
             if (cat) {
                 t.categoryId = cat.id;
                 t.category = cat.name;
@@ -1518,9 +1531,10 @@ async function runSePaySync() {
             
             const newTxn = {
                 id: 'sepay_' + tx.id,
-                walletId: map.walletId,
-                categoryId: map.categoryId,
-                sepayBankAcc: map.bankAcc,
+                walletId: map.walletId || null,
+                categoryId: map.categoryId || null,
+                sepayBankAcc: map.bankAcc || null,
+                manuallyEdited: false, // Auto-synced, can be overwritten by mapping changes
                 type: type,
                 amount: amount,
                 category: cat ? cat.name : (isIncome ? 'Nạp quỹ' : 'Chưa phân loại'),
