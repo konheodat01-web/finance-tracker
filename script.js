@@ -991,15 +991,53 @@ function renderManageCategories() {
         return;
     }
     
-    list.innerHTML = cats.map((cat, idx) => `
-        <div onclick="openEditCategory('${cat.id}')" style="display:flex; align-items:center; padding:14px 16px; border-bottom:${idx === cats.length-1 ? 'none' : '1px solid #f3f4f6'}; cursor:pointer;">
-            <div style="width:40px; height:40px; border-radius:50%; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:${cat.color};">${cat.icon}</div>
-            <div style="flex:1;">
-                <div style="font-size:15px; font-weight:500; color:#1f2937;">${cat.name}</div>
+    // Separate parents and children
+    const parents = cats.filter(c => !c.parentId);
+    const children = cats.filter(c => c.parentId);
+    const orphans = children.filter(c => !cats.find(p => p.id === c.parentId));
+
+    let html = '';
+    const allItems = []; // ordered list: parent then its children
+
+    parents.forEach(parent => {
+        const myChildren = children.filter(c => c.parentId === parent.id);
+        allItems.push({ cat: parent, isChild: false, childCount: myChildren.length });
+        myChildren.forEach(child => allItems.push({ cat: child, isChild: true, parentName: parent.name }));
+    });
+    // Orphaned children (parent deleted) appended at end
+    orphans.forEach(child => allItems.push({ cat: child, isChild: true, parentName: '(Không có nhóm cha)' }));
+
+    allItems.forEach((item, idx) => {
+        const { cat, isChild, childCount, parentName } = item;
+        const isLast = idx === allItems.length - 1;
+        const nextIsChild = !isLast && allItems[idx + 1].isChild;
+
+        let subtitle = '';
+        if (isChild) {
+            subtitle = `<div style="font-size:12px; color:#6b7280; margin-top:1px;">${parentName}</div>`;
+        } else if (childCount > 0) {
+            subtitle = `<div style="font-size:12px; color:#9ca3af; margin-top:1px;">${childCount} nhóm con</div>`;
+        }
+
+        const indent = isChild ? 'padding-left:28px;' : '';
+        const iconSize = isChild ? '34px' : '40px';
+        const fontSize = isChild ? '17px' : '20px';
+        const nameSize = isChild ? '14px' : '15px';
+        const nameWeight = isChild ? '400' : '500';
+
+        html += `
+            <div onclick="openEditCategory('${cat.id}')" style="display:flex; align-items:center; padding:12px 16px; ${indent} border-bottom:${isLast ? 'none' : '1px solid #f3f4f6'}; cursor:pointer; background:${isChild ? '#fafafa' : 'white'};">
+                <div style="width:${iconSize}; height:${iconSize}; border-radius:50%; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:${fontSize}; margin-right:12px; color:${cat.color}; flex-shrink:0;">${cat.icon}</div>
+                <div style="flex:1; min-width:0;">
+                    <div style="font-size:${nameSize}; font-weight:${nameWeight}; color:#1f2937;">${cat.name}</div>
+                    ${subtitle}
+                </div>
+                <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
             </div>
-            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
-        </div>
-    `).join('');
+        `;
+    });
+
+    list.innerHTML = html || '<div style="padding:20px; text-align:center; color:#9ca3af; font-size:13px;">Chưa có nhóm nào.</div>';
 }
 
 function openAddCategoryPage() {
