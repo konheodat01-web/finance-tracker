@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Finance App</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="style.css?v=1.0.49">
+    <link rel="stylesheet" href="style.css?v=1.0.51">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.49</div>
+                <div class="version-tag">Phiên bản v1.0.51</div>
             </main>
         </div>
 
@@ -236,11 +236,10 @@
                         <i class="fas fa-chevron-right aw-field-arrow"></i>
                     </div>
                     <div class="aw-field-row">
-                        <div>
+                        <div style="flex: 1;">
                             <div class="aw-field-label">Số tiền hiện có</div>
-                            <input type="number" id="walletBalance" class="aw-balance-input" placeholder="0" value="0">
+                            <input type="text" id="walletBalance" class="aw-balance-input" placeholder="0" oninput="formatWalletBalance(this)">
                         </div>
-                        <i class="fas fa-chevron-right aw-field-arrow"></i>
                     </div>
                 </div>
 
@@ -676,6 +675,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.49"></script>
+    <script src="script.js?v=1.0.51"></script>
 </body>
 </html>

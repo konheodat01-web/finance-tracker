@@ -287,7 +287,6 @@ function renderAccountsPage() {
                             <div style="font-size:12px; color:#9ca3af;">${formatCurrency(w.balance, w.currency || 'VND')}</div>
                         </div>
                     </div>
-                    <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
                 </div>
             </div>`;
     });
@@ -916,7 +915,7 @@ function openEditWallet(id) {
     document.getElementById('addWalletPageTitle').innerText = 'Sửa Ví';
     document.getElementById('editWalletId').value = w.id;
     document.getElementById('walletName').value = w.name;
-    document.getElementById('walletBalance').value = w.balance;
+    document.getElementById('walletBalance').value = new Intl.NumberFormat('vi-VN').format(w.balance);
     document.getElementById('walletCurrency').value = w.currency || 'VND';
     document.getElementById('walletExclude').checked = w.excluded || false;
     document.getElementById('walletDefault').checked = w.isDefault || false;
@@ -932,7 +931,8 @@ function closeAddWalletPage() {
 function saveWallet() {
     const id = document.getElementById('editWalletId').value;
     const name = document.getElementById('walletName').value.trim();
-    const balance = parseFloat(document.getElementById('walletBalance').value) || 0;
+    const balanceStr = document.getElementById('walletBalance').value.replace(/\./g, '').replace(/,/g, '');
+    const balance = parseFloat(balanceStr) || 0;
     const currency = document.getElementById('walletCurrency').value;
     const excluded = document.getElementById('walletExclude').checked;
     const isDefault = document.getElementById('walletDefault').checked;
@@ -1895,3 +1895,12 @@ async function runSePaySync(silent = false) {
 }
 
 
+
+function formatWalletBalance(input) {
+    let val = input.value.replace(/[^0-9]/g, '');
+    if (!val) {
+        input.value = '';
+        return;
+    }
+    input.value = new Intl.NumberFormat('vi-VN').format(parseInt(val));
+}

@@ -473,7 +473,7 @@ body {
     font-family: 'Inter', sans-serif;
     color: var(--text-primary);
     background: transparent;
-    width: 160px;
+    width: 100%;
 }
 
 .aw-link-card { text-align: center; padding: 16px !important; }
