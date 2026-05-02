@@ -357,6 +357,14 @@ function formatDate(d) {
 }
 
 function renderTransactionsPage() {
+    // If no filter selected yet, use default wallet if available
+    if (currentTxnWalletIndex === -1 && wallets.length > 0) {
+        const defaultIdx = wallets.findIndex(w => w.isDefault);
+        if (defaultIdx !== -1) {
+            currentTxnWalletIndex = defaultIdx;
+        }
+    }
+
     // Wallet selector
     const allWallets = [{id:'all', name:'Tất cả', emoji:'🌐'},...wallets];
     const idx = currentTxnWalletIndex < 0 ? 0 : currentTxnWalletIndex + 1;
@@ -575,7 +583,7 @@ function openEditTransaction(id) {
     txnSelectedWalletId = t.walletId;
     
     document.getElementById('editTxnId').value = t.id;
-    document.getElementById('txnAmount').value = t.amount;
+    document.getElementById('txnAmount').value = new Intl.NumberFormat('vi-VN').format(t.amount);
     document.getElementById('txnNote').value = t.note || '';
     document.getElementById('txnDate').value = t.date;
     document.getElementById('txnExclude').checked = t.excluded || false;
@@ -812,7 +820,8 @@ function selectCategory(cat) {
 }
 
 function checkTxnValid() {
-    const amount = parseFloat(document.getElementById('txnAmount').value) || 0;
+    const amountStr = document.getElementById('txnAmount').value.replace(/\./g, '').replace(/,/g, '');
+    const amount = parseFloat(amountStr) || 0;
     const isValid = amount > 0 && txnSelectedWalletId && selectedCategory;
     
     const btn = document.getElementById('saveTxnBtn');
@@ -829,7 +838,8 @@ function checkTxnValid() {
 
 function saveTransaction() {
     const id = document.getElementById('editTxnId').value;
-    const amount = parseFloat(document.getElementById('txnAmount').value) || 0;
+    const amountStr = document.getElementById('txnAmount').value.replace(/\./g, '').replace(/,/g, '');
+    const amount = parseFloat(amountStr) || 0;
     const note = document.getElementById('txnNote').value.trim();
     const date = document.getElementById('txnDate').value;
     const walletId = txnSelectedWalletId;
@@ -1905,4 +1915,14 @@ function formatWalletBalance(input) {
         return;
     }
     input.value = new Intl.NumberFormat('vi-VN').format(parseInt(val));
+}
+
+function formatTxnAmount(input) {
+    let val = input.value.replace(/[^0-9]/g, '');
+    if (!val) {
+        input.value = '';
+    } else {
+        input.value = new Intl.NumberFormat('vi-VN').format(parseInt(val));
+    }
+    checkTxnValid();
 }
