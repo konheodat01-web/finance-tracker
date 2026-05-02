@@ -1246,6 +1246,15 @@ function saveSePayConfig() {
     syncData();
 }
 
+function toggleSePayConfig() {
+    const sec = document.getElementById('sepayConfigSection');
+    if (sec.style.display === 'none') {
+        sec.style.display = 'block';
+    } else {
+        sec.style.display = 'none';
+    }
+}
+
 function renderSePayMappings() {
     const list = document.getElementById('sepayMappingList');
     if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
@@ -1443,20 +1452,25 @@ async function runSePaySync() {
             const isIncome = amountIn > 0;
             const amount = isIncome ? amountIn : amountOut;
             
+            // Determine type: if category is mapped, use its type. Otherwise infer from transaction.
             let type = isIncome ? 'income' : 'expense';
-            // Optional: If mapped category is opposite type, we should handle it. 
-            // But usually mapping is 1-1.
+            if (cat) {
+                const expCat = (userCategories.expense||[]).find(c => c.id === cat.id);
+                const incCat = (userCategories.income||[]).find(c => c.id === cat.id);
+                if (expCat) type = 'expense';
+                else if (incCat) type = 'income';
+            }
             
             const newTxn = {
                 id: 'sepay_' + tx.id,
                 walletId: map.walletId,
                 type: type,
                 amount: amount,
-                category: (type === 'income' && !cat) ? 'Nạp quỹ' : (cat ? cat.name : 'Chưa phân loại'),
-                categoryIcon: cat ? cat.icon : '💸',
+                category: cat ? cat.name : (isIncome ? 'Nạp quỹ' : 'Chưa phân loại'),
+                categoryIcon: cat ? cat.icon : (isIncome ? '💰' : '💸'),
                 categoryColor: cat ? cat.color : '#9ca3af',
                 note: tx.transaction_content || 'SePay Sync',
-                date: tx.transaction_date.split(' ')[0]
+                date: (tx.transaction_date || '').split(' ')[0]
             };
             
             transactions.push(newTxn);
