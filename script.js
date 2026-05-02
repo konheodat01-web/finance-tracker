@@ -952,6 +952,7 @@ window.onload = () => {
 // === MANAGE CATEGORIES ===
 let catManageType = 'expense';
 let editCatType = 'expense';
+let editCatParentId = null;
 
 function openManageCategories() {
     catManageType = 'expense';
@@ -1012,6 +1013,9 @@ function openAddCategoryPage() {
     setAddCatType(catManageType);
     document.getElementById('deleteCatRow').style.display = 'none';
     
+    editCatParentId = null;
+    updateParentCatDisplay();
+    
     checkCatValid();
     switchPage('add-category');
 }
@@ -1035,6 +1039,9 @@ function openEditCategory(id) {
     setAddCatType(catManageType);
     document.getElementById('deleteCatRow').style.display = 'block';
     
+    editCatParentId = cat.parentId || null;
+    updateParentCatDisplay();
+    
     checkCatValid();
     switchPage('add-category');
 }
@@ -1049,6 +1056,10 @@ function setAddCatType(type) {
     
     if(expBtn) expBtn.style.cssText = type === 'expense' ? activeStyle : inactiveStyle;
     if(incBtn) incBtn.style.cssText = type === 'income' ? activeStyle : inactiveStyle;
+    
+    // Type changed, reset parent to avoid invalid parent references
+    editCatParentId = null;
+    updateParentCatDisplay();
 }
 
 function checkCatValid() {
@@ -1077,6 +1088,7 @@ function saveCategory() {
         if (cat) {
             cat.name = name;
             cat.icon = selectedIcon;
+            cat.parentId = editCatParentId;
             if (catManageType !== editCatType) {
                 userCategories[catManageType] = userCategories[catManageType].filter(c => c.id !== id);
                 userCategories[editCatType].push(cat);
@@ -1087,7 +1099,8 @@ function saveCategory() {
             id: 'cat_' + Date.now(),
             name: name,
             icon: selectedIcon,
-            color: colors[Math.floor(Math.random() * colors.length)]
+            color: colors[Math.floor(Math.random() * colors.length)],
+            parentId: editCatParentId
         };
         if(!userCategories[editCatType]) userCategories[editCatType] = [];
         userCategories[editCatType].push(newCat);
@@ -1104,7 +1117,71 @@ function deleteCategory() {
     if (!id || !confirm('Xóa nhóm này?')) return;
     
     userCategories[catManageType] = userCategories[catManageType].filter(c => c.id !== id);
+    // Also remove parent references for children
+    userCategories[catManageType].forEach(c => {
+        if (c.parentId === id) c.parentId = null;
+    });
+    
     syncData();
     switchPage('categories');
     renderManageCategories();
+}
+
+function openParentCatPicker() {
+    const list = document.getElementById('parentCatPickerList');
+    if (!list) return;
+    
+    const cats = userCategories[editCatType] || [];
+    const currentId = document.getElementById('editCatId').value;
+    const validParents = cats.filter(c => c.id !== currentId && !c.parentId); // Only top-level cats can be parents, prevent infinite nesting
+    
+    let html = `
+        <div onclick="selectParentCategory(null)" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${editCatParentId === null ? '#f0fdf4' : 'transparent'};">
+            <div style="font-size:24px;">🚫</div>
+            <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Không có</div>
+            ${editCatParentId === null ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
+        </div>
+    `;
+    
+    html += validParents.map(cat => `
+        <div onclick="selectParentCategory('${cat.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${cat.id === editCatParentId ? '#f0fdf4' : 'transparent'};">
+            <div style="width:32px; height:32px; border-radius:50%; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:16px; color:${cat.color};">${cat.icon}</div>
+            <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${cat.name}</div>
+            ${cat.id === editCatParentId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
+        </div>
+    `).join('');
+    
+    list.innerHTML = html;
+    document.getElementById('parentCatPickerOverlay').style.display = 'flex';
+}
+
+function closeParentCatPicker() {
+    document.getElementById('parentCatPickerOverlay').style.display = 'none';
+}
+
+function selectParentCategory(id) {
+    editCatParentId = id;
+    updateParentCatDisplay();
+    closeParentCatPicker();
+}
+
+function updateParentCatDisplay() {
+    const display = document.getElementById('parentCatNameDisplay');
+    if (!display) return;
+    
+    if (editCatParentId) {
+        const cats = userCategories[editCatType] || [];
+        const parentCat = cats.find(c => c.id === editCatParentId);
+        if (parentCat) {
+            display.innerText = parentCat.name;
+            display.style.color = '#1f2937';
+        } else {
+            editCatParentId = null;
+            display.innerText = 'Không có';
+            display.style.color = '#9ca3af';
+        }
+    } else {
+        display.innerText = 'Không có';
+        display.style.color = '#9ca3af';
+    }
 }

@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.14</div>
+                <div class="version-tag">Phiên bản v1.0.15</div>
             </main>
         </div>
 
@@ -320,12 +320,12 @@
                             <button id="addCatExpenseBtn" onclick="setAddCatType('expense')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
                         </div>
                     </div>
-                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; cursor:pointer;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; cursor:pointer;" onclick="openParentCatPicker()">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div style="font-size:18px; color:#1f2937;"><i class="fas fa-box-open"></i></div>
                             <div>
                                 <div style="font-size:12px; color:#9ca3af;">Nhóm cha</div>
-                                <div style="font-size:15px; color:#1f2937; font-weight:500;">Chọn nhóm</div>
+                                <div style="font-size:15px; color:#1f2937; font-weight:500;" id="parentCatNameDisplay">Không có</div>
                             </div>
                         </div>
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
@@ -557,6 +557,17 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.14"></script>
+    <!-- ===================== PARENT CATEGORY PICKER OVERLAY ===================== -->
+    <div id="parentCatPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
+        <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6;">
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn nhóm cha</h3>
+                <button onclick="closeParentCatPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div id="parentCatPickerList" style="padding:8px 0;"></div>
+        </div>
+    </div>
+
+    <script src="script.js?v=1.0.15"></script>
 </body>
 </html>
