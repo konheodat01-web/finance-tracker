@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.13</div>
+                <div class="version-tag">Phiên bản v1.0.14</div>
             </main>
         </div>
 
@@ -179,6 +179,17 @@
                         </div>
                     </div>
 
+                </div>
+
+                <div class="section-label" style="margin-top:8px;">DỮ LIỆU</div>
+                <div class="card" style="padding:0; overflow:hidden; margin-bottom:12px;">
+                    <!-- Quản lý nhóm -->
+                    <div onclick="openManageCategories()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Quản lý nhóm chi tiêu</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -249,6 +260,85 @@
                     <button onclick="deleteWallet()" class="aw-delete-btn">🗑 Xóa ví này</button>
                 </div>
             </main>
+        </div>
+
+        <!-- ===================== PAGE: QUẢN LÝ NHÓM ===================== -->
+        <div id="page-categories" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top" style="align-items: center;">
+                    <button class="btn-link" onclick="switchPage('settings')">
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại
+                    </button>
+                    <h2 class="page-title">Nhóm</h2>
+                    <div style="display:flex; gap:14px; align-items:center;">
+                        <button class="btn-link" style="font-size:18px; color:#1f2937;"><i class="fas fa-globe"></i></button>
+                        <button class="btn-link" style="font-size:18px; color:#1f2937;"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </header>
+            <main class="content">
+                <!-- Tabs: Khoản chi | Khoản thu | Vay/Nợ -->
+                <div style="display:flex; background:#f3f4f6; margin-bottom:16px; border-radius:8px; padding:2px;">
+                    <button id="catManageExpenseBtn" onclick="setCatManageType('expense')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
+                    <button id="catManageIncomeBtn" onclick="setCatManageType('income')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
+                    <button id="catManageDebtBtn" onclick="setCatManageType('debt')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Vay/Nợ</button>
+                </div>
+
+                <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:8px; background:white; cursor:pointer;" onclick="openAddCategoryPage()">
+                    <div style="padding:14px; text-align:center; color:#10b981; font-weight:600; font-size:15px;">
+                        <i class="fas fa-plus-circle" style="margin-right:6px;"></i> Nhóm mới
+                    </div>
+                </div>
+
+                <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; margin-bottom:16px;" id="manageCategoryList">
+                </div>
+            </main>
+        </div>
+
+        <!-- ===================== PAGE: THÊM / SỬA NHÓM ===================== -->
+        <div id="page-add-category" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('categories')">
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Nhóm
+                    </button>
+                    <h2 class="page-title" id="addCatPageTitle">Nhóm mới</h2>
+                    <span style="width:70px;"></span>
+                </div>
+            </header>
+            <main class="content">
+                <input type="hidden" id="editCatId">
+                <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:12px; background:white;">
+                    <div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
+                        <button id="catIconPreview" onclick="openIconPickerForCat()" style="width:50px; height:50px; border-radius:50%; background:#e5e7eb; border:none; font-size:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-right:12px;">❤️</button>
+                        <input type="text" id="catNameInput" placeholder="Tên nhóm" oninput="checkCatValid()" style="flex:1; border:none; outline:none; font-size:18px; color:#1f2937; background:transparent; font-weight:500;">
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border-bottom:1px solid #f3f4f6;">
+                        <div style="font-size:20px; color:#1f2937;">+/-</div>
+                        <div style="display:flex; background:#f3f4f6; border-radius:8px; padding:2px;">
+                            <button id="addCatIncomeBtn" onclick="setAddCatType('income')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
+                            <button id="addCatExpenseBtn" onclick="setAddCatType('expense')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; cursor:pointer;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="font-size:18px; color:#1f2937;"><i class="fas fa-box-open"></i></div>
+                            <div>
+                                <div style="font-size:12px; color:#9ca3af;">Nhóm cha</div>
+                                <div style="font-size:15px; color:#1f2937; font-weight:500;">Chọn nhóm</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
+                    </div>
+                </div>
+
+                <div id="deleteCatRow" style="display:none; margin-top:10px;">
+                    <button onclick="deleteCategory()" class="aw-delete-btn">🗑 Xóa nhóm này</button>
+                </div>
+            </main>
+            <div style="padding:16px; background:white; border-top:1px solid #f3f4f6; padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px)); z-index:10; position:relative;">
+                <button onclick="saveCategory()" style="width:100%; background:#d1d5db; color:white; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s;" id="saveCatBtn" disabled>Lưu</button>
+            </div>
         </div>
 
         <!-- ===================== PAGE: CHỌN VÍ (SỔ GIAO DỊCH) ===================== -->
@@ -467,6 +557,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.13"></script>
+    <script src="script.js?v=1.0.14"></script>
 </body>
 </html>

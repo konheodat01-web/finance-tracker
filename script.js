@@ -20,35 +20,36 @@ let settings = {
     firstMonthOfYear: 'Tháng Một'
 };
 
-// === CATEGORIES ===
-const EXPENSE_CATS = [
-    { name: 'Ăn uống', icon: '🍜', color: '#f97316' },
-    { name: 'Di chuyển', icon: '🚗', color: '#3b82f6' },
-    { name: 'Mua sắm', icon: '🛋', color: '#8b5cf6' },
-    { name: 'Giải trí', icon: '🎮', color: '#ec4899' },
-    { name: 'Y tế', icon: '💊', color: '#ef4444' },
-    { name: 'Giáo dục', icon: '📚', color: '#0ea5e9' },
-    { name: 'Nhà ở', icon: '🏠', color: '#f59e0b' },
-    { name: 'Hóa đơn', icon: '📰', color: '#6b7280' },
-    { name: 'Đi chợ', icon: '🧳', color: '#22c55e' },
-    { name: 'Sức khỏe', icon: '🏃', color: '#10b981' },
-    { name: 'Linh tinh', icon: '📦', color: '#d97706' },
-    { name: 'Chi phí khác', icon: '💸', color: '#9ca3af' },
-];
-const INCOME_CATS = [
-    { name: 'Lương', icon: '💰', color: '#22c55e' },
-    { name: 'Thưởng', icon: '🎁', color: '#f97316' },
-    { name: 'Đầu tư', icon: '📈', color: '#3b82f6' },
-    { name: 'Tiết kiệm', icon: '🏦', color: '#0ea5e9' },
-    { name: 'Bán hàng', icon: '🛒', color: '#8b5cf6' },
-    { name: 'Thu nhập khác', icon: '💵', color: '#6b7280' },
-];
-const DEBT_CATS = [
-    { name: 'Đi vay', icon: '🤝', color: '#8b5cf6' },
-    { name: 'Cho vay', icon: '💸', color: '#0ea5e9' },
-    { name: 'Trả nợ', icon: '💳', color: '#ef4444' },
-    { name: 'Thu nợ', icon: '💰', color: '#22c55e' },
-];
+let userCategories = {
+    expense: [
+        { id: 'cat_e_1', name: 'Ăn uống', icon: '🍜', color: '#f97316' },
+        { id: 'cat_e_2', name: 'Di chuyển', icon: '🚗', color: '#3b82f6' },
+        { id: 'cat_e_3', name: 'Mua sắm', icon: '🛋', color: '#8b5cf6' },
+        { id: 'cat_e_4', name: 'Giải trí', icon: '🎮', color: '#ec4899' },
+        { id: 'cat_e_5', name: 'Y tế', icon: '💊', color: '#ef4444' },
+        { id: 'cat_e_6', name: 'Giáo dục', icon: '📚', color: '#0ea5e9' },
+        { id: 'cat_e_7', name: 'Nhà ở', icon: '🏠', color: '#f59e0b' },
+        { id: 'cat_e_8', name: 'Hóa đơn', icon: '📰', color: '#6b7280' },
+        { id: 'cat_e_9', name: 'Đi chợ', icon: '🧳', color: '#22c55e' },
+        { id: 'cat_e_10', name: 'Sức khỏe', icon: '🏃', color: '#10b981' },
+        { id: 'cat_e_11', name: 'Linh tinh', icon: '📦', color: '#d97706' },
+        { id: 'cat_e_12', name: 'Chi phí khác', icon: '💸', color: '#9ca3af' },
+    ],
+    income: [
+        { id: 'cat_i_1', name: 'Lương', icon: '💰', color: '#22c55e' },
+        { id: 'cat_i_2', name: 'Thưởng', icon: '🎁', color: '#f97316' },
+        { id: 'cat_i_3', name: 'Đầu tư', icon: '📈', color: '#3b82f6' },
+        { id: 'cat_i_4', name: 'Tiết kiệm', icon: '🏦', color: '#0ea5e9' },
+        { id: 'cat_i_5', name: 'Bán hàng', icon: '🛒', color: '#8b5cf6' },
+        { id: 'cat_i_6', name: 'Thu nhập khác', icon: '💵', color: '#6b7280' },
+    ],
+    debt: [
+        { id: 'cat_d_1', name: 'Đi vay', icon: '🤝', color: '#8b5cf6' },
+        { id: 'cat_d_2', name: 'Cho vay', icon: '💸', color: '#0ea5e9' },
+        { id: 'cat_d_3', name: 'Trả nợ', icon: '💳', color: '#ef4444' },
+        { id: 'cat_d_4', name: 'Thu nợ', icon: '💰', color: '#22c55e' },
+    ]
+};
 
 const SETTING_OPTIONS = {
     dateFormat: {
@@ -97,7 +98,7 @@ const database = firebase.database();
 const STORAGE_KEY = 'finance_flow_data';
 
 function syncData() {
-    const data = { wallets, isBalanceVisible, settings, transactions };
+    const data = { wallets, isBalanceVisible, settings, transactions, userCategories };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     if (database) database.ref('user_data').set(data);
 }
@@ -110,6 +111,7 @@ function loadData() {
         transactions = data.transactions || [];
         isBalanceVisible = data.isBalanceVisible !== undefined ? data.isBalanceVisible : true;
         if (data.settings) settings = { ...settings, ...data.settings };
+        if (data.userCategories) userCategories = data.userCategories;
     }
     if (database) {
         database.ref('user_data').on('value', (snapshot) => {
@@ -119,6 +121,7 @@ function loadData() {
                 transactions = data.transactions || [];
                 isBalanceVisible = data.isBalanceVisible !== undefined ? data.isBalanceVisible : true;
                 if (data.settings) settings = { ...settings, ...data.settings };
+                if (data.userCategories) userCategories = data.userCategories;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
                 renderAll();
             }
@@ -165,7 +168,7 @@ function switchPage(pageName) {
 
     // Hide bottom nav on certain pages
     const bottomNav = document.querySelector('.bottom-nav');
-    const hideOnPages = ['add-wallet', 'settings', 'add-transaction'];
+    const hideOnPages = ['add-wallet', 'settings', 'add-transaction', 'categories', 'add-category'];
     bottomNav.style.display = hideOnPages.includes(pageName) ? 'none' : 'flex';
 
     renderAll();
@@ -670,7 +673,7 @@ function openTxnCategoryPicker() {
     const grid = document.getElementById('txnCategoryPickerGrid');
     if (!grid) return;
     
-    const cats = currentTxnType === 'expense' ? EXPENSE_CATS : (currentTxnType === 'income' ? INCOME_CATS : DEBT_CATS);
+    const cats = userCategories[currentTxnType] || [];
     
     grid.innerHTML = cats.map(cat => {
         const isSelected = selectedCategory && selectedCategory.name === cat.name;
@@ -836,21 +839,40 @@ function deleteWallet() {
 }
 
 // === ICON PICKER ===
+let iconTarget = 'wallet';
+
 function openIconPicker() {
-    const grid = document.getElementById('iconGrid');
-    grid.innerHTML = '';
-    ICONS.forEach(icon => {
-        const el = document.createElement('div');
-        el.className = 'icon-grid-item' + (icon === selectedIcon ? ' selected' : '');
-        el.innerText = icon;
-        el.onclick = () => {
-            selectedIcon = icon;
-            document.getElementById('walletIconPreview').innerHTML = `${icon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>`;
-            closeIconPicker();
-        };
-        grid.appendChild(el);
-    });
+    iconTarget = 'wallet';
+    renderIconGrid();
     document.getElementById('iconPickerOverlay').style.display = 'flex';
+}
+
+function openIconPickerForCat() {
+    iconTarget = 'category';
+    renderIconGrid();
+    document.getElementById('iconPickerOverlay').style.display = 'flex';
+}
+
+function renderIconGrid() {
+    const grid = document.getElementById('iconGrid');
+    if (!grid) return;
+    grid.innerHTML = ICONS.map(icon => `
+        <div class="icon-grid-item ${icon === selectedIcon ? 'selected' : ''}" onclick="selectIcon('${icon}')">
+            ${icon}
+        </div>
+    `).join('');
+}
+
+function selectIcon(icon) {
+    selectedIcon = icon;
+    if (iconTarget === 'wallet') {
+        const preview = document.getElementById('walletIconPreview');
+        if (preview) preview.innerHTML = `${icon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>`;
+    } else if (iconTarget === 'category') {
+        const preview = document.getElementById('catIconPreview');
+        if (preview) preview.innerText = icon;
+    }
+    closeIconPicker();
 }
 
 function closeIconPicker() {
@@ -926,3 +948,163 @@ window.onload = () => {
     renderAll();
     renderChart();
 };
+
+// === MANAGE CATEGORIES ===
+let catManageType = 'expense';
+let editCatType = 'expense';
+
+function openManageCategories() {
+    catManageType = 'expense';
+    switchPage('categories');
+    renderManageCategories();
+}
+
+function setCatManageType(type) {
+    catManageType = type;
+    renderManageCategories();
+}
+
+function renderManageCategories() {
+    const expBtn = document.getElementById('catManageExpenseBtn');
+    const incBtn = document.getElementById('catManageIncomeBtn');
+    const debtBtn = document.getElementById('catManageDebtBtn');
+    
+    const activeStyle = `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);`;
+    const inactiveStyle = `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;`;
+    
+    if(expBtn) expBtn.style.cssText = catManageType === 'expense' ? activeStyle : inactiveStyle;
+    if(incBtn) incBtn.style.cssText = catManageType === 'income' ? activeStyle : inactiveStyle;
+    if(debtBtn) debtBtn.style.cssText = catManageType === 'debt' ? activeStyle : inactiveStyle;
+    
+    const list = document.getElementById('manageCategoryList');
+    if (!list) return;
+    
+    const cats = userCategories[catManageType] || [];
+    
+    if (cats.length === 0) {
+        list.innerHTML = '<div style="padding:20px; text-align:center; color:#9ca3af; font-size:13px;">Chưa có nhóm nào.</div>';
+        return;
+    }
+    
+    list.innerHTML = cats.map((cat, idx) => `
+        <div onclick="openEditCategory('${cat.id}')" style="display:flex; align-items:center; padding:14px 16px; border-bottom:${idx === cats.length-1 ? 'none' : '1px solid #f3f4f6'}; cursor:pointer;">
+            <div style="width:40px; height:40px; border-radius:50%; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:${cat.color};">${cat.icon}</div>
+            <div style="flex:1;">
+                <div style="font-size:15px; font-weight:500; color:#1f2937;">${cat.name}</div>
+            </div>
+            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
+        </div>
+    `).join('');
+}
+
+function openAddCategoryPage() {
+    document.getElementById('addCatPageTitle').innerText = 'Nhóm mới';
+    document.getElementById('editCatId').value = '';
+    document.getElementById('catNameInput').value = '';
+    
+    selectedIcon = '❤️';
+    const iconBtn = document.getElementById('catIconPreview');
+    if(iconBtn) {
+        iconBtn.innerText = selectedIcon;
+        iconBtn.style.background = '#e5e7eb';
+    }
+    
+    setAddCatType(catManageType);
+    document.getElementById('deleteCatRow').style.display = 'none';
+    
+    checkCatValid();
+    switchPage('add-category');
+}
+
+function openEditCategory(id) {
+    const cats = userCategories[catManageType] || [];
+    const cat = cats.find(c => c.id === id);
+    if (!cat) return;
+    
+    document.getElementById('addCatPageTitle').innerText = 'Sửa nhóm';
+    document.getElementById('editCatId').value = cat.id;
+    document.getElementById('catNameInput').value = cat.name;
+    
+    selectedIcon = cat.icon;
+    const iconBtn = document.getElementById('catIconPreview');
+    if(iconBtn) {
+        iconBtn.innerText = selectedIcon;
+        iconBtn.style.background = cat.color + '40';
+    }
+    
+    setAddCatType(catManageType);
+    document.getElementById('deleteCatRow').style.display = 'block';
+    
+    checkCatValid();
+    switchPage('add-category');
+}
+
+function setAddCatType(type) {
+    editCatType = type;
+    const incBtn = document.getElementById('addCatIncomeBtn');
+    const expBtn = document.getElementById('addCatExpenseBtn');
+    
+    const activeStyle = `padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);`;
+    const inactiveStyle = `padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;`;
+    
+    if(expBtn) expBtn.style.cssText = type === 'expense' ? activeStyle : inactiveStyle;
+    if(incBtn) incBtn.style.cssText = type === 'income' ? activeStyle : inactiveStyle;
+}
+
+function checkCatValid() {
+    const name = document.getElementById('catNameInput').value.trim();
+    const btn = document.getElementById('saveCatBtn');
+    if (btn) {
+        if (name) {
+            btn.style.background = '#10b981';
+            btn.disabled = false;
+        } else {
+            btn.style.background = '#d1d5db';
+            btn.disabled = true;
+        }
+    }
+}
+
+function saveCategory() {
+    const id = document.getElementById('editCatId').value;
+    const name = document.getElementById('catNameInput').value.trim();
+    if (!name) return;
+    
+    const colors = ['#f97316', '#3b82f6', '#8b5cf6', '#ec4899', '#ef4444', '#0ea5e9', '#f59e0b', '#22c55e', '#10b981'];
+    
+    if (id) {
+        const cat = userCategories[catManageType].find(c => c.id === id);
+        if (cat) {
+            cat.name = name;
+            cat.icon = selectedIcon;
+            if (catManageType !== editCatType) {
+                userCategories[catManageType] = userCategories[catManageType].filter(c => c.id !== id);
+                userCategories[editCatType].push(cat);
+            }
+        }
+    } else {
+        const newCat = {
+            id: 'cat_' + Date.now(),
+            name: name,
+            icon: selectedIcon,
+            color: colors[Math.floor(Math.random() * colors.length)]
+        };
+        if(!userCategories[editCatType]) userCategories[editCatType] = [];
+        userCategories[editCatType].push(newCat);
+    }
+    
+    catManageType = editCatType;
+    syncData();
+    switchPage('categories');
+    renderManageCategories();
+}
+
+function deleteCategory() {
+    const id = document.getElementById('editCatId').value;
+    if (!id || !confirm('Xóa nhóm này?')) return;
+    
+    userCategories[catManageType] = userCategories[catManageType].filter(c => c.id !== id);
+    syncData();
+    switchPage('categories');
+    renderManageCategories();
+}
