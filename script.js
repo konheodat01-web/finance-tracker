@@ -7,6 +7,39 @@ let selectedWalletId = null;
 let chartInstance = null;
 let selectedIcon = '💰';
 let prevPage = 'accounts';
+let settings = {
+    dateFormat: 'DD/MM/YYYY',
+    totalCurrency: 'VND',
+    firstDayOfWeek: 'Thứ Hai',
+    firstDayOfMonth: 1,
+    firstMonthOfYear: 'Tháng Một'
+};
+
+const SETTING_OPTIONS = {
+    dateFormat: {
+        title: 'Định dạng thời gian',
+        options: ['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY/MM/DD',
+                  'DD-MM-YYYY', 'MM-DD-YYYY', 'D MMM YYYY']
+    },
+    totalCurrency: {
+        title: 'Đơn vị tiền cho ví Tổng',
+        options: ['VND', 'USD']
+    },
+    firstDayOfWeek: {
+        title: 'Chọn ngày đầu tuần',
+        options: ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật']
+    },
+    firstDayOfMonth: {
+        title: 'Đặt ngày đầu tiên của tháng',
+        options: Array.from({length: 28}, (_, i) => i + 1)
+    },
+    firstMonthOfYear: {
+        title: 'Chọn tháng đầu tiên của năm',
+        options: ['Tháng Một','Tháng Hai','Tháng Ba','Tháng Tư','Tháng Năm',
+                  'Tháng Sáu','Tháng Bảy','Tháng Tám','Tháng Chín',
+                  'Tháng Mười','Tháng Mười Một','Tháng Mười Hai']
+    }
+};
 
 // === FIREBASE CONFIG ===
 const firebaseConfig = {
@@ -29,33 +62,26 @@ const database = firebase.database();
 const STORAGE_KEY = 'finance_flow_data';
 
 function syncData() {
-    // 1. Lưu local trước
-    const data = { wallets, isBalanceVisible };
+    const data = { wallets, isBalanceVisible, settings };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-
-    // 2. Đẩy lên Firebase nếu đã kết nối
-    if (database) {
-        database.ref('user_data').set(data);
-    }
+    if (database) database.ref('user_data').set(data);
 }
 
 function loadData() {
-    // 1. Ưu tiên tải từ Local Storage trước để app hiện nhanh
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
         const data = JSON.parse(saved);
         wallets = data.wallets || [];
         isBalanceVisible = data.isBalanceVisible !== undefined ? data.isBalanceVisible : true;
+        if (data.settings) settings = { ...settings, ...data.settings };
     }
-
-    // 2. Nếu có Firebase, lắng nghe thay đổi thời gian thực
     if (database) {
         database.ref('user_data').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 wallets = data.wallets || [];
                 isBalanceVisible = data.isBalanceVisible !== undefined ? data.isBalanceVisible : true;
-                // Lưu ngược lại vào local cho lần sau
+                if (data.settings) settings = { ...settings, ...data.settings };
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
                 renderAll();
             }
@@ -100,13 +126,10 @@ function switchPage(pageName) {
     const navEl = document.getElementById('nav-' + pageName);
     if (navEl) navEl.classList.add('active');
 
-    // Hide bottom nav on add-wallet page
+    // Hide bottom nav on certain pages
     const bottomNav = document.querySelector('.bottom-nav');
-    if (pageName === 'add-wallet') {
-        bottomNav.style.display = 'none';
-    } else {
-        bottomNav.style.display = 'flex';
-    }
+    const hideOnPages = ['add-wallet', 'settings'];
+    bottomNav.style.display = hideOnPages.includes(pageName) ? 'none' : 'flex';
 
     renderAll();
 }
@@ -115,13 +138,19 @@ function switchPage(pageName) {
 function renderAll() {
     renderHomeWallets();
     renderAccountsPage();
+    renderSettingsPage();
     updateBalanceDisplays();
 }
 
 function updateBalanceDisplays() {
+    const currency = settings.totalCurrency || 'VND';
     const total = getTotalBalance();
-    document.getElementById('mainTotalBalance').innerText = formatCurrency(total, 'VND').replace(' đ', '');
-    document.getElementById('accountsTotalBalance').innerText = formatCurrency(total, 'VND');
+    const formatted = formatCurrency(total, currency);
+    // Strip trailing ' đ' for main display if VND since we show 'đ' separately
+    document.getElementById('mainTotalBalance').innerText = currency === 'VND'
+        ? new Intl.NumberFormat('vi-VN').format(total)
+        : formatted;
+    document.getElementById('accountsTotalBalance').innerText = formatted;
 }
 
 function renderHomeWallets() {
@@ -170,6 +199,41 @@ function renderAccountsPage() {
                 </div>
             </div>`;
     });
+}
+// === SETTINGS PAGE ===
+function renderSettingsPage() {
+    const keys = ['dateFormat', 'totalCurrency', 'firstDayOfWeek', 'firstDayOfMonth', 'firstMonthOfYear'];
+    keys.forEach(key => {
+        const el = document.getElementById('val-' + key);
+        if (el) el.innerText = settings[key];
+    });
+}
+
+let currentSettingKey = null;
+function openSettingPicker(key) {
+    currentSettingKey = key;
+    const cfg = SETTING_OPTIONS[key];
+    document.getElementById('settingPickerTitle').innerText = cfg.title;
+    const list = document.getElementById('settingPickerList');
+    list.innerHTML = '';
+    cfg.options.forEach(opt => {
+        const isActive = String(settings[key]) === String(opt);
+        const row = document.createElement('div');
+        row.className = 'setting-option-row' + (isActive ? ' active' : '');
+        row.innerHTML = `<span>${opt}</span>${isActive ? '<i class="fas fa-check check-icon"></i>' : ''}`;
+        row.onclick = () => {
+            settings[key] = opt;
+            syncData();
+            renderSettingsPage();
+            closeSettingPicker();
+        };
+        list.appendChild(row);
+    });
+    document.getElementById('settingPickerOverlay').style.display = 'flex';
+}
+
+function closeSettingPicker() {
+    document.getElementById('settingPickerOverlay').style.display = 'none';
 }
 
 // === WALLET SELECTION ===

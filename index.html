@@ -79,7 +79,10 @@
                 <div class="header-top">
                     <button class="btn-link" onclick="switchPage('home')">Đóng</button>
                     <h2 class="page-title">Chọn Ví</h2>
-                    <button class="btn-link" id="btnEditMode" onclick="toggleEditMode()">Sửa</button>
+                    <div style="display:flex; gap:14px; align-items:center;">
+                        <button class="btn-link" style="font-size:18px; color:#6b7280;" onclick="switchPage('settings')" title="Cài đặt"><i class="fas fa-cog"></i></button>
+                        <button class="btn-link" id="btnEditMode" onclick="toggleEditMode()">Sửa</button>
+                    </div>
                 </div>
             </header>
             <main class="content">
@@ -109,6 +112,68 @@
                         <span class="action-icon green"><i class="fas fa-link"></i></span>
                         <span class="action-text green">Liên kết dịch vụ</span>
                     </button>
+                </div>
+            </main>
+        </div>
+
+        <!-- ===================== PAGE: CÀI ĐẦT ===================== -->
+        <div id="page-settings" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('accounts')">
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại
+                    </button>
+                    <h2 class="page-title">Cài Đặt</h2>
+                    <span style="width:70px;"></span>
+                </div>
+            </header>
+            <main class="content">
+                <div class="section-label" style="margin-top:8px;">HIỂN THỊ</div>
+                <div class="card aw-card">
+                    <!-- Định dạng thời gian -->
+                    <div class="settings-row" onclick="openSettingPicker('dateFormat')">
+                        <span class="settings-label">Định dạng thời gian</span>
+                        <div class="settings-value">
+                            <span id="val-dateFormat" class="settings-val-text"></span>
+                            <i class="fas fa-chevron-right settings-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="divider-thin"></div>
+                    <!-- Đơn vị tiền cho ví Tổng -->
+                    <div class="settings-row" onclick="openSettingPicker('totalCurrency')">
+                        <span class="settings-label">Đơn vị tiền cho ví Tổng</span>
+                        <div class="settings-value">
+                            <span id="val-totalCurrency" class="settings-val-text"></span>
+                            <i class="fas fa-chevron-right settings-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="divider-thin"></div>
+                    <!-- Chọn ngày đầu tuần -->
+                    <div class="settings-row" onclick="openSettingPicker('firstDayOfWeek')">
+                        <span class="settings-label">Chọn ngày đầu tuần</span>
+                        <div class="settings-value">
+                            <span id="val-firstDayOfWeek" class="settings-val-text"></span>
+                            <i class="fas fa-chevron-right settings-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="divider-thin"></div>
+                    <!-- Đặt ngày đầu tiên của tháng -->
+                    <div class="settings-row" onclick="openSettingPicker('firstDayOfMonth')">
+                        <span class="settings-label">Đặt ngày đầu tiên của tháng</span>
+                        <div class="settings-value">
+                            <span id="val-firstDayOfMonth" class="settings-val-text"></span>
+                            <i class="fas fa-chevron-right settings-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="divider-thin"></div>
+                    <!-- Chọn tháng đầu tiên của năm -->
+                    <div class="settings-row" onclick="openSettingPicker('firstMonthOfYear')">
+                        <span class="settings-label">Chọn tháng đầu tiên của năm</span>
+                        <div class="settings-value">
+                            <span id="val-firstMonthOfYear" class="settings-val-text"></span>
+                            <i class="fas fa-chevron-right settings-arrow"></i>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -215,6 +280,17 @@
                 <button onclick="closeIconPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
             </div>
             <div id="iconGrid" style="display:grid; grid-template-columns: repeat(6, 1fr); gap:10px; text-align:center;"></div>
+        </div>
+    </div>
+
+    <!-- ===================== SETTINGS PICKER OVERLAY ===================== -->
+    <div id="settingPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:3000; justify-content:center; align-items:flex-end;">
+        <div style="background:white; width:100%; max-width:414px; border-radius:20px 20px 0 0; padding:0 0 30px 0; max-height:70vh; overflow-y:auto; box-shadow:0 -4px 20px rgba(0,0,0,0.15);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6;">
+                <h3 id="settingPickerTitle" style="font-size:16px; font-weight:700;"></h3>
+                <button onclick="closeSettingPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div id="settingPickerList" style="padding:8px 0;"></div>
         </div>
     </div>
 

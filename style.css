@@ -677,3 +677,59 @@ body {
     margin: 0 16px;
 }
 
+/* === SETTINGS PAGE === */
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.settings-row:hover { background: #f9fafb; }
+
+.settings-label {
+    font-size: 15px;
+    color: var(--text-primary);
+    font-weight: 400;
+}
+
+.settings-value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-val-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary-green);
+}
+
+.settings-arrow {
+    font-size: 12px;
+    color: #d1d5db;
+}
+
+/* Settings picker list items */
+.setting-option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.15s;
+}
+.setting-option-row:last-child { border-bottom: none; }
+.setting-option-row:hover { background: #f9fafb; }
+.setting-option-row.active {
+    color: var(--primary-green);
+    font-weight: 600;
+}
+.setting-option-row .check-icon {
+    color: var(--primary-green);
+    font-size: 15px;
+}
