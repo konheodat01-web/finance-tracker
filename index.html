@@ -121,7 +121,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.61</div>
+                <div class="version-tag">Phiên bản v1.0.62</div>
             </main>
         </div>
 
@@ -227,8 +227,12 @@
                     <div id="receivingInfoList" class="recv-carousel">
                         <!-- Slides -->
                     </div>
-                    <div id="receivingInfoDots" class="recv-dots">
-                        <!-- Dots -->
+                    <div class="recv-nav-controls" style="display:flex; align-items:center; justify-content:center; gap:20px; margin-top:-10px; padding-bottom:20px;">
+                        <button class="btn-link" onclick="scrollReceiving(-1)" style="color:#6b7280; font-size:18px; padding:10px;"><i class="fas fa-chevron-left"></i></button>
+                        <div id="receivingInfoDots" class="recv-dots" style="margin:0; padding:0;">
+                            <!-- Dots -->
+                        </div>
+                        <button class="btn-link" onclick="scrollReceiving(1)" style="color:#6b7280; font-size:18px; padding:10px;"><i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
             </main>
@@ -758,6 +762,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.61"></script>
+    <script src="script.js?v=1.0.62"></script>
 </body>
 </html>

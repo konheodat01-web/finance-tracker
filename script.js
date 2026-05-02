@@ -1994,38 +1994,13 @@ function renderReceivingInfoList() {
         });
     };
 
-    // Solution 2: Drag to Scroll for PC
-    let isDown = false;
-    let startX;
-    let scrollLeft;
+    };
+}
 
-    listEl.addEventListener('mousedown', (e) => {
-        isDown = true;
-        listEl.classList.add('dragging');
-        startX = e.pageX - listEl.offsetLeft;
-        scrollLeft = listEl.scrollLeft;
-        // Stop scroll snap while dragging to avoid fighting
-        listEl.style.scrollSnapType = 'none';
-    });
-    listEl.addEventListener('mouseleave', () => {
-        if (!isDown) return;
-        isDown = false;
-        listEl.classList.remove('dragging');
-        listEl.style.scrollSnapType = 'x mandatory';
-    });
-    listEl.addEventListener('mouseup', () => {
-        if (!isDown) return;
-        isDown = false;
-        listEl.classList.remove('dragging');
-        listEl.style.scrollSnapType = 'x mandatory';
-    });
-    listEl.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - listEl.offsetLeft;
-        const walk = (x - startX) * 2; // Scroll speed
-        listEl.scrollLeft = scrollLeft - walk;
-    });
+function scrollReceiving(dir) {
+    const listEl = document.getElementById('receivingInfoList');
+    const width = listEl.offsetWidth;
+    listEl.scrollBy({ left: dir * width, behavior: 'smooth' });
 }
 
 function openAddReceivingInfo() {
