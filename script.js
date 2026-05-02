@@ -581,7 +581,7 @@ function openEditTransaction(id) {
     document.getElementById('txnExclude').checked = t.excluded || false;
     document.getElementById('deleteTxnRow').style.display = 'block';
     
-    setTxnType(t.type);
+    setTxnType(t.type, false);
     updateTxnDateDisplay();
     updateSelectedWalletDisplay();
     updateSelectedCategoryDisplay();
@@ -594,7 +594,7 @@ function closeAddTransaction() {
     switchPage('transactions');
 }
 
-function setTxnType(type) {
+function setTxnType(type, clearCategory = true) {
     currentTxnType = type;
     
     const expBtn = document.getElementById('typeExpenseBtn');
@@ -611,7 +611,9 @@ function setTxnType(type) {
     if (incBtn) incBtn.style.cssText = type === 'income' ? activeStyle('#10b981') : inactiveStyle;
     if (debtBtn) debtBtn.style.cssText = type === 'debt' ? activeStyle('#8b5cf6') : inactiveStyle;
     
-    selectedCategory = null;
+    if (clearCategory) {
+        selectedCategory = null;
+    }
     updateSelectedCategoryDisplay();
     checkTxnValid();
 }
