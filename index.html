@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Finance App</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" href="style.css?v=1.0.46">
+    <link rel="stylesheet" href="style.css?v=1.0.47">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -116,7 +116,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.46</div>
+                <div class="version-tag">Phiên bản v1.0.47</div>
             </main>
         </div>
 
@@ -466,7 +466,7 @@
                     </div>
 
                     <!-- Date -->
-                    <div style="display:flex; align-items:center; padding:16px;">
+                    <div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
                         <i class="far fa-calendar-alt" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
                         <div style="flex:1; display:flex; align-items:center; justify-content:space-between; background:#f4f5f7; border-radius:6px; padding:6px 10px; cursor:pointer;" onclick="document.getElementById('txnDate').showPicker()">
                             <button onclick="event.stopPropagation(); changeTxnDate(-1)" style="width:24px; height:24px; border-radius:50%; border:none; background:white; color:#10b981; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05); padding:0;"><i class="fas fa-chevron-left" style="font-size:10px;"></i></button>
@@ -474,6 +474,18 @@
                             <button onclick="event.stopPropagation(); changeTxnDate(1)" style="width:24px; height:24px; border-radius:50%; border:none; background:white; color:#10b981; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05); padding:0;"><i class="fas fa-chevron-right" style="font-size:10px;"></i></button>
                             <input type="date" id="txnDate" style="position:absolute; visibility:hidden; width:0; height:0;" onchange="updateTxnDateDisplay()">
                         </div>
+                    </div>
+
+                    <!-- Exclude from report -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px;">
+                        <div style="display:flex; align-items:center;">
+                            <i class="fas fa-eye-slash" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
+                            <span style="font-size:14px; color:#1f2937;">Không tính vào báo cáo</span>
+                        </div>
+                        <label class="aw-switch">
+                            <input type="checkbox" id="txnExclude">
+                            <span class="aw-slider"></span>
+                        </label>
                     </div>
                 </div>
 
@@ -655,6 +667,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.46"></script>
+    <script src="script.js?v=1.0.47"></script>
 </body>
 </html>

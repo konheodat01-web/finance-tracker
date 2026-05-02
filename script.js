@@ -220,7 +220,7 @@ function getStateHash() {
     // Generate a quick hash of the core data state to detect if anything actually changed
     // This includes wallet balances, txn count, period selection, and UI tab
     const walletState = wallets.map(w => `${w.id}:${w.balance}`).join('|');
-    const txnMeta = `${transactions.length}:${transactions.length > 0 ? transactions[transactions.length-1].id : ''}`;
+    const txnMeta = `${transactions.length}:${transactions.length > 0 ? transactions[transactions.length-1].id : ''}:${transactions.filter(t=>t.excluded).length}`;
     return `${walletState}#${txnMeta}#${currentPeriodIndex}#${currentTab}#${settings.firstDayOfMonth}#${isBalanceVisible}`;
 }
 
@@ -561,6 +561,7 @@ function openAddTransaction() {
     document.getElementById('txnAmount').value = '';
     document.getElementById('txnNote').value = '';
     document.getElementById('txnDate').value = getTodayStr();
+    document.getElementById('txnExclude').checked = false;
     document.getElementById('deleteTxnRow').style.display = 'none';
     
     setTxnType('expense');
@@ -594,6 +595,7 @@ function openEditTransaction(id) {
     document.getElementById('txnAmount').value = t.amount;
     document.getElementById('txnNote').value = t.note || '';
     document.getElementById('txnDate').value = t.date;
+    document.getElementById('txnExclude').checked = t.excluded || false;
     document.getElementById('deleteTxnRow').style.display = 'block';
     
     setTxnType(t.type);
@@ -846,6 +848,7 @@ function saveTransaction() {
     const note = document.getElementById('txnNote').value.trim();
     const date = document.getElementById('txnDate').value;
     const walletId = txnSelectedWalletId;
+    const excluded = document.getElementById('txnExclude').checked;
     
     if (!amount || !date || !walletId || !selectedCategory) return;
 
@@ -860,7 +863,7 @@ function saveTransaction() {
         sepayBankAcc: oldTxn ? (oldTxn.sepayBankAcc || null) : null,
         manuallyEdited: true, // Mark as manually edited - never auto-overwrite
         amount, category: selectedCategory.name, categoryIcon: selectedCategory.icon, categoryColor: selectedCategory.color,
-        note, date
+        note, date, excluded
     };
 
     if (id) {
@@ -1065,6 +1068,7 @@ function renderChart() {
 
     // Sum transactions
     transactions.forEach(t => {
+        if (t.excluded) return;
         if (t.type !== type) return;
         if (t.date >= getLocalDateStr(start) && t.date <= getLocalDateStr(end)) {
             dailyMap[t.date] = (dailyMap[t.date] || 0) + t.amount;
@@ -1099,6 +1103,7 @@ function renderChart() {
     let totalExp = 0;
     let totalInc = 0;
     transactions.forEach(t => {
+        if (t.excluded) return;
         if (t.date >= sStr && t.date <= eStr) {
             if (t.type === 'expense') totalExp += t.amount;
             else if (t.type === 'income') totalInc += t.amount;
