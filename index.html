@@ -115,11 +115,11 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.1</div>
+                <div class="version-tag">Phiên bản v1.0.2</div>
             </main>
         </div>
 
-        <!-- ===================== PAGE: CÀI ĐẦT ===================== -->
+        <!-- ===================== PAGE: CÀI ĐẶT ===================== -->
         <div id="page-settings" class="page page-light">
             <header class="header header-modal-style">
                 <div class="header-top">
@@ -132,51 +132,53 @@
             </header>
             <main class="content">
                 <div class="section-label" style="margin-top:8px;">HIỂN THỊ</div>
-                <div class="card aw-card">
+                <div class="card" style="padding:0; overflow:hidden; margin-bottom:12px;">
+
                     <!-- Định dạng thời gian -->
-                    <div class="settings-row" onclick="openSettingPicker('dateFormat')">
-                        <span class="settings-label">Định dạng thời gian</span>
-                        <div class="settings-value">
-                            <span id="val-dateFormat" class="settings-val-text"></span>
-                            <i class="fas fa-chevron-right settings-arrow"></i>
+                    <div onclick="openSettingPicker('dateFormat')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Định dạng thời gian</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-dateFormat" style="font-size:14px; font-weight:500; color:#22c55e;">DD/MM/YYYY</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
-                    <div class="divider-thin"></div>
+
                     <!-- Đơn vị tiền cho ví Tổng -->
-                    <div class="settings-row" onclick="openSettingPicker('totalCurrency')">
-                        <span class="settings-label">Đơn vị tiền cho ví Tổng</span>
-                        <div class="settings-value">
-                            <span id="val-totalCurrency" class="settings-val-text"></span>
-                            <i class="fas fa-chevron-right settings-arrow"></i>
+                    <div onclick="openSettingPicker('totalCurrency')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đơn vị tiền cho ví Tổng</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-totalCurrency" style="font-size:14px; font-weight:500; color:#22c55e;">VND</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
-                    <div class="divider-thin"></div>
+
                     <!-- Chọn ngày đầu tuần -->
-                    <div class="settings-row" onclick="openSettingPicker('firstDayOfWeek')">
-                        <span class="settings-label">Chọn ngày đầu tuần</span>
-                        <div class="settings-value">
-                            <span id="val-firstDayOfWeek" class="settings-val-text"></span>
-                            <i class="fas fa-chevron-right settings-arrow"></i>
+                    <div onclick="openSettingPicker('firstDayOfWeek')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Chọn ngày đầu tuần</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-firstDayOfWeek" style="font-size:14px; font-weight:500; color:#22c55e;">Thứ Hai</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
-                    <div class="divider-thin"></div>
+
                     <!-- Đặt ngày đầu tiên của tháng -->
-                    <div class="settings-row" onclick="openSettingPicker('firstDayOfMonth')">
-                        <span class="settings-label">Đặt ngày đầu tiên của tháng</span>
-                        <div class="settings-value">
-                            <span id="val-firstDayOfMonth" class="settings-val-text"></span>
-                            <i class="fas fa-chevron-right settings-arrow"></i>
+                    <div onclick="openSettingPicker('firstDayOfMonth')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đặt ngày đầu tiên của tháng</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-firstDayOfMonth" style="font-size:14px; font-weight:500; color:#22c55e;">1</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
-                    <div class="divider-thin"></div>
+
                     <!-- Chọn tháng đầu tiên của năm -->
-                    <div class="settings-row" onclick="openSettingPicker('firstMonthOfYear')">
-                        <span class="settings-label">Chọn tháng đầu tiên của năm</span>
-                        <div class="settings-value">
-                            <span id="val-firstMonthOfYear" class="settings-val-text"></span>
-                            <i class="fas fa-chevron-right settings-arrow"></i>
+                    <div onclick="openSettingPicker('firstMonthOfYear')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Chọn tháng đầu tiên của năm</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-firstMonthOfYear" style="font-size:14px; font-weight:500; color:#22c55e;">Tháng Một</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
+
                 </div>
             </main>
         </div>
