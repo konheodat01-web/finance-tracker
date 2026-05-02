@@ -46,37 +46,27 @@ let settings = {
 };
 
 let sepayConfig = { apiToken: '', proxyUrl: '', mappings: [], lastSyncIds: [] };
-
 let userCategories = {
     expense: [
-        { id: 'cat_e_1', name: 'Ăn uống', icon: '🍜', color: '#f97316' },
-        { id: 'cat_e_2', name: 'Di chuyển', icon: '🚗', color: '#3b82f6' },
-        { id: 'cat_e_3', name: 'Mua sắm', icon: '🛋', color: '#8b5cf6' },
-        { id: 'cat_e_4', name: 'Giải trí', icon: '🎮', color: '#ec4899' },
-        { id: 'cat_e_5', name: 'Y tế', icon: '💊', color: '#ef4444' },
-        { id: 'cat_e_6', name: 'Giáo dục', icon: '📚', color: '#0ea5e9' },
-        { id: 'cat_e_7', name: 'Nhà ở', icon: '🏠', color: '#f59e0b' },
-        { id: 'cat_e_8', name: 'Hóa đơn', icon: '📰', color: '#6b7280' },
-        { id: 'cat_e_9', name: 'Đi chợ', icon: '🧳', color: '#22c55e' },
-        { id: 'cat_e_10', name: 'Sức khỏe', icon: '🏃', color: '#10b981' },
-        { id: 'cat_e_11', name: 'Linh tinh', icon: '📦', color: '#d97706' },
-        { id: 'cat_e_12', name: 'Chi phí khác', icon: '💸', color: '#9ca3af' },
+        { id: 'cat1', name: 'Ăn uống', icon: '🍔', color: '#f97316' },
+        { id: 'cat2', name: 'Di chuyển', icon: '🚗', color: '#3b82f6' },
+        { id: 'cat3', name: 'Mua sắm', icon: '🛍️', color: '#ec4899' },
+        { id: 'cat4', name: 'Nhà cửa', icon: '🏠', color: '#8b5cf6' },
+        { id: 'cat5', name: 'Giải trí', icon: '🎮', color: '#f59e0b' }
     ],
     income: [
-        { id: 'cat_i_1', name: 'Lương', icon: '💰', color: '#22c55e' },
-        { id: 'cat_i_2', name: 'Thưởng', icon: '🎁', color: '#f97316' },
-        { id: 'cat_i_3', name: 'Đầu tư', icon: '📈', color: '#3b82f6' },
-        { id: 'cat_i_4', name: 'Tiết kiệm', icon: '🏦', color: '#0ea5e9' },
-        { id: 'cat_i_5', name: 'Bán hàng', icon: '🛒', color: '#8b5cf6' },
-        { id: 'cat_i_6', name: 'Thu nhập khác', icon: '💵', color: '#6b7280' },
+        { id: 'cat6', name: 'Tiền lương', icon: '💸', color: '#10b981' },
+        { id: 'cat7', name: 'Tiền thưởng', icon: '🎁', color: '#3b82f6' },
+        { id: 'cat8', name: 'Thu nhập khác', icon: '💰', color: '#10b981' }
     ],
     debt: [
-        { id: 'cat_d_1', name: 'Đi vay', icon: '🤝', color: '#8b5cf6' },
-        { id: 'cat_d_2', name: 'Cho vay', icon: '💸', color: '#0ea5e9' },
-        { id: 'cat_d_3', name: 'Trả nợ', icon: '💳', color: '#ef4444' },
-        { id: 'cat_d_4', name: 'Thu nợ', icon: '💰', color: '#22c55e' },
+        { id: 'cat9', name: 'Cho vay', icon: '📤', color: '#ef4444' },
+        { id: 'cat10', name: 'Đi vay', icon: '📥', color: '#10b981' },
+        { id: 'cat11', name: 'Thu nợ', icon: '📥', color: '#10b981' },
+        { id: 'cat12', name: 'Trả nợ', icon: '📤', color: '#ef4444' }
     ]
 };
+let receivingInfos = [];
 
 const SETTING_OPTIONS = {
     dateFormat: {
@@ -125,7 +115,7 @@ const database = firebase.database();
 const STORAGE_KEY = 'finance_flow_data';
 
 function syncData() {
-    const data = { wallets, isBalanceVisible, settings, transactions, userCategories, sepayConfig };
+    const data = { wallets, isBalanceVisible, settings, transactions, userCategories, sepayConfig, receivingInfos };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     if (database) database.ref('user_data').set(data);
 }
@@ -142,28 +132,22 @@ function loadData() {
             initCurrentPeriod();
         }
         if (data.userCategories) userCategories = data.userCategories;
-        if (data.sepayConfig) sepayConfig = data.sepayConfig;
+        sepayConfig = data.sepayConfig || { apiToken: '', proxyUrl: '', mappings: [], lastSyncIds: [] };
+        receivingInfos = data.receivingInfos || [];
+        renderAll();
     }
+    
     if (database) {
-        database.ref('user_data').on('value', (snapshot) => {
-            const data = snapshot.val();
+        database.ref('user_data').once('value').then(s => {
+            const data = s.val();
             if (data) {
                 wallets = data.wallets || [];
                 transactions = data.transactions || [];
-                isBalanceVisible = data.isBalanceVisible !== undefined ? data.isBalanceVisible : true;
-                if (data.settings) {
-                    settings = { ...settings, ...data.settings };
-                    initCurrentPeriod();
-                }
-                if (data.userCategories) userCategories = data.userCategories;
-                if (data.sepayConfig) sepayConfig = data.sepayConfig;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                userCategories = data.userCategories || userCategories;
+                settings = data.settings || settings;
+                sepayConfig = data.sepayConfig || sepayConfig;
+                receivingInfos = data.receivingInfos || [];
                 renderAll();
-                
-                // Auto-sync SePay on first load
-                if (sepayConfig && sepayConfig.apiToken) {
-                    setTimeout(() => runSePaySync(true), 2000);
-                }
             }
         });
     }
@@ -207,9 +191,9 @@ function switchPage(pageName) {
     if (navEl) navEl.classList.add('active');
 
     // Hide bottom nav on certain pages
-    const bottomNav = document.querySelector('.bottom-nav');
-    const hideOnPages = ['add-wallet', 'settings', 'add-transaction', 'categories', 'add-category', 'sepay'];
-    bottomNav.style.display = hideOnPages.includes(pageName) ? 'none' : 'flex';
+    const hideNavPages = ['add-transaction', 'add-wallet', 'sepay', 'receiving-info', 'add-receiving'];
+    const nav = document.querySelector('.nav');
+    if (nav) nav.style.display = hideNavPages.includes(pageName) ? 'none' : 'flex';
 
     renderAll(true); // Force render when navigating between pages
 }
@@ -1935,7 +1919,7 @@ function openReceivingInfoPage() {
 
 function renderReceivingInfoList() {
     const listEl = document.getElementById('receivingInfoList');
-    const infos = userData.receivingInfos || [];
+    const infos = receivingInfos || [];
     
     if (infos.length === 0) {
         listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px;">
@@ -1971,7 +1955,7 @@ function openAddReceivingInfo() {
 }
 
 function openEditReceivingInfo(idx) {
-    const info = userData.receivingInfos[idx];
+    const info = receivingInfos[idx];
     if (!info) return;
     
     document.getElementById('addReceivingTitle').innerText = 'Sửa thông tin';
@@ -1980,7 +1964,6 @@ function openEditReceivingInfo(idx) {
     document.getElementById('recvNumber').value = info.accountNumber || '';
     document.getElementById('recvName').value = info.accountName || '';
     
-    // Reverse logic: show the original URL if possible, or just the direct URL
     document.getElementById('recvImageLink').value = info.originalUrl || info.imageUrl || '';
     
     previewReceivingImage(info.originalUrl || info.imageUrl || '');
@@ -2032,17 +2015,13 @@ function saveReceivingInfo() {
         }
     }
     
-    if (!userData.receivingInfos) {
-        userData.receivingInfos = [];
-    }
-    
     const info = { bankName, accountNumber, accountName, imageUrl, originalUrl: url };
     
     const idxStr = document.getElementById('editReceivingId').value;
     if (idxStr !== '') {
-        userData.receivingInfos[parseInt(idxStr)] = info;
+        receivingInfos[parseInt(idxStr)] = info;
     } else {
-        userData.receivingInfos.push(info);
+        receivingInfos.push(info);
     }
     
     syncData();
@@ -2055,7 +2034,7 @@ function deleteReceivingInfo() {
     
     const idxStr = document.getElementById('editReceivingId').value;
     if (idxStr !== '') {
-        userData.receivingInfos.splice(parseInt(idxStr), 1);
+        receivingInfos.splice(parseInt(idxStr), 1);
         syncData();
         openReceivingInfoPage();
     }
