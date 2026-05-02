@@ -946,9 +946,23 @@ function renderChart() {
     if (!ctx) return;
     if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
-    // Get current period
+    // Get periods
     const periods = getPeriods();
-    const period = periods[currentPeriodIndex] || periods[3];
+    
+    // Logic: If on Home page, always show the period containing Today.
+    // If on Transactions page, show the selected currentPeriodIndex.
+    let activeIdx = currentPeriodIndex;
+    const now = new Date();
+    const nowTime = now.getTime();
+    
+    // Auto-detect index for Today
+    const todayIdx = periods.findIndex(p => nowTime >= p.start.getTime() && nowTime <= p.end.getTime() + 86399999);
+    
+    if (document.getElementById('page-home').classList.contains('active')) {
+        if (todayIdx !== -1) activeIdx = todayIdx;
+    }
+
+    const period = periods[activeIdx] || (todayIdx !== -1 ? periods[todayIdx] : periods[3]);
     const start = period.start;
     const end = period.end;
 
