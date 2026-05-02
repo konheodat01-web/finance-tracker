@@ -757,3 +757,49 @@ body {
     margin: 20px 0 10px 0;
     font-weight: 500;
 }
+
+/* === RECEIVING INFO CAROUSEL === */
+.recv-carousel-container {
+    position: relative;
+    width: 100%;
+}
+
+.recv-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: 0;
+    padding-bottom: 20px;
+}
+
+.recv-carousel::-webkit-scrollbar { display: none; }
+
+.recv-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+
+.recv-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: -10px;
+    padding-bottom: 20px;
+}
+
+.recv-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d1d5db;
+    transition: all 0.3s ease;
+}
+
+.recv-dot.active {
+    background: #10b981;
+    width: 20px;
+}

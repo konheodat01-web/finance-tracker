@@ -121,7 +121,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.59</div>
+                <div class="version-tag">Phiên bản v1.0.60</div>
             </main>
         </div>
 
@@ -222,9 +222,14 @@
                     <input type="text" id="receivingSearchInput" placeholder="Tìm theo tên, NH, STK hoặc tag..." style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #e5e7eb; outline:none; font-family:'Inter', sans-serif; font-size:14px; background:#f9fafb;" oninput="renderReceivingInfoList()">
                 </div>
             </header>
-            <main class="content" style="padding-top:16px;">
-                <div id="receivingInfoList" style="display:flex; flex-direction:column; gap:16px;">
-                    <!-- Items -->
+            <main class="content" style="padding-top:16px; padding-left:0; padding-right:0;">
+                <div class="recv-carousel-container">
+                    <div id="receivingInfoList" class="recv-carousel">
+                        <!-- Slides -->
+                    </div>
+                    <div id="receivingInfoDots" class="recv-dots">
+                        <!-- Dots -->
+                    </div>
                 </div>
             </main>
         </div>
@@ -753,6 +758,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.59"></script>
+    <script src="script.js?v=1.0.60"></script>
 </body>
 </html>
