@@ -440,19 +440,55 @@ function renderTxnList(period) {
     listEl.innerHTML = html;
 }
 
-function txnPrevWallet() {
-    const total = wallets.length;
-    if (total === 0) return;
-    currentTxnWalletIndex = currentTxnWalletIndex <= -1 ? total - 1 : currentTxnWalletIndex - 1;
-    renderTransactionsPage();
+function openSelectWalletPage() {
+    renderSelectWalletList();
+    switchPage('select-wallet');
 }
-function txnNextWallet() {
-    const total = wallets.length;
-    if (total === 0) return;
-    currentTxnWalletIndex = currentTxnWalletIndex >= total - 1 ? -1 : currentTxnWalletIndex + 1;
-    renderTransactionsPage();
+
+function renderSelectWalletList() {
+    const list = document.getElementById('selectWalletList');
+    if (!list) return;
+
+    const totalBalance = getTotalBalance();
+    const currency = settings.totalCurrency || 'VND';
+
+    let html = `
+        <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div style="display:flex; align-items:center; padding:16px; cursor:pointer; background:${currentTxnWalletIndex === -1 ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(-1)">
+                <div style="width:44px; height:44px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; font-size:24px; margin-right:12px;">🌐</div>
+                <div style="flex:1;">
+                    <div style="font-size:16px; font-weight:700; color:#000;">Tổng cộng</div>
+                    <div style="font-size:13px; color:#6b7280;">${new Intl.NumberFormat('vi-VN').format(totalBalance)} ${currency}</div>
+                </div>
+                ${currentTxnWalletIndex === -1 ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
+            </div>
+        </div>
+        <div style="font-size:11px; color:#9ca3af; font-weight:600; margin-bottom:8px; padding-left:4px; letter-spacing:0.5px; text-transform:uppercase;">TÍNH VÀO TỔNG</div>
+        <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+    `;
+
+    wallets.forEach((w, idx) => {
+        const isSelected = currentTxnWalletIndex === idx;
+        html += `
+            <div style="display:flex; align-items:center; padding:16px; cursor:pointer; border-bottom:${idx === wallets.length - 1 ? 'none' : '1px solid #f3f4f6'}; background:${isSelected ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(${idx})">
+                <div style="width:40px; height:40px; border-radius:50%; background:${w.bgClass || '#3b82f6'}; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:white;">${w.emoji || '💰'}</div>
+                <div style="flex:1;">
+                    <div style="font-size:15px; font-weight:600; color:#000;">${w.name}</div>
+                    <div style="font-size:13px; color:#6b7280;">${new Intl.NumberFormat('vi-VN').format(w.balance)} ${w.currency || 'VND'}</div>
+                </div>
+                ${isSelected ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    list.innerHTML = html;
 }
-function txnCycleWallet() { txnNextWallet(); }
+
+function selectTxnWalletFilter(index) {
+    currentTxnWalletIndex = index;
+    switchPage('transactions');
+}
 
 // === ADD TRANSACTION ===
 let txnSelectedWalletId = null;
