@@ -735,3 +735,11 @@ body {
     color: var(--primary-green);
     font-size: 15px;
 }
+
+.version-tag {
+    text-align: center;
+    font-size: 11px;
+    color: #cbd5e1;
+    margin: 20px 0 10px 0;
+    font-weight: 500;
+}
