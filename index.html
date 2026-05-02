@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Finance App</title>
-    <link rel="stylesheet" href="style.css?v=1.0.27">
+    <link rel="stylesheet" href="style.css?v=1.0.28">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.27</div>
+                <div class="version-tag">Phiên bản v1.0.28</div>
             </main>
         </div>
 
@@ -357,7 +357,7 @@
                     <button style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;">Sửa</button>
                 </div>
             </div>
-            <main style="flex: 1; overflow-y: auto; padding: 10px 15px calc(80px + env(safe-area-inset-bottom, 0px)) 15px; background: var(--bg-main);" id="selectWalletList">
+            <main style="flex: 1; overflow-y: auto; padding: 10px 15px 20px 15px; background: var(--bg-main);" id="selectWalletList">
                 
                 <div class="card" style="margin-top:20px; padding:0; border-radius:12px; background:white; overflow:hidden;">
                     <div style="display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid #f3f4f6; cursor:pointer;" onclick="openAddWallet()">
@@ -564,6 +564,31 @@
         </nav>
     </div> <!-- End .app-container -->
 
+    <style>
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-main);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .bottom-nav {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: white;
+            padding: 8px 0 calc(env(safe-area-inset-bottom, 0px) + 8px);
+            border-top: 1px solid #f3f4f6;
+            z-index: 1000;
+        }
+    </style>
+
     <!-- ===================== ICON PICKER OVERLAY ===================== -->
     <div id="iconPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:3000; justify-content:center; align-items:center;">
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
@@ -629,6 +654,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.27"></script>
+    <script src="script.js?v=1.0.28"></script>
 </body>
 </html>
