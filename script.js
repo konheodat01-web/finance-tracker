@@ -211,7 +211,7 @@ function switchPage(pageName) {
     const hideOnPages = ['add-wallet', 'settings', 'add-transaction', 'categories', 'add-category', 'sepay'];
     bottomNav.style.display = hideOnPages.includes(pageName) ? 'none' : 'flex';
 
-    renderAll();
+    renderAll(true); // Force render when navigating between pages
 }
 
 // === RENDER ===
@@ -221,7 +221,7 @@ function getStateHash() {
     // This includes wallet balances, txn count, period selection, and UI tab
     const walletState = wallets.map(w => `${w.id}:${w.balance}`).join('|');
     const txnMeta = `${transactions.length}:${transactions.length > 0 ? transactions[transactions.length-1].id : ''}:${transactions.filter(t=>t.excluded).length}`;
-    return `${walletState}#${txnMeta}#${currentPeriodIndex}#${currentTab}#${settings.firstDayOfMonth}#${isBalanceVisible}`;
+    return `${walletState}#${txnMeta}#${currentPeriodIndex}#${currentTab}#${settings.firstDayOfMonth}#${isBalanceVisible}#${currentTxnWalletIndex}`;
 }
 
 function renderAll(force = false) {
