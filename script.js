@@ -215,7 +215,22 @@ function switchPage(pageName) {
 }
 
 // === RENDER ===
-function renderAll() {
+let lastStateHash = "";
+function getStateHash() {
+    // Generate a quick hash of the core data state to detect if anything actually changed
+    // This includes wallet balances, txn count, period selection, and UI tab
+    const walletState = wallets.map(w => `${w.id}:${w.balance}`).join('|');
+    const txnMeta = `${transactions.length}:${transactions.length > 0 ? transactions[transactions.length-1].id : ''}`;
+    return `${walletState}#${txnMeta}#${currentPeriodIndex}#${currentTab}#${settings.firstDayOfMonth}#${isBalanceVisible}`;
+}
+
+function renderAll(force = false) {
+    const newHash = getStateHash();
+    if (!force && newHash === lastStateHash) {
+        return; // Skip rendering if state hasn't changed to prevent flicker
+    }
+    lastStateHash = newHash;
+    
     renderHomeWallets();
     renderAccountsPage();
     renderSettingsPage();
