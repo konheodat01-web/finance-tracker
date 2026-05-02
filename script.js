@@ -133,12 +133,9 @@ function loadData() {
                 if (data.userCategories) userCategories = data.userCategories;
                 if (data.sepayConfig) sepayConfig = data.sepayConfig;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-                initCurrentPeriod(); // Focus on current period after loading
                 renderAll();
             }
         });
-    } else {
-        initCurrentPeriod();
     }
 }
 
@@ -194,6 +191,7 @@ function renderAll() {
     renderSettingsPage();
     renderTransactionsPage();
     updateBalanceDisplays();
+    renderChart();
 }
 
 function updateBalanceDisplays() {
@@ -925,42 +923,119 @@ function switchTab(tab) {
 
 // === CHART ===
 function renderChart() {
-    const ctx = document.getElementById('reportChart').getContext('2d');
-    if (chartInstance) chartInstance.destroy();
-    const dataPoints = [4, 4.2, 5, 5.5, 6, 6.2, 6.5, 6.5, 6.8, 8, 8.5, 9, 9.2, 9.2, 9.5, 12, 22];
-    const lineColor = currentTab === 'expense' ? '#ef4444' : '#3b82f6';
+    const ctx = document.getElementById('reportChart');
+    if (!ctx) return;
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
-    chartInstance = new Chart(ctx, {
+    // Get current period
+    const periods = getPeriods();
+    const period = periods[currentPeriodIndex] || periods[3];
+    const start = period.start;
+    const end = period.end;
+
+    // Build daily data map
+    const type = currentTab; // 'expense' or 'income'
+    const dailyMap = {};
+    
+    // Fill all days in period with 0
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        dailyMap[d.toISOString().split('T')[0]] = 0;
+    }
+
+    // Sum transactions
+    transactions.forEach(t => {
+        if (t.type !== type) return;
+        if (t.date >= start.toISOString().split('T')[0] && t.date <= end.toISOString().split('T')[0]) {
+            dailyMap[t.date] = (dailyMap[t.date] || 0) + t.amount;
+        }
+    });
+
+    const labels = Object.keys(dailyMap).sort();
+    const rawData = labels.map(d => dailyMap[d]);
+
+    // Cumulative sum
+    let cumSum = 0;
+    const data = rawData.map(v => { cumSum += v; return Math.round(cumSum / 1000); }); // in K
+
+    const lineColor = type === 'expense' ? '#ef4444' : '#3b82f6';
+    const gradientColor = type === 'expense' ? 'rgba(239,68,68,0.08)' : 'rgba(59,130,246,0.08)';
+
+    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 200);
+    gradient.addColorStop(0, type === 'expense' ? 'rgba(239,68,68,0.15)' : 'rgba(59,130,246,0.15)');
+    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+    const maxVal = Math.max(...data, 1);
+    const maxDisplay = Math.ceil(maxVal / 5) * 5;
+
+    const firstLabel = labels[0] ? labels[0].split('-').slice(1).reverse().join('/') : '';
+    const lastLabel = labels[labels.length-1] ? labels[labels.length-1].split('-').slice(1).reverse().join('/') : '';
+
+    chartInstance = new Chart(ctx.getContext('2d'), {
         type: 'line',
         data: {
-            labels: Array(17).fill(''),
+            labels,
             datasets: [{
-                data: dataPoints,
-                borderColor: '#d1d5db',
-                borderWidth: 2.5,
-                tension: 0.1,
-                pointRadius: 0
+                data,
+                borderColor: lineColor,
+                borderWidth: 2,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                fill: true,
+                backgroundColor: gradient,
+            }, {
+                // 3-month average line (gray)
+                data: Array(data.length).fill(0), // placeholder
+                borderColor: '#e5e7eb',
+                borderWidth: 1.5,
+                tension: 0.4,
+                pointRadius: 0,
+                fill: false,
+                borderDash: [4, 4],
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'white',
+                    titleColor: '#6b7280',
+                    bodyColor: '#1f2937',
+                    borderColor: '#e5e7eb',
+                    borderWidth: 1,
+                    padding: 8,
+                    callbacks: {
+                        title: items => items[0]?.label?.split('-').slice(1).reverse().join('/') || '',
+                        label: items => {
+                            const v = items.raw * 1000;
+                            return new Intl.NumberFormat('vi-VN').format(v) + ' đ';
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
-                    min: 0, max: 25,
+                    min: 0,
+                    max: maxDisplay || 10,
                     position: 'right',
-                    grid: { color: '#f3f4f6' },
+                    grid: { color: '#f9fafb' },
                     ticks: {
-                        color: '#9ca3af', font: { size: 10 }, stepSize: 10,
-                        callback: v => v === 0 ? '0' : v + ' M'
+                        color: '#9ca3af', font: { size: 10 },
+                        callback: v => v === 0 ? '0' : (v >= 1000 ? (v/1000)+'M' : v+'K')
                     }
                 },
                 x: {
-                    grid: { display: false, borderColor: lineColor, borderWidth: 2 },
+                    grid: { display: false },
                     ticks: {
                         color: '#9ca3af', font: { size: 10 }, maxRotation: 0,
-                        callback: (val, i) => i === 0 ? '16/04' : i === 16 ? '15/05' : ''
+                        callback: (val, i) => {
+                            if (i === 0) return firstLabel;
+                            if (i === labels.length - 1) return lastLabel;
+                            return '';
+                        }
                     }
                 }
             }
@@ -968,13 +1043,14 @@ function renderChart() {
     });
 }
 
+
 // === INIT ===
 window.onload = () => {
+    initCurrentPeriod();
     loadData();
     // Update eye icon state based on loaded data
     document.getElementById('toggleBalanceBtn').className = isBalanceVisible ? 'fas fa-eye' : 'fas fa-eye-slash';
     renderAll();
-    renderChart();
 };
 
 // === MANAGE CATEGORIES ===
