@@ -803,3 +803,13 @@ body {
     background: #10b981;
     width: 20px;
 }
+
+/* Hide arrows on mobile, keep swipe */
+@media (max-width: 768px) {
+    .recv-nav-controls button {
+        display: none !important;
+    }
+    .recv-nav-controls {
+        gap: 0 !important;
+    }
+}
