@@ -10,10 +10,29 @@ let selectedIcon = '💰';
 let prevPage = 'accounts';
 let currentTxnWalletIndex = -1; // -1 = Tất cả
 let currentPeriodIndex = 3; 
+
+function getTodayStr() {
+    // Correctly get YYYY-MM-DD in local timezone (Vietnam UTC+7)
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    const localDate = new Date(now.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().split('T')[0];
+}
+
+function getLocalDateStr(date) {
+    if (!date) return getTodayStr();
+    const d = new Date(date);
+    const offset = d.getTimezoneOffset();
+    const localDate = new Date(d.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().split('T')[0];
+}
+
 function initCurrentPeriod() {
     const periods = getPeriods();
     const now = new Date();
-    const idx = periods.findIndex(p => now >= p.start && now <= p.end);
+    // Compare time at midnight for more accuracy
+    const nowTime = now.getTime();
+    const idx = periods.findIndex(p => nowTime >= p.start.getTime() && nowTime <= p.end.getTime() + 86399999);
     if (idx !== -1) currentPeriodIndex = idx;
 }
 let currentTxnType = 'expense';
@@ -515,7 +534,7 @@ function openAddTransaction() {
     document.getElementById('editTxnId').value = '';
     document.getElementById('txnAmount').value = '';
     document.getElementById('txnNote').value = '';
-    document.getElementById('txnDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('txnDate').value = getTodayStr();
     document.getElementById('deleteTxnRow').style.display = 'none';
     
     setTxnType('expense');
@@ -612,7 +631,7 @@ function changeTxnDate(delta) {
     
     const d = new Date(dateInput.value);
     d.setDate(d.getDate() + delta);
-    dateInput.value = d.toISOString().split('T')[0];
+    dateInput.value = getLocalDateStr(d);
     updateTxnDateDisplay();
 }
 
@@ -939,13 +958,13 @@ function renderChart() {
     
     // Fill all days in period with 0
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        dailyMap[d.toISOString().split('T')[0]] = 0;
+        dailyMap[getLocalDateStr(d)] = 0;
     }
 
     // Sum transactions
     transactions.forEach(t => {
         if (t.type !== type) return;
-        if (t.date >= start.toISOString().split('T')[0] && t.date <= end.toISOString().split('T')[0]) {
+        if (t.date >= getLocalDateStr(start) && t.date <= getLocalDateStr(end)) {
             dailyMap[t.date] = (dailyMap[t.date] || 0) + t.amount;
         }
     });
@@ -972,8 +991,8 @@ function renderChart() {
 
     // Update Home Report Summary Values
     const currentPeriod = periods[currentPeriodIndex] || periods[3];
-    const sStr = currentPeriod.start.toISOString().split('T')[0];
-    const eStr = currentPeriod.end.toISOString().split('T')[0];
+    const sStr = getLocalDateStr(currentPeriod.start);
+    const eStr = getLocalDateStr(currentPeriod.end);
     
     let totalExp = 0;
     let totalInc = 0;
@@ -992,7 +1011,7 @@ function renderChart() {
     // Update Chart Date Label (Today's spend)
     const chartDateEl = document.querySelector('.chart-date');
     if (chartDateEl) {
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = getTodayStr();
         const todaySpend = dailyMap[todayStr] || 0;
         const todayDateFormatted = new Date().toLocaleDateString('vi-VN');
         chartDateEl.innerHTML = `${todayDateFormatted}: <strong class="${type === 'expense' ? 'expense-text' : 'income-text'}">${new Intl.NumberFormat('vi-VN').format(todaySpend)}</strong>`;
