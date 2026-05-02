@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Finance App</title>
-    <link rel="stylesheet" href="style.css?v=1.0.19">
+    <link rel="stylesheet" href="style.css?v=1.0.20">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.19</div>
+                <div class="version-tag">Phiên bản v1.0.20</div>
             </main>
         </div>
 
@@ -498,9 +498,16 @@
             </header>
             <main class="content">
                 <div class="card" style="padding:16px; margin-bottom:16px;">
-                    <h3 style="font-size:14px; color:#6b7280; font-weight:600; margin-bottom:8px; text-transform:uppercase;">API Token SePay</h3>
-                    <input type="text" id="sepayApiToken" placeholder="Nhập API Token của SePay..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:12px; font-size:14px; outline:none;" onchange="saveSePayConfig()">
-                    <p style="font-size:12px; color:#9ca3af; margin-top:8px;">Lấy mã API Token tại my.sepay.vn. Token chỉ lưu trên máy của bạn.</p>
+                    <h3 style="font-size:14px; color:#6b7280; font-weight:600; margin-bottom:8px; text-transform:uppercase;">Cấu hình SePay</h3>
+                    <div style="margin-bottom:12px;">
+                        <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">API Token</div>
+                        <input type="text" id="sepayApiToken" placeholder="Nhập API Token..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:12px; font-size:14px; outline:none;" onchange="saveSePayConfig()">
+                    </div>
+                    <div>
+                        <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">Proxy URL (Google Apps Script)</div>
+                        <input type="text" id="sepayProxyUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:12px; font-size:14px; outline:none;" onchange="saveSePayConfig()">
+                    </div>
+                    <p style="font-size:12px; color:#9ca3af; margin-top:8px;">Lấy mã Token tại my.sepay.vn. Dùng Proxy URL để vượt lỗi CORS.</p>
                 </div>
 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -612,6 +619,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.19"></script>
+    <script src="script.js?v=1.0.20"></script>
 </body>
 </html>

@@ -20,7 +20,7 @@ let settings = {
     firstMonthOfYear: 'Tháng Một'
 };
 
-let sepayConfig = { apiToken: '', mappings: [], lastSyncIds: [] };
+let sepayConfig = { apiToken: '', proxyUrl: '', mappings: [], lastSyncIds: [] };
 
 let userCategories = {
     expense: [
@@ -1193,9 +1193,10 @@ function updateParentCatDisplay() {
 // === SEPAY SYNC LOGIC ===
 function openSePaySync() {
     if (!sepayConfig) {
-        sepayConfig = { apiToken: '', mappings: [], lastSyncIds: [] };
+        sepayConfig = { apiToken: '', proxyUrl: '', mappings: [], lastSyncIds: [] };
     }
     document.getElementById('sepayApiToken').value = sepayConfig.apiToken || '';
+    document.getElementById('sepayProxyUrl').value = sepayConfig.proxyUrl || '';
     document.getElementById('sepaySyncLog').style.display = 'none';
     renderSePayMappings();
     switchPage('sepay');
@@ -1203,6 +1204,7 @@ function openSePaySync() {
 
 function saveSePayConfig() {
     sepayConfig.apiToken = document.getElementById('sepayApiToken').value.trim();
+    sepayConfig.proxyUrl = document.getElementById('sepayProxyUrl').value.trim();
     syncData();
 }
 
@@ -1351,14 +1353,21 @@ async function runSePaySync() {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...';
         btn.disabled = true;
         logBox.style.display = 'block';
-        logBox.innerHTML = 'Đang kết nối SePay...<br>';
+        logBox.innerHTML = 'Đang kết nối SePay qua Proxy...<br>';
         
-        const res = await fetch('https://my.sepay.vn/api/transactions/list?limit=50', {
-            headers: {
-                'Authorization': 'Bearer ' + apiToken,
-                'Content-Type': 'application/json'
-            }
-        });
+        let url = 'https://my.sepay.vn/api/transactions/list?limit=50';
+        let headers = {
+            'Authorization': 'Bearer ' + apiToken,
+            'Content-Type': 'application/json'
+        };
+
+        // If proxy is available, use it to bypass CORS
+        if (sepayConfig.proxyUrl) {
+            url = `${sepayConfig.proxyUrl}?token=${encodeURIComponent(apiToken)}&limit=50`;
+            headers = { 'Content-Type': 'application/json' }; // Auth handled by proxy
+        }
+        
+        const res = await fetch(url, { headers });
         
         if (!res.ok) throw new Error('Lỗi kết nối API SePay. Vui lòng kiểm tra lại API Token.');
         
