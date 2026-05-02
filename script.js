@@ -1966,15 +1966,15 @@ function renderReceivingInfoList() {
             
         return `
         <div class="recv-slide">
-            <div class="card aw-card" style="padding:16px; height: 100%;" onclick="openEditReceivingInfo(${originalIndex})">
+            <div class="card aw-card" style="padding:16px; height: 100%; position:relative;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                     <span style="font-weight:600; font-size:16px;">${info.bankName || 'Ngân hàng'}</span>
-                    <span style="color:#6b7280; font-size:14px;">Chạm để sửa <i class="fas fa-chevron-right" style="font-size:10px; margin-left:4px;"></i></span>
+                    <span style="color:#6b7280; font-size:14px; cursor:pointer; padding: 4px 8px; background:#f3f4f6; border-radius:6px;" onclick="openEditReceivingInfo(${originalIndex})">Sửa <i class="fas fa-edit" style="font-size:10px; margin-left:4px;"></i></span>
                 </div>
                 <div style="font-size:20px; font-weight:700; font-family:monospace; margin-bottom:4px; letter-spacing:1px;">${info.accountNumber || ''}</div>
                 <div style="font-size:14px; color:#6b7280; text-transform:uppercase; margin-bottom:8px;">${info.accountName || ''}</div>
                 ${tagsHtml}
-                ${info.imageUrl ? `<img src="${info.imageUrl}" style="width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">` : ''}
+                ${info.imageUrl ? `<img src="${info.imageUrl}" style="width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); pointer-events:none;">` : ''}
             </div>
         </div>
         `;
@@ -1993,6 +1993,39 @@ function renderReceivingInfoList() {
             dot.classList.toggle('active', i === index);
         });
     };
+
+    // Solution 2: Drag to Scroll for PC
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    listEl.addEventListener('mousedown', (e) => {
+        isDown = true;
+        listEl.classList.add('dragging');
+        startX = e.pageX - listEl.offsetLeft;
+        scrollLeft = listEl.scrollLeft;
+        // Stop scroll snap while dragging to avoid fighting
+        listEl.style.scrollSnapType = 'none';
+    });
+    listEl.addEventListener('mouseleave', () => {
+        if (!isDown) return;
+        isDown = false;
+        listEl.classList.remove('dragging');
+        listEl.style.scrollSnapType = 'x mandatory';
+    });
+    listEl.addEventListener('mouseup', () => {
+        if (!isDown) return;
+        isDown = false;
+        listEl.classList.remove('dragging');
+        listEl.style.scrollSnapType = 'x mandatory';
+    });
+    listEl.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - listEl.offsetLeft;
+        const walk = (x - startX) * 2; // Scroll speed
+        listEl.scrollLeft = scrollLeft - walk;
+    });
 }
 
 function openAddReceivingInfo() {
