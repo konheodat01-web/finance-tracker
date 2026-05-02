@@ -9,7 +9,13 @@ let chartInstance = null;
 let selectedIcon = '💰';
 let prevPage = 'accounts';
 let currentTxnWalletIndex = -1; // -1 = Tất cả
-let currentPeriodIndex = 3;      // Default to current period
+let currentPeriodIndex = 3; 
+function initCurrentPeriod() {
+    const periods = getPeriods();
+    const now = new Date();
+    const idx = periods.findIndex(p => now >= p.start && now <= p.end);
+    if (idx !== -1) currentPeriodIndex = idx;
+}
 let currentTxnType = 'expense';
 let selectedCategory = null;
 let settings = {
@@ -127,9 +133,12 @@ function loadData() {
                 if (data.userCategories) userCategories = data.userCategories;
                 if (data.sepayConfig) sepayConfig = data.sepayConfig;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                initCurrentPeriod(); // Focus on current period after loading
                 renderAll();
             }
         });
+    } else {
+        initCurrentPeriod();
     }
 }
 
@@ -525,7 +534,17 @@ function openEditTransaction(id) {
     if (!t) return;
     
     currentTxnType = t.type;
-    selectedCategory = { name: t.category, icon: t.categoryIcon, color: t.categoryColor };
+    
+    // Prioritize categoryId to find the real category object
+    const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+    const realCat = allCats.find(c => c.id === t.categoryId);
+    
+    if (realCat) {
+        selectedCategory = realCat;
+    } else {
+        selectedCategory = { name: t.category, icon: t.categoryIcon, color: t.categoryColor };
+    }
+    
     txnSelectedWalletId = t.walletId;
     
     document.getElementById('editTxnId').value = t.id;
@@ -733,9 +752,13 @@ function saveTransaction() {
 
     const isIncome = currentTxnType === 'income' || (currentTxnType === 'debt' && (selectedCategory.name === 'Đi vay' || selectedCategory.name === 'Thu nợ'));
 
+    const oldTxn = id ? transactions.find(t => t.id === id) : null;
+
     const txn = {
         id: id || 'txn_' + Date.now(),
         walletId, type: currentTxnType,
+        categoryId: selectedCategory.id || (oldTxn ? oldTxn.categoryId : null),
+        sepayBankAcc: oldTxn ? oldTxn.sepayBankAcc : null,
         amount, category: selectedCategory.name, categoryIcon: selectedCategory.icon, categoryColor: selectedCategory.color,
         note, date
     };
@@ -1338,6 +1361,7 @@ function retroUpdateSepayTxns(mappingIndex) {
     transactions.forEach(t => {
         if (t.sepayBankAcc && t.sepayBankAcc === map.bankAcc) {
             if (cat) {
+                t.categoryId = cat.id;
                 t.category = cat.name;
                 t.categoryIcon = cat.icon;
                 t.categoryColor = cat.color;
@@ -1495,6 +1519,7 @@ async function runSePaySync() {
             const newTxn = {
                 id: 'sepay_' + tx.id,
                 walletId: map.walletId,
+                categoryId: map.categoryId,
                 sepayBankAcc: map.bankAcc,
                 type: type,
                 amount: amount,
