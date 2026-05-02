@@ -859,6 +859,12 @@ function saveTransaction() {
     }
     
     transactions.push(txn);
+    
+    // Only notify if it's a new transaction
+    if (!id) {
+        sendTelegramNotification(txn, targetWallet);
+    }
+    
     syncData();
     switchPage('transactions');
     renderAll();
@@ -1464,6 +1470,46 @@ function updateParentCatDisplay() {
     }
 }
 
+// === TELEGRAM NOTIFICATION ===
+async function sendTelegramNotification(txn, wallet) {
+    const botToken = '8676951438:AAF3VX3xAo4FlG0l6wba4r5zhWIZ685NCjs';
+    const chatId = '6936696698';
+    if (!botToken || !chatId) return;
+
+    const isIncome = txn.type === 'income' || (txn.type === 'debt' && (txn.category === 'Đi vay' || txn.category === 'Thu nợ'));
+    const sign = isIncome ? '+' : '-';
+    
+    let totalBalance = 0;
+    if (typeof wallets !== 'undefined' && Array.isArray(wallets)) {
+        totalBalance = wallets.reduce((sum, w) => sum + w.balance, 0);
+    }
+    
+    const formatter = new Intl.NumberFormat('vi-VN');
+    const amountStr = formatter.format(txn.amount) + ' đ';
+    const walletBalanceStr = wallet ? formatter.format(wallet.balance) + ' đ' : '0 đ';
+    const totalBalanceStr = formatter.format(totalBalance) + ' đ';
+    const walletName = wallet ? wallet.name : 'Chưa rõ ví';
+    
+    const message = `BIẾN ĐỘNG SỐ DƯ "${walletName}"
+${sign} ${amountStr}
+NỘI DUNG: "${txn.note || txn.category}"
+SỐ DƯ VÍ: "${walletBalanceStr}"
+TỔNG SỐ DƯ: "${totalBalanceStr}"`;
+
+    try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message
+            })
+        });
+    } catch(err) {
+        console.error('Failed to send Telegram notif:', err);
+    }
+}
+
 // === SEPAY SYNC LOGIC ===
 function openSePaySync() {
     if (!sepayConfig) {
@@ -1787,6 +1833,8 @@ async function runSePaySync() {
                 if (type === 'income') w.balance += amount;
                 else w.balance -= amount;
             }
+            
+            sendTelegramNotification(newTxn, w);
             
             newCount++;
             logBox.innerHTML += `<span style="color:#10b981;">+ ${newTxn.category} (${newTxn.amount.toLocaleString()})</span><br>`;
