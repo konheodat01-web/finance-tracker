@@ -1917,11 +1917,36 @@ function openReceivingInfoPage() {
     switchPage('receiving-info');
 }
 
+function toggleReceivingSearch() {
+    const searchContainer = document.getElementById('receivingSearchContainer');
+    const searchInput = document.getElementById('receivingSearchInput');
+    if (searchContainer.style.display === 'none') {
+        searchContainer.style.display = 'block';
+        searchInput.focus();
+    } else {
+        searchContainer.style.display = 'none';
+        searchInput.value = '';
+        renderReceivingInfoList();
+    }
+}
+
 function renderReceivingInfoList() {
     const listEl = document.getElementById('receivingInfoList');
+    const query = (document.getElementById('receivingSearchInput')?.value || '').toLowerCase().trim();
     const infos = receivingInfos || [];
     
-    if (infos.length === 0) {
+    let filteredInfos = infos;
+    if (query) {
+        filteredInfos = infos.filter(info => {
+            const matchName = (info.accountName || '').toLowerCase().includes(query);
+            const matchBank = (info.bankName || '').toLowerCase().includes(query);
+            const matchNumber = (info.accountNumber || '').includes(query);
+            const matchTags = (info.tags || []).some(t => t.toLowerCase().includes(query));
+            return matchName || matchBank || matchNumber || matchTags;
+        });
+    }
+    
+    if (filteredInfos.length === 0) {
         listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px;">
             <div style="font-size:40px; margin-bottom:12px;">📇</div>
             Chưa có thông tin nhận tiền nào
@@ -1929,17 +1954,27 @@ function renderReceivingInfoList() {
         return;
     }
     
-    listEl.innerHTML = infos.map((info, idx) => `
-        <div class="card aw-card" style="padding:16px;" onclick="openEditReceivingInfo(${idx})">
+    listEl.innerHTML = filteredInfos.map((info) => {
+        const originalIndex = infos.indexOf(info);
+        const tagsHtml = (info.tags || []).length > 0 
+            ? `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+                ${info.tags.map(t => `<span style="background:#e0e7ff; color:#4f46e5; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600;">${t}</span>`).join('')}
+               </div>`
+            : '';
+            
+        return `
+        <div class="card aw-card" style="padding:16px;" onclick="openEditReceivingInfo(${originalIndex})">
             <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                 <span style="font-weight:600; font-size:16px;">${info.bankName || 'Ngân hàng'}</span>
                 <span style="color:#6b7280; font-size:14px;">Chạm để sửa <i class="fas fa-chevron-right" style="font-size:10px; margin-left:4px;"></i></span>
             </div>
             <div style="font-size:20px; font-weight:700; font-family:monospace; margin-bottom:4px; letter-spacing:1px;">${info.accountNumber || ''}</div>
-            <div style="font-size:14px; color:#6b7280; text-transform:uppercase; margin-bottom:12px;">${info.accountName || ''}</div>
+            <div style="font-size:14px; color:#6b7280; text-transform:uppercase; margin-bottom:8px;">${info.accountName || ''}</div>
+            ${tagsHtml}
             ${info.imageUrl ? `<img src="${info.imageUrl}" style="width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">` : ''}
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function openAddReceivingInfo() {
@@ -1948,6 +1983,7 @@ function openAddReceivingInfo() {
     document.getElementById('recvBank').value = '';
     document.getElementById('recvNumber').value = '';
     document.getElementById('recvName').value = '';
+    document.getElementById('recvTags').value = '';
     document.getElementById('recvImageLink').value = '';
     document.getElementById('recvImagePreviewContainer').style.display = 'none';
     document.getElementById('deleteReceivingRow').style.display = 'none';
@@ -1963,6 +1999,8 @@ function openEditReceivingInfo(idx) {
     document.getElementById('recvBank').value = info.bankName || '';
     document.getElementById('recvNumber').value = info.accountNumber || '';
     document.getElementById('recvName').value = info.accountName || '';
+    document.getElementById('recvTags').value = (info.tags || []).join(', ');
+
     
     document.getElementById('recvImageLink').value = info.originalUrl || info.imageUrl || '';
     
@@ -2001,6 +2039,7 @@ function saveReceivingInfo() {
     const accountNumber = document.getElementById('recvNumber').value.trim();
     const accountName = document.getElementById('recvName').value.trim();
     const url = document.getElementById('recvImageLink').value.trim();
+    const tagsStr = document.getElementById('recvTags').value.trim();
     
     if (!bankName && !accountNumber) {
         alert('Vui lòng nhập Ngân hàng hoặc Số tài khoản!');
@@ -2015,7 +2054,8 @@ function saveReceivingInfo() {
         }
     }
     
-    const info = { bankName, accountNumber, accountName, imageUrl, originalUrl: url };
+    const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t !== '') : [];
+    const info = { bankName, accountNumber, accountName, imageUrl, originalUrl: url, tags };
     
     const idxStr = document.getElementById('editReceivingId').value;
     if (idxStr !== '') {
