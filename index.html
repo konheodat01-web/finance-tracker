@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Finance App</title>
-    <link rel="stylesheet" href="style.css?v=1.0.18">
+    <link rel="stylesheet" href="style.css?v=1.0.19">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -115,7 +115,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.18</div>
+                <div class="version-tag">Phiên bản v1.0.19</div>
             </main>
         </div>
 
@@ -183,16 +183,9 @@
 
                 <div class="section-label" style="margin-top:8px;">DỮ LIỆU</div>
                 <div class="card" style="padding:0; overflow:hidden; margin-bottom:12px;">
-                    <!-- Quản lý nhóm -->
-                    <div onclick="openManageCategories()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
-                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Quản lý nhóm chi tiêu</span>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
-                        </div>
-                    </div>
-                    <!-- Đồng bộ Casso -->
-                    <div onclick="openCassoSync()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer;">
-                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đồng bộ ngân hàng (Casso)</span>
+                    <!-- Đồng bộ SePay -->
+                    <div onclick="openSePaySync()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đồng bộ ngân hàng (SePay)</span>
                         <div style="display:flex; align-items:center; gap:8px;">
                             <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
@@ -492,38 +485,38 @@
             </div>
         </div>
 
-        <!-- ===================== PAGE: CASSO SYNC ===================== -->
-        <div id="page-casso" class="page page-light">
+        <!-- ===================== PAGE: SEPAY SYNC ===================== -->
+        <div id="page-sepay" class="page page-light">
             <header class="header header-modal-style">
                 <div class="header-top" style="align-items: center;">
                     <button class="btn-link" onclick="switchPage('settings')">
                         <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Cài đặt
                     </button>
-                    <h2 class="page-title">Đồng bộ Casso</h2>
+                    <h2 class="page-title">Đồng bộ SePay</h2>
                     <span style="width:70px;"></span>
                 </div>
             </header>
             <main class="content">
                 <div class="card" style="padding:16px; margin-bottom:16px;">
-                    <h3 style="font-size:14px; color:#6b7280; font-weight:600; margin-bottom:8px; text-transform:uppercase;">API Key Casso</h3>
-                    <input type="text" id="cassoApiKey" placeholder="Nhập API Key của Casso..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:12px; font-size:14px; outline:none;" onchange="saveCassoConfig()">
-                    <p style="font-size:12px; color:#9ca3af; margin-top:8px;">Lấy mã API Key tại casso.vn. Lưu ý: Key chỉ lưu trên máy của bạn.</p>
+                    <h3 style="font-size:14px; color:#6b7280; font-weight:600; margin-bottom:8px; text-transform:uppercase;">API Token SePay</h3>
+                    <input type="text" id="sepayApiToken" placeholder="Nhập API Token của SePay..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:12px; font-size:14px; outline:none;" onchange="saveSePayConfig()">
+                    <p style="font-size:12px; color:#9ca3af; margin-top:8px;">Lấy mã API Token tại my.sepay.vn. Token chỉ lưu trên máy của bạn.</p>
                 </div>
 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                     <h3 style="font-size:14px; color:#6b7280; font-weight:600; text-transform:uppercase;">Liên kết Ngân hàng</h3>
-                    <button onclick="addCassoMapping()" style="background:none; border:none; color:#10b981; font-weight:600; font-size:13px; cursor:pointer;"><i class="fas fa-plus"></i> Thêm</button>
+                    <button onclick="addSePayMapping()" style="background:none; border:none; color:#10b981; font-weight:600; font-size:13px; cursor:pointer;"><i class="fas fa-plus"></i> Thêm</button>
                 </div>
                 
-                <div id="cassoMappingList">
+                <div id="sepayMappingList">
                     <!-- Mappings will be rendered here -->
                 </div>
 
-                <button onclick="runCassoSync()" id="btnRunCassoSync" style="width:100%; background:#3b82f6; color:white; border:none; border-radius:12px; padding:16px; font-size:16px; font-weight:600; cursor:pointer; margin-top:16px; box-shadow:0 4px 12px rgba(59,130,246,0.3); display:flex; justify-content:center; align-items:center; gap:8px;">
+                <button onclick="runSePaySync()" id="btnRunSePaySync" style="width:100%; background:#10b981; color:white; border:none; border-radius:12px; padding:16px; font-size:16px; font-weight:600; cursor:pointer; margin-top:16px; box-shadow:0 4px 12px rgba(16,185,129,0.3); display:flex; justify-content:center; align-items:center; gap:8px;">
                     <i class="fas fa-sync-alt"></i> Đồng bộ ngay
                 </button>
                 
-                <div id="cassoSyncLog" style="margin-top:16px; font-size:13px; color:#4b5563; background:#f9fafb; padding:12px; border-radius:8px; display:none; max-height:200px; overflow-y:auto;">
+                <div id="sepaySyncLog" style="margin-top:16px; font-size:13px; color:#4b5563; background:#f9fafb; padding:12px; border-radius:8px; display:none; max-height:200px; overflow-y:auto;">
                 </div>
             </main>
         </div>
@@ -619,6 +612,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.18"></script>
+    <script src="script.js?v=1.0.19"></script>
 </body>
 </html>

@@ -20,7 +20,7 @@ let settings = {
     firstMonthOfYear: 'Tháng Một'
 };
 
-let cassoConfig = { apiKey: '', mappings: [], lastSyncIds: [] };
+let sepayConfig = { apiToken: '', mappings: [], lastSyncIds: [] };
 
 let userCategories = {
     expense: [
@@ -100,7 +100,7 @@ const database = firebase.database();
 const STORAGE_KEY = 'finance_flow_data';
 
 function syncData() {
-    const data = { wallets, isBalanceVisible, settings, transactions, userCategories, cassoConfig };
+    const data = { wallets, isBalanceVisible, settings, transactions, userCategories, sepayConfig };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     if (database) database.ref('user_data').set(data);
 }
@@ -114,7 +114,7 @@ function loadData() {
         isBalanceVisible = data.isBalanceVisible !== undefined ? data.isBalanceVisible : true;
         if (data.settings) settings = { ...settings, ...data.settings };
         if (data.userCategories) userCategories = data.userCategories;
-        if (data.cassoConfig) cassoConfig = data.cassoConfig;
+        if (data.sepayConfig) sepayConfig = data.sepayConfig;
     }
     if (database) {
         database.ref('user_data').on('value', (snapshot) => {
@@ -125,7 +125,7 @@ function loadData() {
                 isBalanceVisible = data.isBalanceVisible !== undefined ? data.isBalanceVisible : true;
                 if (data.settings) settings = { ...settings, ...data.settings };
                 if (data.userCategories) userCategories = data.userCategories;
-                if (data.cassoConfig) cassoConfig = data.cassoConfig;
+                if (data.sepayConfig) sepayConfig = data.sepayConfig;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
                 renderAll();
             }
@@ -172,7 +172,7 @@ function switchPage(pageName) {
 
     // Hide bottom nav on certain pages
     const bottomNav = document.querySelector('.bottom-nav');
-    const hideOnPages = ['add-wallet', 'settings', 'add-transaction', 'categories', 'add-category', 'casso'];
+    const hideOnPages = ['add-wallet', 'settings', 'add-transaction', 'categories', 'add-category', 'sepay'];
     bottomNav.style.display = hideOnPages.includes(pageName) ? 'none' : 'flex';
 
     renderAll();
@@ -1190,31 +1190,31 @@ function updateParentCatDisplay() {
     }
 }
 
-// === CASSO SYNC LOGIC ===
-function openCassoSync() {
-    if (!cassoConfig) {
-        cassoConfig = { apiKey: '', mappings: [], lastSyncIds: [] };
+// === SEPAY SYNC LOGIC ===
+function openSePaySync() {
+    if (!sepayConfig) {
+        sepayConfig = { apiToken: '', mappings: [], lastSyncIds: [] };
     }
-    document.getElementById('cassoApiKey').value = cassoConfig.apiKey || '';
-    document.getElementById('cassoSyncLog').style.display = 'none';
-    renderCassoMappings();
-    switchPage('casso');
+    document.getElementById('sepayApiToken').value = sepayConfig.apiToken || '';
+    document.getElementById('sepaySyncLog').style.display = 'none';
+    renderSePayMappings();
+    switchPage('sepay');
 }
 
-function saveCassoConfig() {
-    cassoConfig.apiKey = document.getElementById('cassoApiKey').value.trim();
+function saveSePayConfig() {
+    sepayConfig.apiToken = document.getElementById('sepayApiToken').value.trim();
     syncData();
 }
 
-function renderCassoMappings() {
-    const list = document.getElementById('cassoMappingList');
-    if (!cassoConfig.mappings || cassoConfig.mappings.length === 0) {
+function renderSePayMappings() {
+    const list = document.getElementById('sepayMappingList');
+    if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
         list.innerHTML = '<div style="text-align:center; padding:20px; color:#9ca3af; font-size:13px;">Chưa có liên kết ngân hàng nào.</div>';
         return;
     }
     
     let html = '';
-    cassoConfig.mappings.forEach((m, index) => {
+    sepayConfig.mappings.forEach((m, index) => {
         const wallet = wallets.find(w => w.id === m.walletId);
         const wName = wallet ? `${wallet.icon} ${wallet.name}` : 'Chưa chọn Ví';
         
@@ -1233,18 +1233,18 @@ function renderCassoMappings() {
 
         html += `
             <div class="card" style="padding:16px; margin-bottom:12px; position:relative;">
-                <button onclick="removeCassoMapping(${index})" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                <button onclick="removeSePayMapping(${index})" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer;"><i class="fas fa-trash"></i></button>
                 <div style="margin-bottom:12px;">
                     <div style="font-size:11px; color:#9ca3af; text-transform:uppercase; font-weight:600; margin-bottom:4px;">Số tài khoản</div>
-                    <input type="text" placeholder="Nhập số tài khoản..." value="${m.bankAcc}" onchange="updateCassoMapping(${index}, 'bankAcc', this.value)" style="width:calc(100% - 30px); border:none; outline:none; border-bottom:1px solid #e5e7eb; padding:4px 0; font-size:15px; font-weight:600; color:#1f2937;">
+                    <input type="text" placeholder="Nhập số tài khoản..." value="${m.bankAcc}" onchange="updateSePayMapping(${index}, 'bankAcc', this.value)" style="width:calc(100% - 30px); border:none; outline:none; border-bottom:1px solid #e5e7eb; padding:4px 0; font-size:15px; font-weight:600; color:#1f2937;">
                 </div>
                 
                 <div style="display:flex; gap:12px;">
-                    <div style="flex:1; background:#f9fafb; padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="openCassoWalletPicker(${index})">
+                    <div style="flex:1; background:#f9fafb; padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="openSePayWalletPicker(${index})">
                         <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">Nhập vào Ví</div>
                         <div style="font-size:14px; font-weight:500; color:#1f2937;">${wName}</div>
                     </div>
-                    <div style="flex:1; background:#f9fafb; padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="openCassoCategoryPicker(${index})">
+                    <div style="flex:1; background:#f9fafb; padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="openSePayCategoryPicker(${index})">
                         <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">Nhóm chi tiêu</div>
                         <div style="font-size:14px; font-weight:500; color:${cColor};"><span style="margin-right:4px;">${cIcon}</span> ${cName}</div>
                     </div>
@@ -1255,37 +1255,37 @@ function renderCassoMappings() {
     list.innerHTML = html;
 }
 
-function addCassoMapping() {
-    if (!cassoConfig.mappings) cassoConfig.mappings = [];
-    cassoConfig.mappings.push({ bankAcc: '', walletId: '', categoryId: '' });
-    renderCassoMappings();
+function addSePayMapping() {
+    if (!sepayConfig.mappings) sepayConfig.mappings = [];
+    sepayConfig.mappings.push({ bankAcc: '', walletId: '', categoryId: '' });
+    renderSePayMappings();
     syncData();
 }
 
-function removeCassoMapping(index) {
+function removeSePayMapping(index) {
     if(confirm('Xóa liên kết này?')) {
-        cassoConfig.mappings.splice(index, 1);
-        renderCassoMappings();
+        sepayConfig.mappings.splice(index, 1);
+        renderSePayMappings();
         syncData();
     }
 }
 
-function updateCassoMapping(index, field, value) {
-    cassoConfig.mappings[index][field] = value.trim();
+function updateSePayMapping(index, field, value) {
+    sepayConfig.mappings[index][field] = value.trim();
     syncData();
 }
 
-let activeCassoMappingIndex = -1;
+let activeSePayMappingIndex = -1;
 
-function openCassoWalletPicker(index) {
-    activeCassoMappingIndex = index;
+function openSePayWalletPicker(index) {
+    activeSePayMappingIndex = index;
     const list = document.getElementById('txnWalletPickerList');
     if(!list) return;
     
     let html = '';
     wallets.forEach(w => {
         html += `
-            <div onclick="selectCassoWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer;">
+            <div onclick="selectSePayWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer;">
                 <div style="width:36px; height:36px; border-radius:50%; background:#f3f4f6; display:flex; align-items:center; justify-content:center; font-size:18px;">${w.icon}</div>
                 <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
             </div>
@@ -1295,17 +1295,17 @@ function openCassoWalletPicker(index) {
     document.getElementById('txnWalletPickerOverlay').style.display = 'flex';
 }
 
-function selectCassoWallet(id) {
-    if (activeCassoMappingIndex !== -1) {
-        cassoConfig.mappings[activeCassoMappingIndex].walletId = id;
-        renderCassoMappings();
+function selectSePayWallet(id) {
+    if (activeSePayMappingIndex !== -1) {
+        sepayConfig.mappings[activeSePayMappingIndex].walletId = id;
+        renderSePayMappings();
         syncData();
     }
     closeTxnWalletPicker();
 }
 
-function openCassoCategoryPicker(index) {
-    activeCassoMappingIndex = index;
+function openSePayCategoryPicker(index) {
+    activeSePayMappingIndex = index;
     const grid = document.getElementById('txnCategoryPickerGrid');
     if(!grid) return;
     
@@ -1314,7 +1314,7 @@ function openCassoCategoryPicker(index) {
     let html = '';
     allCats.forEach(cat => {
         html += `
-            <div onclick="selectCassoCategory('${cat.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer;">
+            <div onclick="selectSePayCategory('${cat.id}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer;">
                 <div style="width:48px; height:48px; border-radius:14px; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:24px; color:${cat.color}; margin-bottom:6px;">${cat.icon}</div>
                 <div style="font-size:12px; font-weight:500; color:#4b5563; text-align:center;">${cat.name}</div>
             </div>
@@ -1324,25 +1324,25 @@ function openCassoCategoryPicker(index) {
     document.getElementById('txnCategoryPickerOverlay').style.display = 'flex';
 }
 
-function selectCassoCategory(id) {
-    if (activeCassoMappingIndex !== -1) {
-        cassoConfig.mappings[activeCassoMappingIndex].categoryId = id;
-        renderCassoMappings();
+function selectSePayCategory(id) {
+    if (activeSePayMappingIndex !== -1) {
+        sepayConfig.mappings[activeSePayMappingIndex].categoryId = id;
+        renderSePayMappings();
         syncData();
     }
     closeTxnCategoryPicker();
 }
 
-async function runCassoSync() {
-    const btn = document.getElementById('btnRunCassoSync');
-    const logBox = document.getElementById('cassoSyncLog');
-    const apiKey = cassoConfig.apiKey;
+async function runSePaySync() {
+    const btn = document.getElementById('btnRunSePaySync');
+    const logBox = document.getElementById('sepaySyncLog');
+    const apiToken = sepayConfig.apiToken;
     
-    if (!apiKey) {
-        alert('Vui lòng nhập API Key Casso trước!');
+    if (!apiToken) {
+        alert('Vui lòng nhập API Token SePay trước!');
         return;
     }
-    if (!cassoConfig.mappings || cassoConfig.mappings.length === 0) {
+    if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
         alert('Vui lòng thêm ít nhất 1 liên kết ngân hàng!');
         return;
     }
@@ -1351,74 +1351,79 @@ async function runCassoSync() {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...';
         btn.disabled = true;
         logBox.style.display = 'block';
-        logBox.innerHTML = 'Đang kết nối Casso...<br>';
+        logBox.innerHTML = 'Đang kết nối SePay...<br>';
         
-        const res = await fetch('https://oauth.casso.vn/v2/transactions?limit=50&sort=DESC', {
+        const res = await fetch('https://my.sepay.vn/api/transactions/list?limit=50', {
             headers: {
-                'Authorization': 'Apikey ' + apiKey,
+                'Authorization': 'Bearer ' + apiToken,
                 'Content-Type': 'application/json'
             }
         });
         
-        if (!res.ok) throw new Error('Lỗi kết nối API Casso. Vui lòng kiểm tra lại API Key.');
+        if (!res.ok) throw new Error('Lỗi kết nối API SePay. Vui lòng kiểm tra lại API Token.');
         
         const json = await res.json();
-        if (json.error !== 0) throw new Error(json.message || 'Lỗi lấy dữ liệu từ Casso');
+        if (json.status !== 200) throw new Error(json.messages || 'Lỗi lấy dữ liệu từ SePay');
         
-        const records = json.data.records || [];
+        const records = json.transactions || [];
         logBox.innerHTML += `Tìm thấy ${records.length} giao dịch gần đây.<br>`;
         
-        if (!cassoConfig.lastSyncIds) cassoConfig.lastSyncIds = [];
+        if (!sepayConfig.lastSyncIds) sepayConfig.lastSyncIds = [];
         let newCount = 0;
         
+        // SePay returns newest first, we process oldest first for balance integrity
         records.reverse().forEach(tx => {
             const txIdStr = String(tx.id);
-            if (cassoConfig.lastSyncIds.includes(txIdStr)) return;
+            if (sepayConfig.lastSyncIds.includes(txIdStr)) return;
             
-            const map = cassoConfig.mappings.find(m => m.bankAcc && m.bankAcc.trim() === String(tx.bank_sub_acc_id));
+            const map = sepayConfig.mappings.find(m => m.bankAcc && m.bankAcc.trim() === String(tx.account_number));
             if (!map) return;
             
             const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
             const cat = allCats.find(c => c.id === map.categoryId);
             
-            let type = 'expense';
-            if (userCategories.income && userCategories.income.find(c => c.id === map.categoryId)) type = 'income';
-            if (tx.amount > 0 && type === 'expense') type = 'income';
-            else if (tx.amount < 0 && type === 'income') type = 'expense';
+            const amountIn = parseFloat(tx.amount_in || 0);
+            const amountOut = parseFloat(tx.amount_out || 0);
+            const isIncome = amountIn > 0;
+            const amount = isIncome ? amountIn : amountOut;
+            
+            let type = isIncome ? 'income' : 'expense';
+            // Optional: If mapped category is opposite type, we should handle it. 
+            // But usually mapping is 1-1.
             
             const newTxn = {
-                id: 'casso_' + tx.id,
+                id: 'sepay_' + tx.id,
                 walletId: map.walletId,
                 type: type,
-                amount: Math.abs(tx.amount),
+                amount: amount,
                 category: (type === 'income' && !cat) ? 'Nạp quỹ' : (cat ? cat.name : 'Chưa phân loại'),
                 categoryIcon: cat ? cat.icon : '💸',
                 categoryColor: cat ? cat.color : '#9ca3af',
-                note: tx.description || 'Casso Sync',
-                date: tx.when.split(' ')[0]
+                note: tx.transaction_content || 'SePay Sync',
+                date: tx.transaction_date.split(' ')[0]
             };
             
             transactions.push(newTxn);
-            cassoConfig.lastSyncIds.push(txIdStr);
+            sepayConfig.lastSyncIds.push(txIdStr);
             
             const w = wallets.find(w => w.id === map.walletId);
             if (w) {
-                if (type === 'income') w.balance += Math.abs(tx.amount);
-                else w.balance -= Math.abs(tx.amount);
+                if (type === 'income') w.balance += amount;
+                else w.balance -= amount;
             }
             
             newCount++;
             logBox.innerHTML += `<span style="color:#10b981;">+ ${newTxn.category} (${newTxn.amount.toLocaleString()})</span><br>`;
         });
         
-        if (cassoConfig.lastSyncIds.length > 200) {
-            cassoConfig.lastSyncIds = cassoConfig.lastSyncIds.slice(cassoConfig.lastSyncIds.length - 200);
+        if (sepayConfig.lastSyncIds.length > 200) {
+            sepayConfig.lastSyncIds = sepayConfig.lastSyncIds.slice(sepayConfig.lastSyncIds.length - 200);
         }
         
         syncData();
         renderAll();
         
-        logBox.innerHTML += `<strong style="color:#2563eb;">Hoàn tất! Đã đồng bộ ${newCount} giao dịch mới.</strong>`;
+        logBox.innerHTML += `<strong style="color:#10b981;">Hoàn tất! Đã đồng bộ ${newCount} giao dịch mới.</strong>`;
         
     } catch (e) {
         logBox.innerHTML += `<strong style="color:#ef4444;">Lỗi: ${e.message}</strong>`;
