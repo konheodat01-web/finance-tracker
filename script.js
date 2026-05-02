@@ -1492,8 +1492,8 @@ function updateParentCatDisplay() {
 
 // === TELEGRAM NOTIFICATION ===
 async function sendTelegramNotification(txn, wallet) {
-    const botToken = '8676951438:AAF3VX3xAo4FlG0l6wba4r5zhWIZ685NCjs';
-    const chatId = '6936696698';
+    const botToken = '8785673510:AAE38yQmsY3NglAmsUdlW9maYC8fmVM6B7w';
+    const chatId = '-5124834913';
     if (!botToken || !chatId) return;
 
     const isIncome = txn.type === 'income' || (txn.type === 'debt' && (txn.category === 'Đi vay' || txn.category === 'Thu nợ'));
