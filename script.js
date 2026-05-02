@@ -1579,6 +1579,8 @@ function retroUpdateSepayTxns(mappingIndex) {
         if (t.sepayBankAcc && t.sepayBankAcc === map.bankAcc) {
             // Respect manual edits - never overwrite user's manual changes
             if (t.manuallyEdited) return;
+            // Income transactions are auto-mapped to "Thu nhập khác", do not overwrite them with expense mapping
+            if (t.type === 'income') return;
             if (cat) {
                 t.categoryId = cat.id;
                 t.category = cat.name;
@@ -1721,24 +1723,52 @@ async function runSePaySync() {
             
             // Determine type: if category is mapped, use its type. Otherwise infer from transaction.
             let type = isIncome ? 'income' : 'expense';
-            if (cat) {
-                const expCat = (userCategories.expense||[]).find(c => c.id === cat.id);
-                const incCat = (userCategories.income||[]).find(c => c.id === cat.id);
-                if (expCat) type = 'expense';
-                else if (incCat) type = 'income';
+            let finalCatId = null;
+            let finalCatName = isIncome ? 'Nạp quỹ' : 'Chưa phân loại';
+            let finalCatIcon = isIncome ? '💰' : '💸';
+            let finalCatColor = '#9ca3af';
+
+            if (isIncome) {
+                // If Income, ignore mapped category and force to "Thu nhập khác"
+                type = 'income';
+                const incomeCats = userCategories.income || [];
+                const otherIncomeCat = incomeCats.find(c => c.name.toLowerCase() === 'thu nhập khác');
+                if (otherIncomeCat) {
+                    finalCatId = otherIncomeCat.id;
+                    finalCatName = otherIncomeCat.name;
+                    finalCatIcon = otherIncomeCat.icon;
+                    finalCatColor = otherIncomeCat.color;
+                } else {
+                    finalCatName = 'Thu nhập khác';
+                    finalCatIcon = '💵';
+                    finalCatColor = '#10b981';
+                }
+            } else {
+                // If Expense, use mapped category
+                if (cat) {
+                    finalCatId = cat.id;
+                    finalCatName = cat.name;
+                    finalCatIcon = cat.icon;
+                    finalCatColor = cat.color;
+                    
+                    const expCat = (userCategories.expense||[]).find(c => c.id === cat.id);
+                    const incCat = (userCategories.income||[]).find(c => c.id === cat.id);
+                    if (expCat) type = 'expense';
+                    else if (incCat) type = 'income';
+                }
             }
             
             const newTxn = {
                 id: 'sepay_' + tx.id,
                 walletId: map.walletId || null,
-                categoryId: map.categoryId || null,
+                categoryId: finalCatId,
                 sepayBankAcc: map.bankAcc || null,
                 manuallyEdited: false, // Auto-synced, can be overwritten by mapping changes
                 type: type,
                 amount: amount,
-                category: cat ? cat.name : (isIncome ? 'Nạp quỹ' : 'Chưa phân loại'),
-                categoryIcon: cat ? cat.icon : (isIncome ? '💰' : '💸'),
-                categoryColor: cat ? cat.color : '#9ca3af',
+                category: finalCatName,
+                categoryIcon: finalCatIcon,
+                categoryColor: finalCatColor,
                 note: tx.transaction_content || 'SePay Sync',
                 date: (tx.transaction_date || '').split(' ')[0]
             };
