@@ -1993,8 +1993,6 @@ function renderReceivingInfoList() {
             dot.classList.toggle('active', i === index);
         });
     };
-
-    };
 }
 
 function scrollReceiving(dir) {
