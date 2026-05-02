@@ -1218,7 +1218,7 @@ function renderSePayMappings() {
     let html = '';
     sepayConfig.mappings.forEach((m, index) => {
         const wallet = wallets.find(w => w.id === m.walletId);
-        const wName = wallet ? `${wallet.icon} ${wallet.name}` : 'Chưa chọn Ví';
+        const wName = wallet ? `${wallet.emoji || '💰'} ${wallet.name}` : 'Chưa chọn Ví';
         
         let cName = 'Chưa chọn Nhóm';
         let cIcon = '❓';
@@ -1356,18 +1356,21 @@ async function runSePaySync() {
         logBox.innerHTML = 'Đang kết nối SePay qua Proxy...<br>';
         
         let url = 'https://my.sepay.vn/api/transactions/list?limit=50';
-        let headers = {
-            'Authorization': 'Bearer ' + apiToken,
-            'Content-Type': 'application/json'
+        let options = {
+            headers: {
+                'Authorization': 'Bearer ' + apiToken,
+                'Content-Type': 'application/json'
+            }
         };
 
-        // If proxy is available, use it to bypass CORS
+        // If proxy is available, use it to bypass CORS. 
+        // We MUST NOT send custom headers to avoid triggering an OPTIONS preflight request.
         if (sepayConfig.proxyUrl) {
             url = `${sepayConfig.proxyUrl}?token=${encodeURIComponent(apiToken)}&limit=50`;
-            headers = { 'Content-Type': 'application/json' }; // Auth handled by proxy
+            options = {}; // No custom headers
         }
         
-        const res = await fetch(url, { headers });
+        const res = await fetch(url, options);
         
         if (!res.ok) throw new Error('Lỗi kết nối API SePay. Vui lòng kiểm tra lại API Token.');
         
