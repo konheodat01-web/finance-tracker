@@ -192,7 +192,7 @@ function formatCurrency(amount, currencyCode = 'VND') {
 
 function getTotalBalance() {
     // Note: Simple sum for now, ignores conversion
-    return wallets.reduce((sum, w) => sum + w.balance, 0);
+    return wallets.reduce((sum, w) => sum + (w.excluded ? 0 : w.balance), 0);
 }
 
 // === PAGE ROUTING ===
@@ -277,22 +277,17 @@ function renderAccountsPage() {
         return;
     }
     wallets.forEach(w => {
-        const isSelected = selectedWalletId === w.id;
-        const rightSide = editModeActive
-            ? `<button class="wallet-edit-btn" onclick="openEditWallet('${w.id}'); event.stopPropagation();"><i class="fas fa-pencil-alt"></i></button>`
-            : (isSelected ? '<i class="fas fa-check wallet-check"></i>' : '');
-
         list.innerHTML += `
-            <div class="wallet-item" onclick="selectWallet('${w.id}')">
+            <div class="wallet-item" onclick="openEditWallet('${w.id}')" style="cursor:pointer;">
                 <div class="wallet-item-row">
                     <div class="wallet-left">
                         <div class="wallet-icon ${w.bgClass}">${w.emoji}</div>
                         <div>
-                            <div class="wallet-name">${w.name}</div>
+                            <div class="wallet-name">${w.name} ${w.isDefault ? '<span style="font-size:10px; background:#10b981; color:white; padding:2px 6px; border-radius:10px; margin-left:6px; vertical-align:middle;">Mặc định</span>' : ''}</div>
                             <div style="font-size:12px; color:#9ca3af;">${formatCurrency(w.balance, w.currency || 'VND')}</div>
                         </div>
                     </div>
-                    ${rightSide}
+                    <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
                 </div>
             </div>`;
     });
@@ -333,19 +328,7 @@ function closeSettingPicker() {
     document.getElementById('settingPickerOverlay').style.display = 'none';
 }
 
-// === WALLET SELECTION ===
-function selectWallet(id) {
-    if (editModeActive) return;
-    selectedWalletId = (selectedWalletId === id) ? null : id;
-    renderAccountsPage();
-}
-
-// === EDIT MODE ===
-function toggleEditMode() {
-    editModeActive = !editModeActive;
-    document.getElementById('btnEditMode').innerText = editModeActive ? 'Xong' : 'Sửa';
-    renderAccountsPage();
-}
+// === SETTINGS PAGE ===
 
 // === TRANSACTIONS PAGE ===
 function getPeriods() {
@@ -555,7 +538,8 @@ let txnSelectedWalletId = null;
 function openAddTransaction() {
     currentTxnType = 'expense';
     selectedCategory = null;
-    txnSelectedWalletId = wallets.length > 0 ? wallets[0].id : null;
+    const defaultWallet = wallets.find(w => w.isDefault);
+    txnSelectedWalletId = defaultWallet ? defaultWallet.id : (wallets.length > 0 ? wallets[0].id : null);
     
     document.getElementById('editTxnId').value = '';
     document.getElementById('txnAmount').value = '';
@@ -918,6 +902,7 @@ function openAddWallet() {
     document.getElementById('walletBalance').value = '0';
     document.getElementById('walletCurrency').value = 'VND';
     document.getElementById('walletExclude').checked = false;
+    document.getElementById('walletDefault').checked = false;
     document.getElementById('walletIconPreview').innerHTML = `${selectedIcon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>`;
     document.getElementById('deleteWalletRow').style.display = 'none';
     switchPage('add-wallet');
@@ -934,6 +919,7 @@ function openEditWallet(id) {
     document.getElementById('walletBalance').value = w.balance;
     document.getElementById('walletCurrency').value = w.currency || 'VND';
     document.getElementById('walletExclude').checked = w.excluded || false;
+    document.getElementById('walletDefault').checked = w.isDefault || false;
     document.getElementById('walletIconPreview').innerHTML = `${selectedIcon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>`;
     document.getElementById('deleteWalletRow').style.display = 'block';
     switchPage('add-wallet');
@@ -949,19 +935,38 @@ function saveWallet() {
     const balance = parseFloat(document.getElementById('walletBalance').value) || 0;
     const currency = document.getElementById('walletCurrency').value;
     const excluded = document.getElementById('walletExclude').checked;
+    const isDefault = document.getElementById('walletDefault').checked;
     if (!name) {
         document.getElementById('walletName').focus();
         return;
     }
+    
+    if (isDefault) {
+        wallets.forEach(w => w.isDefault = false);
+    }
+    
     if (id) {
         const w = wallets.find(x => x.id === id);
-        if (w) { w.name = name; w.balance = balance; w.emoji = selectedIcon; w.excluded = excluded; w.currency = currency; }
+        if (w) { w.name = name; w.balance = balance; w.emoji = selectedIcon; w.excluded = excluded; w.isDefault = isDefault; w.currency = currency; }
     } else {
-        wallets.push({ id: 'w' + Date.now(), name, balance, emoji: selectedIcon, bgClass: 'icon-cash', excluded, currency });
+        wallets.push({ id: 'w' + Date.now(), name, balance, emoji: selectedIcon, bgClass: 'icon-cash', excluded, isDefault, currency });
     }
     syncData();
     switchPage(prevPage);
     renderAll();
+}
+
+function handleDefaultWalletChange(checkbox) {
+    if (checkbox.checked) {
+        const currentDefault = wallets.find(w => w.isDefault);
+        const editId = document.getElementById('editWalletId').value;
+        if (currentDefault && currentDefault.id !== editId) {
+            const confirmChange = confirm(`Ví "${currentDefault.name}" đang là ví mặc định. Bạn có muốn đổi sang ví này không?`);
+            if (!confirmChange) {
+                checkbox.checked = false;
+            }
+        }
+    }
 }
 
 function deleteWallet() {
@@ -1067,8 +1072,11 @@ function renderChart() {
     }
 
     // Sum transactions
+    const excludedWalletIds = wallets.filter(w => w.excluded).map(w => w.id);
+    const isTxnExcluded = (t) => t.excluded || excludedWalletIds.includes(t.walletId);
+    
     transactions.forEach(t => {
-        if (t.excluded) return;
+        if (isTxnExcluded(t)) return;
         if (t.type !== type) return;
         if (t.date >= getLocalDateStr(start) && t.date <= getLocalDateStr(end)) {
             dailyMap[t.date] = (dailyMap[t.date] || 0) + t.amount;
@@ -1103,7 +1111,7 @@ function renderChart() {
     let totalExp = 0;
     let totalInc = 0;
     transactions.forEach(t => {
-        if (t.excluded) return;
+        if (isTxnExcluded(t)) return;
         if (t.date >= sStr && t.date <= eStr) {
             if (t.type === 'expense') totalExp += t.amount;
             else if (t.type === 'income') totalInc += t.amount;
