@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finance App</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="app-container">
+
+        <!-- ===================== PAGE: TỔNG QUAN ===================== -->
+        <div id="page-home" class="page active">
+            <header class="header">
+                <div class="header-top">
+                    <div class="balance-section">
+                        <div class="balance-wrapper">
+                            <span id="mainTotalBalance">0</span> <span class="currency">đ</span>
+                            <i class="fas fa-eye" id="toggleBalanceBtn" onclick="toggleBalance()"></i>
+                        </div>
+                        <div class="balance-label">Tổng số dư <i class="fas fa-question-circle" style="color: #cbd5e1; font-size: 12px;"></i></div>
+                    </div>
+                    <div class="header-actions">
+                        <i class="fas fa-search"></i>
+                        <i class="far fa-bell"></i>
+                    </div>
+                </div>
+            </header>
+            <main class="content">
+                <!-- Wallets Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Ví của tôi</h3>
+                        <a href="#" class="card-link" onclick="switchPage('accounts'); return false;">Xem tất cả</a>
+                    </div>
+                    <div class="wallet-list" id="walletListHome"></div>
+                </div>
+                <!-- Report Card -->
+                <div class="report-section-header">
+                    <h3 class="section-title">Báo cáo tháng này</h3>
+                    <a href="#" class="card-link">Xem báo cáo</a>
+                </div>
+                <div class="card report-card">
+                    <div class="report-tabs">
+                        <div class="tab active" onclick="switchTab('expense')">
+                            <div class="tab-label">Tổng đã chi</div>
+                            <div class="tab-value expense">0</div>
+                        </div>
+                        <div class="tab" onclick="switchTab('income')">
+                            <div class="tab-label">Tổng thu</div>
+                            <div class="tab-value income">0</div>
+                        </div>
+                    </div>
+                    <div class="chart-info">
+                        <div class="chart-date">02/05/2026: <strong class="expense-text">0</strong></div>
+                        <div class="chart-avg">Trung bình 3 tháng trước: <strong>0</strong></div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="reportChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span class="dot red"></span> Tháng này</div>
+                        <div class="legend-item"><span class="dot gray"></span> Trung bình 3 tháng trước <i class="fas fa-question-circle" style="color:#cbd5e1;"></i></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- ===================== PAGE: TÀI KHOẢN (Chọn Ví) ===================== -->
+        <div id="page-accounts" class="page">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('home')">Đóng</button>
+                    <h2 class="page-title">Chọn Ví</h2>
+                    <button class="btn-link" id="btnEditMode" onclick="toggleEditMode()">Sửa</button>
+                </div>
+            </header>
+            <main class="content">
+                <!-- Tổng cộng -->
+                <div class="card wallet-total-card">
+                    <div class="wallet-item-full">
+                        <div class="wallet-icon icon-globe"><i class="fas fa-globe"></i></div>
+                        <div>
+                            <div class="wallet-name-big">Tổng cộng</div>
+                            <div class="wallet-balance-sub" id="accountsTotalBalance">0 đ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danh sách ví -->
+                <div class="section-label">TÍNH VÀO TỔNG</div>
+                <div class="card wallet-list-card" id="walletListAccounts"></div>
+
+                <!-- Actions -->
+                <div class="card wallet-actions-card">
+                    <button class="wallet-action-row" onclick="openAddWallet()">
+                        <span class="action-icon green"><i class="fas fa-plus"></i></span>
+                        <span class="action-text green">Thêm ví</span>
+                    </button>
+                    <div class="divider-thin"></div>
+                    <button class="wallet-action-row">
+                        <span class="action-icon green"><i class="fas fa-link"></i></span>
+                        <span class="action-text green">Liên kết dịch vụ</span>
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <!-- ===================== PAGE: THÊM / SỬA VÍ ===================== -->
+        <div id="page-add-wallet" class="page page-light">
+            <!-- Header -->
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" id="btnCancelWallet" onclick="closeAddWalletPage()">Huỷ</button>
+                    <h2 class="page-title" id="addWalletPageTitle">Thêm Ví</h2>
+                    <button class="btn-link btn-link-primary" onclick="saveWallet()">Lưu</button>
+                </div>
+            </header>
+            <main class="content">
+                <input type="hidden" id="editWalletId">
+
+                <!-- Tên + Icon -->
+                <div class="card aw-card">
+                    <div class="aw-name-row">
+                        <button class="aw-icon-btn" id="walletIconPreview" onclick="openIconPicker()">💰 <i class="fas fa-chevron-up" style="font-size:9px; color:#aaa;"></i></button>
+                        <input type="text" id="walletName" class="aw-name-input" placeholder="Tên">
+                    </div>
+                </div>
+
+                <!-- Tiền tệ + Số dư -->
+                <div class="card aw-card">
+                    <div class="aw-field-row" style="border-bottom: 1px solid var(--border-color);">
+                        <span class="aw-field-icon">💲</span>
+                        <div style="flex:1;">
+                            <div class="aw-field-label" style="margin-bottom:0;">Đơn vị tiền tệ</div>
+                            <select id="walletCurrency" style="width:100%; border:none; outline:none; background:transparent; font-size:15px; font-weight:600; color:var(--text-primary); cursor:pointer; font-family:'Inter', sans-serif;">
+                                <option value="VND">Việt Nam Đồng (VND)</option>
+                                <option value="USD">Đô la Mỹ (USD)</option>
+                            </select>
+                        </div>
+                        <i class="fas fa-chevron-right aw-field-arrow"></i>
+                    </div>
+                    <div class="aw-field-row">
+                        <div>
+                            <div class="aw-field-label">Số tiền hiện có</div>
+                            <input type="number" id="walletBalance" class="aw-balance-input" placeholder="0" value="0">
+                        </div>
+                        <i class="fas fa-chevron-right aw-field-arrow"></i>
+                    </div>
+                </div>
+
+                <!-- Liên kết dịch vụ -->
+                <div class="card aw-card aw-link-card">
+                    <button class="aw-link-btn">Liên kết dịch vụ</button>
+                </div>
+                <p class="aw-hint">Kết nối tới các dịch vụ ngay trong app.</p>
+
+                <!-- Toggle Không tính vào tổng -->
+                <div class="card aw-card">
+                    <div class="aw-toggle-row">
+                        <span class="aw-toggle-label">Không tính vào tổng</span>
+                        <label class="aw-switch">
+                            <input type="checkbox" id="walletExclude">
+                            <span class="aw-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <p class="aw-hint">Bỏ qua ví này và số dư khỏi "Tổng".</p>
+
+                <!-- Nút xóa (khi sửa) -->
+                <div id="deleteWalletRow" style="display:none; margin-top:10px;">
+                    <button onclick="deleteWallet()" class="aw-delete-btn">🗑 Xóa ví này</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- ===================== BOTTOM NAV ===================== -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" id="nav-home" onclick="switchPage('home'); return false;">
+                <i class="fas fa-home"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="#" class="nav-item" onclick="return false;">
+                <i class="fas fa-wallet"></i>
+                <span>Sổ giao dịch</span>
+            </a>
+            <div class="nav-fab-wrapper">
+                <button class="fab-btn">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <a href="#" class="nav-item" onclick="return false;">
+                <i class="fas fa-book"></i>
+                <span>Ngân sách</span>
+            </a>
+            <a href="#" class="nav-item" id="nav-accounts" onclick="switchPage('accounts'); return false;">
+                <i class="far fa-user"></i>
+                <span>Tài khoản</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- ===================== ICON PICKER OVERLAY ===================== -->
+    <div id="iconPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:20px; max-height:70vh; overflow-y:auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="font-size:16px; font-weight:700;">Chọn biểu tượng</h3>
+                <button onclick="closeIconPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div id="iconGrid" style="display:grid; grid-template-columns: repeat(6, 1fr); gap:10px; text-align:center;"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
