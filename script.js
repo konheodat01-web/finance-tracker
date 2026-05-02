@@ -1013,7 +1013,14 @@ function renderChart() {
     if (chartDateEl) {
         const todayStr = getTodayStr();
         const todaySpend = dailyMap[todayStr] || 0;
-        const todayDateFormatted = new Date().toLocaleDateString('vi-VN');
+        
+        // Manual format to ensure DD/MM/YYYY
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        const todayDateFormatted = `${dd}/${mm}/${yyyy}`;
+        
         chartDateEl.innerHTML = `${todayDateFormatted}: <strong class="${type === 'expense' ? 'expense-text' : 'income-text'}">${new Intl.NumberFormat('vi-VN').format(todaySpend)}</strong>`;
     }
 
