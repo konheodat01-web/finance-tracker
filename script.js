@@ -2243,7 +2243,7 @@ function renderBudgetsPage() {
     if (globalPercent > 1) globalPercent = 1;
     if (globalPercent < 0) globalPercent = 0;
     
-    const deg = -45 + (180 * globalPercent);
+    const deg = -135 + (180 * globalPercent);
     document.getElementById('budgetGlobalProgress').style.transform = `rotate(${deg}deg)`;
     document.getElementById('budgetGlobalProgress').style.borderColor = globalAvailable < 0 ? '#ef4444' : '#10b981';
     document.getElementById('budgetGlobalProgress').style.borderBottomColor = 'transparent';
@@ -2266,23 +2266,28 @@ function openAddBudget() {
 
 function openBudgetCategoryPicker() {
     window.isPickingForBudget = true;
-    openCategoryPicker('expense');
+    // Reuse the existing category picker overlay
+    const list = document.getElementById('txnCategoryPickerList');
+    if (!list) return;
+    const cats = userCategories['expense'] || [];
+    list.innerHTML = generateCategoryListHTML(cats, null, 'selectCategory');
+    document.getElementById('txnCategoryPickerOverlay').style.display = 'flex';
 }
 
 const originalSelectCategory = selectCategory;
-window.selectCategory = function(id, name, icon, color) {
+function selectCategory(cat) {
     if (window.isPickingForBudget) {
-        document.getElementById('budgetCatId').value = id;
-        document.getElementById('budgetCategoryName').innerText = name;
-        document.getElementById('budgetCategoryIcon').innerHTML = icon;
-        document.getElementById('budgetCategoryIcon').style.background = color;
+        document.getElementById('budgetCatId').value = cat.id;
+        document.getElementById('budgetCategoryName').innerText = cat.name;
+        document.getElementById('budgetCategoryIcon').innerHTML = cat.icon;
+        document.getElementById('budgetCategoryIcon').style.background = cat.color;
         document.getElementById('budgetCategoryIcon').style.color = 'white';
-        switchPage('add-budget');
+        closeTxnCategoryPicker();
         window.isPickingForBudget = false;
     } else {
-        originalSelectCategory(id, name, icon, color);
+        originalSelectCategory(cat);
     }
-};
+}
 
 function saveBudget() {
     const id = document.getElementById('editBudgetId').value;
@@ -2327,7 +2332,9 @@ function openBudgetDetail(id) {
     currentDetailBudgetId = id;
     
     let catObj = null;
-    userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
+    if (userCategories && userCategories.expense) {
+        userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
+    }
     const icon = catObj ? catObj.icon : '💰';
     const name = catObj ? catObj.name : 'Tổng cộng';
     const color = catObj ? catObj.color : '#10b981';
@@ -2388,7 +2395,9 @@ function editBudgetFromDetail() {
     if (!b) return;
 
     let catObj = null;
-    userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
+    if (userCategories && userCategories.expense) {
+        userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
+    }
     const icon = catObj ? catObj.icon : '💰';
     const name = catObj ? catObj.name : 'Tổng cộng';
     const color = catObj ? catObj.color : '#10b981';
@@ -2419,37 +2428,137 @@ function deleteBudget() {
     }
 }
 
+// === BUDGET WALLET PICKER (centered modal) ===
 function openBudgetWalletPicker() {
-    let list = `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer;"><div style="font-size:24px;">🌐</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div></div>`;
-    list += wallets.map(w => `<div onclick="selectBudgetWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer;"><div style="font-size:24px;">${w.emoji||'??'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div></div>`).join('');
+    let existing = document.getElementById('budgetWalletOverlay');
+    if (existing) existing.remove();
     
-    const overlayHtml = `
-    <div id="budgetWalletOverlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:9999; display:flex; flex-direction:column; justify-content:flex-end;">
-        <div style="background:white; border-radius:24px 24px 0 0; padding-bottom:20px; max-height:80vh; overflow-y:auto;">
-            <div style="padding:20px; text-align:center; font-weight:600; font-size:16px; border-bottom:1px solid #f3f4f6; position:sticky; top:0; background:white; z-index:10;">Chọn ví <button onclick="document.body.removeChild(document.getElementById('budgetWalletOverlay'))" style="position:absolute; right:20px; top:20px; background:none; border:none; color:#9ca3af; font-size:16px; cursor:pointer;"><i class="fas fa-times"></i></button></div>
-            ${list}
-        </div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', overlayHtml);
+    const currentWalletId = document.getElementById('budgetWalletId').value;
+    let listHtml = '';
+    
+    const allCheck = currentWalletId === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
+    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">🌐</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
+    
+    wallets.forEach(w => {
+        const check = currentWalletId === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
+        listHtml += `<div onclick="selectBudgetWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'💳'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
+    });
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'budgetWalletOverlay';
+    overlay.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;';
+    overlay.innerHTML = `
+        <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn ví</h3>
+                <button onclick="closeBudgetWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div style="flex:1; overflow-y:auto;">${listHtml}</div>
+        </div>`;
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeBudgetWalletPicker(); });
+    document.body.appendChild(overlay);
+}
+
+function closeBudgetWalletPicker() {
+    const el = document.getElementById('budgetWalletOverlay');
+    if (el) el.remove();
 }
 
 function selectBudgetWallet(id) {
     document.getElementById('budgetWalletId').value = id;
-    if(id === 'all') {
+    if (id === 'all') {
         document.getElementById('budgetWalletName').innerText = 'Tổng cộng';
     } else {
         const w = wallets.find(x => x.id === id);
         document.getElementById('budgetWalletName').innerText = w ? w.name : 'Tổng cộng';
     }
-    document.body.removeChild(document.getElementById('budgetWalletOverlay'));
+    closeBudgetWalletPicker();
 }
+
+// === BUDGET GLOBAL WALLET PICKER (dashboard header) ===
+let budgetGlobalWalletFilter = 'all';
 
 function openBudgetGlobalWalletPicker() {
-    alert('Tính năng lọc toàn bộ ngân sách theo từng ví sẽ được cập nhật sớm!');
+    let existing = document.getElementById('budgetGlobalWalletOverlay');
+    if (existing) existing.remove();
+    
+    let listHtml = '';
+    const allCheck = budgetGlobalWalletFilter === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
+    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">🌐</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
+    
+    wallets.forEach(w => {
+        const check = budgetGlobalWalletFilter === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
+        listHtml += `<div onclick="selectBudgetGlobalWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'💳'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
+    });
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'budgetGlobalWalletOverlay';
+    overlay.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;';
+    overlay.innerHTML = `
+        <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Lọc theo ví</h3>
+                <button onclick="closeBudgetGlobalWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div style="flex:1; overflow-y:auto;">${listHtml}</div>
+        </div>`;
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeBudgetGlobalWalletPicker(); });
+    document.body.appendChild(overlay);
 }
 
+function closeBudgetGlobalWalletPicker() {
+    const el = document.getElementById('budgetGlobalWalletOverlay');
+    if (el) el.remove();
+}
+
+function selectBudgetGlobalWallet(id) {
+    budgetGlobalWalletFilter = id;
+    if (id === 'all') {
+        document.getElementById('budgetGlobalWalletLabel').innerText = 'Tổng';
+        document.getElementById('budgetGlobalWalletIcon').className = 'fas fa-globe';
+    } else {
+        const w = wallets.find(x => x.id === id);
+        document.getElementById('budgetGlobalWalletLabel').innerText = w ? w.name : 'Tổng';
+        document.getElementById('budgetGlobalWalletIcon').className = 'fas fa-wallet';
+    }
+    closeBudgetGlobalWalletPicker();
+    renderBudgetsPage();
+}
+
+// === BUDGET PERIOD PICKER (centered modal) ===
 function openBudgetPeriodPicker() {
-    alert('Tính năng chọn giai đoạn tuỳ chỉnh (Tuần/Năm) sẽ được cập nhật sớm! Hiện tại áp dụng cho Tháng Này.');
+    let existing = document.getElementById('budgetPeriodOverlay');
+    if (existing) existing.remove();
+    
+    const periods = getPeriods();
+    const now = new Date();
+    let listHtml = '';
+    
+    periods.forEach((p, i) => {
+        const label = formatDate(p.start) + ' - ' + formatDate(p.end);
+        const isThisMonth = now >= p.start && now <= new Date(p.end.getTime() + 86399999);
+        const displayLabel = isThisMonth ? 'Tháng này (' + label + ')' : label;
+        listHtml += '<div onclick="selectBudgetPeriod(\'' + p.start.toISOString() + '\', \'' + p.end.toISOString() + '\', \'' + displayLabel.replace(/'/g, "\\'") + '\')" style="display:flex; align-items:center; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; font-size:15px; color:#1f2937; font-weight:' + (isThisMonth ? '600' : '400') + '; background:' + (isThisMonth ? '#f0fdf4' : 'transparent') + ';">' + displayLabel + '</div>';
+    });
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'budgetPeriodOverlay';
+    overlay.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;';
+    overlay.innerHTML = '<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);"><div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;"><h3 style="font-size:16px; font-weight:700; margin:0;">Chọn giai đoạn</h3><button onclick="closeBudgetPeriodPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button></div><div style="flex:1; overflow-y:auto;">' + listHtml + '</div></div>';
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeBudgetPeriodPicker(); });
+    document.body.appendChild(overlay);
+}
+
+function closeBudgetPeriodPicker() {
+    const el = document.getElementById('budgetPeriodOverlay');
+    if (el) el.remove();
+}
+
+function selectBudgetPeriod(startStr, endStr, label) {
+    document.getElementById('budgetPeriodStr').innerText = label;
+    document.getElementById('budgetPeriodStart').value = startStr;
+    document.getElementById('budgetPeriodEnd').value = endStr;
+    closeBudgetPeriodPicker();
 }
 
 // Hook renderBudgetsPage into renderAll
@@ -2462,9 +2571,6 @@ if (typeof originalRenderAll === 'undefined') {
         }
     };
 }
-
-
-
 
 function formatMoney(amount) { return formatCurrency(amount, 'VND'); }
 

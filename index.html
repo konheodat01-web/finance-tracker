@@ -122,7 +122,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.71</div>
+                <div class="version-tag">Phiên bản v1.0.72</div>
             </main>
         </div>
 
@@ -651,15 +651,11 @@
         <div id="page-budgets" class="page page-light">
             <header class="header">
                 <div class="header-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <h2 class="page-title" style="margin: 0; text-align: left;">Ngân sách Đang áp dụng</h2>
-                        <div onclick="openBudgetGlobalWalletPicker()" style="display:flex; align-items:center; gap:4px; cursor:pointer; padding:4px;">
-                            <i class="fas fa-globe" style="color:#6b7280; font-size:18px;"></i>
-                            <i class="fas fa-chevron-down" style="font-size:10px; color:#6b7280;"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn-icon"><i class="far fa-question-circle"></i></button>
+                    <h2 class="page-title" style="margin: 0; text-align: left;">Ngân sách Đang áp dụng</h2>
+                    <div onclick="openBudgetGlobalWalletPicker()" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:6px 10px; border:1px solid #e5e7eb; border-radius:20px;">
+                        <i id="budgetGlobalWalletIcon" class="fas fa-globe" style="color:#10b981; font-size:16px;"></i>
+                        <span id="budgetGlobalWalletLabel" style="font-size:13px; color:#374151; font-weight:500;">Tổng</span>
+                        <i class="fas fa-chevron-down" style="font-size:9px; color:#9ca3af;"></i>
                     </div>
                 </div>
                 <div class="date-navigator" style="justify-content: flex-start; padding-left: 16px; border-bottom: 1px solid #f3f4f6;">
@@ -671,7 +667,7 @@
                     <!-- Speedometer / Semi-circle chart -->
                     <div style="position: relative; width: 220px; height: 110px; margin: 0 auto 20px; overflow: hidden;">
                         <div style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #f3f4f6; position: absolute; top: 0; left: 0; box-sizing: border-box;"></div>
-                        <div id="budgetGlobalProgress" style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #10b981; position: absolute; top: 0; left: 0; box-sizing: border-box; border-bottom-color: transparent; border-right-color: transparent; transform: rotate(-45deg); transition: transform 0.5s;"></div>
+                        <div id="budgetGlobalProgress" style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #10b981; position: absolute; top: 0; left: 0; box-sizing: border-box; border-bottom-color: transparent; border-right-color: transparent; transform: rotate(-135deg); transition: transform 0.5s;"></div>
                         <div style="position: absolute; bottom: 0; width: 100%; text-align: center;">
                             <div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">Số tiền bạn có thể chi</div>
                             <div id="budgetGlobalAvailable" style="font-size: 28px; font-weight: 700; color: #10b981;">0</div>
@@ -742,6 +738,8 @@
                         <div style="display:flex; align-items:center; gap:12px; flex:1;">
                             <i class="far fa-calendar-alt" style="color:#4b5563; font-size:18px;"></i>
                             <div id="budgetPeriodStr" style="font-size:15px; color:#1f2937;">Tháng này</div>
+                            <input type="hidden" id="budgetPeriodStart">
+                            <input type="hidden" id="budgetPeriodEnd">
                         </div>
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
                     </div>
@@ -960,6 +958,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.71"></script>
+    <script src="script.js?v=1.0.72"></script>
 </body>
 </html>
