@@ -2290,6 +2290,7 @@ function saveBudget() {
     const amountStr = document.getElementById('budgetAmount').value.replace(/\./g, '');
     const amount = parseInt(amountStr);
     const isRepeat = document.getElementById('budgetRepeat').checked;
+    const walletId = document.getElementById('budgetWalletId') ? document.getElementById('budgetWalletId').value : 'all';
 
     if (!catId) return alert('Vui lòng chọn nhóm chi tiêu!');
     if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền hợp lệ!');
@@ -2300,11 +2301,13 @@ function saveBudget() {
             b.categoryId = catId;
             b.amount = amount;
             b.isRepeating = isRepeat;
+            b.walletId = walletId;
         }
     } else {
         budgets.push({
             id: 'b_' + Date.now(),
             categoryId: catId,
+            walletId: walletId,
             amount: amount,
             isRepeating: isRepeat,
             createdAt: new Date().toISOString()
@@ -2414,6 +2417,39 @@ function deleteBudget() {
         renderBudgetsPage();
         switchPage('budgets');
     }
+}
+
+function openBudgetWalletPicker() {
+    let list = `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer;"><div style="font-size:24px;">🌐</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div></div>`;
+    list += wallets.map(w => `<div onclick="selectBudgetWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer;"><div style="font-size:24px;">${w.emoji||'??'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div></div>`).join('');
+    
+    const overlayHtml = `
+    <div id="budgetWalletOverlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:9999; display:flex; flex-direction:column; justify-content:flex-end;">
+        <div style="background:white; border-radius:24px 24px 0 0; padding-bottom:20px; max-height:80vh; overflow-y:auto;">
+            <div style="padding:20px; text-align:center; font-weight:600; font-size:16px; border-bottom:1px solid #f3f4f6; position:sticky; top:0; background:white; z-index:10;">Chọn ví <button onclick="document.body.removeChild(document.getElementById('budgetWalletOverlay'))" style="position:absolute; right:20px; top:20px; background:none; border:none; color:#9ca3af; font-size:16px; cursor:pointer;"><i class="fas fa-times"></i></button></div>
+            ${list}
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', overlayHtml);
+}
+
+function selectBudgetWallet(id) {
+    document.getElementById('budgetWalletId').value = id;
+    if(id === 'all') {
+        document.getElementById('budgetWalletName').innerText = 'Tổng cộng';
+    } else {
+        const w = wallets.find(x => x.id === id);
+        document.getElementById('budgetWalletName').innerText = w ? w.name : 'Tổng cộng';
+    }
+    document.body.removeChild(document.getElementById('budgetWalletOverlay'));
+}
+
+function openBudgetGlobalWalletPicker() {
+    alert('Tính năng lọc toàn bộ ngân sách theo từng ví sẽ được cập nhật sớm!');
+}
+
+function openBudgetPeriodPicker() {
+    alert('Tính năng chọn giai đoạn tuỳ chỉnh (Tuần/Năm) sẽ được cập nhật sớm! Hiện tại áp dụng cho Tháng Này.');
 }
 
 // Hook renderBudgetsPage into renderAll

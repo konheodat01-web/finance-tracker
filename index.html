@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Finance">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="style.css?v=1.0.65">
+    <link rel="stylesheet" href="style.css?v=1.0.71">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -122,7 +122,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.70</div>
+                <div class="version-tag">Phiên bản v1.0.71</div>
             </main>
         </div>
 
@@ -650,8 +650,14 @@
         <!-- ===================== PAGE: NGÂN SÁCH ===================== -->
         <div id="page-budgets" class="page page-light">
             <header class="header">
-                <div class="header-top">
-                    <h2 class="page-title">Ngân sách Đang áp dụng <i class="fas fa-globe" style="color:#6b7280; font-size:16px;"></i></h2>
+                <div class="header-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h2 class="page-title" style="margin: 0; text-align: left;">Ngân sách Đang áp dụng</h2>
+                        <div onclick="openBudgetGlobalWalletPicker()" style="display:flex; align-items:center; gap:4px; cursor:pointer; padding:4px;">
+                            <i class="fas fa-globe" style="color:#6b7280; font-size:18px;"></i>
+                            <i class="fas fa-chevron-down" style="font-size:10px; color:#6b7280;"></i>
+                        </div>
+                    </div>
                     <div>
                         <button class="btn-icon"><i class="far fa-question-circle"></i></button>
                     </div>
@@ -732,7 +738,7 @@
                     </div>
                     
                     <!-- Thời gian -->
-                    <div class="aw-field-row" style="cursor: pointer;">
+                    <div class="aw-field-row" style="cursor: pointer;" onclick="openBudgetPeriodPicker()">
                         <div style="display:flex; align-items:center; gap:12px; flex:1;">
                             <i class="far fa-calendar-alt" style="color:#4b5563; font-size:18px;"></i>
                             <div id="budgetPeriodStr" style="font-size:15px; color:#1f2937;">Tháng này</div>
@@ -741,10 +747,11 @@
                     </div>
                     
                     <!-- Chọn ví -->
-                    <div class="aw-field-row" style="border-bottom: none; cursor: pointer;">
+                    <div class="aw-field-row" style="border-bottom: none; cursor: pointer;" onclick="openBudgetWalletPicker()">
                         <div style="display:flex; align-items:center; gap:12px; flex:1;">
                             <i class="fas fa-globe" style="color:#10b981; font-size:18px;"></i>
-                            <div style="font-size:15px; color:#1f2937;">Tổng cộng</div>
+                            <div id="budgetWalletName" style="font-size:15px; color:#1f2937;">Tổng cộng</div>
+                            <input type="hidden" id="budgetWalletId" value="all">
                         </div>
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
                     </div>
@@ -953,6 +960,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.70"></script>
+    <script src="script.js?v=1.0.71"></script>
 </body>
 </html>
