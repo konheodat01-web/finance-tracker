@@ -800,12 +800,21 @@ function closeTxnCategoryPicker() {
 }
 
 function selectCategory(cat) {
-    selectedCategory = cat;
-    updateSelectedCategoryDisplay();
-    closeTxnCategoryPicker();
-    checkTxnValid();
+    if (window.isPickingForBudget) {
+        document.getElementById('budgetCatId').value = cat.id;
+        document.getElementById('budgetCategoryName').innerText = cat.name;
+        document.getElementById('budgetCategoryIcon').innerHTML = cat.icon;
+        document.getElementById('budgetCategoryIcon').style.background = cat.color;
+        document.getElementById('budgetCategoryIcon').style.color = 'white';
+        closeTxnCategoryPicker();
+        window.isPickingForBudget = false;
+    } else {
+        selectedCategory = cat;
+        updateSelectedCategoryDisplay();
+        closeTxnCategoryPicker();
+        checkTxnValid();
+    }
 }
-
 function checkTxnValid() {
     const amountStr = document.getElementById('txnAmount').value.replace(/\./g, '').replace(/,/g, '');
     const amount = parseFloat(amountStr) || 0;
@@ -2318,20 +2327,6 @@ function openBudgetCategoryPicker() {
     document.getElementById('txnCategoryPickerOverlay').style.display = 'flex';
 }
 
-const originalSelectCategory = selectCategory;
-function selectCategory(cat) {
-    if (window.isPickingForBudget) {
-        document.getElementById('budgetCatId').value = cat.id;
-        document.getElementById('budgetCategoryName').innerText = cat.name;
-        document.getElementById('budgetCategoryIcon').innerHTML = cat.icon;
-        document.getElementById('budgetCategoryIcon').style.background = cat.color;
-        document.getElementById('budgetCategoryIcon').style.color = 'white';
-        closeTxnCategoryPicker();
-        window.isPickingForBudget = false;
-    } else {
-        originalSelectCategory(cat);
-    }
-}
 
 function saveBudget() {
     const id = document.getElementById('editBudgetId').value;
