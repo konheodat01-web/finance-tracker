@@ -2168,30 +2168,39 @@ function deleteReceivingInfo() {
 
 
 // === BUDGET LOGIC ===
+function getBudgetCategoryIds(categoryId) {
+    // Returns a Set of categoryIds: the category itself + all direct children
+    const ids = new Set();
+    if (!categoryId || categoryId === 'all') return ids;
+    ids.add(categoryId);
+    const allCats = [...(userCategories.expense || [])];
+    allCats.forEach(c => {
+        if (c.parentId === categoryId) ids.add(c.id);
+    });
+    return ids;
+}
+
 function getBudgetSpent(b) {
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
-    
+    const matchIds = getBudgetCategoryIds(b.categoryId);
     let spent = 0;
     transactions.forEach(t => {
         if (t.type !== 'expense') return;
         if (t.excluded) return;
-        
         const tDate = new Date(t.date);
         if (tDate.getMonth() !== currentMonth || tDate.getFullYear() !== currentYear) return;
-        
-        // Match category: budget's categoryId matches transaction's categoryId OR category name
-        const catMatch = b.categoryId === 'all' || 
-                         t.categoryId === b.categoryId || 
-                         t.category === b.categoryId;
+        let catMatch = false;
+        if (b.categoryId === 'all') {
+            catMatch = true;
+        } else {
+            catMatch = matchIds.has(t.categoryId) || matchIds.has(t.category);
+        }
         if (!catMatch) return;
-        
-        // Match wallet: if budget is for a specific wallet, only count that wallet's transactions
         if (b.walletId && b.walletId !== 'all') {
             if (t.walletId !== b.walletId) return;
         }
-        
         spent += t.amount;
     });
     return spent;
@@ -2596,5 +2605,6 @@ if (typeof originalRenderAll === 'undefined') {
 }
 
 function formatMoney(amount) { return formatCurrency(amount, 'VND'); }
+
 
 
