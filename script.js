@@ -206,9 +206,9 @@ let lastStateHash = "";
 function getStateHash() {
     // Generate a quick hash of the core data state to detect if anything actually changed
     // This includes wallet balances, txn count, period selection, and UI tab
-    const walletState = wallets.map(w => ${w.id}:${w.balance}).join('|');
-    const txnMeta = ${transactions.length}:${transactions.length > 0 ? transactions[transactions.length-1].id : ''}:${transactions.filter(t=>t.excluded).length};
-    return ${walletState}#${txnMeta}#${currentPeriodIndex}#${currentTab}#${settings.firstDayOfMonth}#${isBalanceVisible}#${currentTxnWalletIndex};
+    const walletState = wallets.map(w => `${w.id}:${w.balance}`).join('|');
+    const txnMeta = `${transactions.length}:${transactions.length > 0 ? transactions[transactions.length-1].id : ''}:${transactions.filter(t=>t.excluded).length}`;
+    return `${walletState}#${txnMeta}#${currentPeriodIndex}#${currentTab}#${settings.firstDayOfMonth}#${isBalanceVisible}#${currentTxnWalletIndex}`;
 }
 
 function renderAll(force = false) {
@@ -245,14 +245,14 @@ function renderHomeWallets() {
         return;
     }
     wallets.forEach(w => {
-        list.innerHTML += 
+        list.innerHTML += `
             <div class="wallet-item">
                 <div class="wallet-info-left">
                     <div class="wallet-icon ${w.bgClass}">${w.emoji}</div>
                     <div class="wallet-name">${w.name}</div>
                 </div>
                 <div class="wallet-balance">${formatCurrency(w.balance, w.currency || 'VND')}</div>
-            </div>;
+            </div>`;
     });
 }
 
@@ -264,7 +264,7 @@ function renderAccountsPage() {
         return;
     }
     wallets.forEach(w => {
-        list.innerHTML += 
+        list.innerHTML += `
             <div class="wallet-item" onclick="openEditWallet('${w.id}')" style="cursor:pointer;">
                 <div class="wallet-item-row">
                     <div class="wallet-left">
@@ -275,7 +275,7 @@ function renderAccountsPage() {
                         </div>
                     </div>
                 </div>
-            </div>;
+            </div>`;
     });
 }
 // === SETTINGS PAGE ===
@@ -298,7 +298,7 @@ function openSettingPicker(key) {
         const isActive = String(settings[key]) === String(opt);
         const row = document.createElement('div');
         row.className = 'setting-option-row' + (isActive ? ' active' : '');
-        row.innerHTML = <span>${opt}</span>${isActive ? '<i class="fas fa-check check-icon"></i>' : ''};
+        row.innerHTML = `<span>${opt}</span>${isActive ? '<i class="fas fa-check check-icon"></i>' : ''}`;
         row.onclick = () => {
             settings[key] = opt;
             syncData();
@@ -340,7 +340,7 @@ function formatDate(d) {
     const dd = String(d.getDate()).padStart(2,'0');
     const mm = String(d.getMonth()+1).padStart(2,'0');
     const yyyy = d.getFullYear();
-    return ${dd}/${mm}/${yyyy};
+    return `${dd}/${mm}/${yyyy}`;
 }
 
 function renderTransactionsPage() {
@@ -378,14 +378,14 @@ function renderTransactionsPage() {
     if (tabsEl) {
         tabsEl.innerHTML = '';
         periods.forEach((p, i) => {
-            const label = ${formatDate(p.start)} - ${formatDate(p.end)};
+            const label = `${formatDate(p.start)} - ${formatDate(p.end)}`;
             const tab = document.createElement('div');
-            tab.style.cssText = 
+            tab.style.cssText = `
                 flex-shrink:0; padding:10px 14px; font-size:12px; cursor:pointer;
                 color:${i===currentPeriodIndex ? '#1f2937' : '#9ca3af'};
                 font-weight:${i===currentPeriodIndex ? '700' : '400'};
                 border-bottom:${i===currentPeriodIndex ? '2px solid #1f2937' : '2px solid transparent'};
-                white-space:nowrap;;
+                white-space:nowrap;`;
             tab.innerText = label;
             tab.onclick = () => { currentPeriodIndex = i; renderTransactionsPage(); };
             tabsEl.appendChild(tab);
@@ -412,10 +412,10 @@ function renderTxnList(period) {
     });
 
     if (filtered.length === 0) {
-        listEl.innerHTML = <div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px;">
+        listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px;">
             <div style="font-size:40px; margin-bottom:12px;">�x9</div>
             Chưa có giao d�9ch nào<br>trong kỳ này
-        </div>;
+        </div>`;
         return;
     }
 
@@ -446,18 +446,18 @@ function renderTxnList(period) {
         let txnRows = txns.map(t => {
             const amtColor = t.type === 'income' ? '#3b82f6' : '#ef4444';
             const amtStr = new Intl.NumberFormat('vi-VN').format(t.amount);
-            return 
+            return `
             <div onclick="openEditTransaction('${t.id}')" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-top:1px solid #f3f4f6; cursor:pointer;">
                 <div style="width:38px;height:38px;border-radius:50%;background:${t.categoryColor||'#9ca3af'};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${t.categoryIcon||'�x�'}</div>
                 <div style="flex:1; min-width:0;">
                     <div style="font-size:14px;font-weight:600;color:#1f2937;">${t.category||'Khác'}</div>
-                    ${t.note ? <div style="font-size:12px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.note}</div> : ''}
+                    ${t.note ? `<div style="font-size:12px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.note}</div>` : ''}
                 </div>
                 <div style="font-size:15px;font-weight:600;color:${amtColor};white-space:nowrap;">${amtStr}</div>
-            </div>;
+            </div>`;
         }).join('');
 
-        html += 
+        html += `
         <div style="background:white; border-radius:14px; margin-bottom:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.05);">
             <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px 8px;">
                 <div style="display:flex; align-items:baseline; gap:10px;">
@@ -470,7 +470,7 @@ function renderTxnList(period) {
                 <div style="font-size:14px;font-weight:600;color:${totalColor};">${totalStr}</div>
             </div>
             ${txnRows}
-        </div>;
+        </div>`;
     });
 
     listEl.innerHTML = html;
@@ -488,7 +488,7 @@ function renderSelectWalletList() {
     const totalBalance = getTotalBalance();
     const currency = settings.totalCurrency || 'VND';
 
-    let html = 
+    let html = `
         <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
             <div style="display:flex; align-items:center; padding:16px; cursor:pointer; background:${currentTxnWalletIndex === -1 ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(-1)">
                 <div style="width:44px; height:44px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; font-size:24px; margin-right:12px;">�xR�</div>
@@ -501,11 +501,11 @@ function renderSelectWalletList() {
         </div>
         <div style="font-size:11px; color:#9ca3af; font-weight:600; margin-bottom:8px; padding-left:4px; letter-spacing:0.5px; text-transform:uppercase;">TÍNH VìO T�NG</div>
         <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-    ;
+    `;
 
     wallets.forEach((w, idx) => {
         const isSelected = currentTxnWalletIndex === idx;
-        html += 
+        html += `
             <div style="display:flex; align-items:center; padding:16px; cursor:pointer; border-bottom:${idx === wallets.length - 1 ? 'none' : '1px solid #f3f4f6'}; background:${isSelected ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(${idx})">
                 <div style="width:40px; height:40px; border-radius:50%; background:${w.bgClass || '#3b82f6'}; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:white;">${w.emoji || '�x�'}</div>
                 <div style="flex:1;">
@@ -514,10 +514,10 @@ function renderSelectWalletList() {
                 </div>
                 ${isSelected ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
             </div>
-        ;
+        `;
     });
 
-    html += </div>;
+    html += `</div>`;
     list.innerHTML = html;
 }
 
@@ -599,8 +599,8 @@ function setTxnType(type, clearCategory = true) {
     const colors = { expense: '#ef4444', income: '#10b981', debt: '#8b5cf6' };
     const activeBg = colors[type];
     
-    const activeStyle = (bg) => flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:${bg}; color:white; box-shadow:0 1px 3px rgba(0,0,0,0.15);;
-    const inactiveStyle = flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;;
+    const activeStyle = (bg) => `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:${bg}; color:white; box-shadow:0 1px 3px rgba(0,0,0,0.15);`;
+    const inactiveStyle = `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;`;
     
     if (expBtn) expBtn.style.cssText = type === 'expense' ? activeStyle('#ef4444') : inactiveStyle;
     if (incBtn) incBtn.style.cssText = type === 'income' ? activeStyle('#10b981') : inactiveStyle;
@@ -629,7 +629,7 @@ function updateTxnDateDisplay() {
         const dd = String(d.getDate()).padStart(2, '0');
         const mm = String(d.getMonth() + 1).padStart(2, '0');
         const yyyy = d.getFullYear();
-        document.getElementById('txnDateDisplay').innerText = ${DAY_NAMES[d.getDay()]}, ${dd}/${mm}/${yyyy};
+        document.getElementById('txnDateDisplay').innerText = `${DAY_NAMES[d.getDay()]}, ${dd}/${mm}/${yyyy}`;
     }
 }
 
@@ -695,13 +695,13 @@ function openTxnWalletPicker() {
     const list = document.getElementById('txnWalletPickerList');
     if (!list) return;
     
-    list.innerHTML = wallets.map(w => 
+    list.innerHTML = wallets.map(w => `
         <div onclick="selectTxnWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${w.id === txnSelectedWalletId ? '#f0fdf4' : 'transparent'};">
             <div style="font-size:24px;">${w.emoji||'�x�'}</div>
             <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
             ${w.id === txnSelectedWalletId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
         </div>
-    ).join('');
+    `).join('');
     
     document.getElementById('txnWalletPickerOverlay').style.display = 'flex';
 }
@@ -741,9 +741,9 @@ function generateCategoryListHTML(cats, selectedId, clickHandlerName) {
 
         let subtitle = '';
         if (isChild) {
-            subtitle = <div style="font-size:12px; color:#6b7280; margin-top:1px;">${parentName}</div>;
+            subtitle = `<div style="font-size:12px; color:#6b7280; margin-top:1px;">${parentName}</div>`;
         } else if (childCount > 0) {
-            subtitle = <div style="font-size:12px; color:#9ca3af; margin-top:1px;">${childCount} nhóm con</div>;
+            subtitle = `<div style="font-size:12px; color:#9ca3af; margin-top:1px;">${childCount} nhóm con</div>`;
         }
 
         const indent = isChild ? 'padding-left:28px;' : '';
@@ -758,17 +758,17 @@ function generateCategoryListHTML(cats, selectedId, clickHandlerName) {
         
         if (isSelected) {
             bgColor = cat.color + '15';
-            checkMark = <i class="fas fa-check" style="color:${cat.color}; font-size:16px;"></i>;
+            checkMark = `<i class="fas fa-check" style="color:${cat.color}; font-size:16px;"></i>`;
         }
 
         let onClickAttr = '';
         if (clickHandlerName === 'selectCategory') {
-            onClickAttr = onclick="selectCategory(${JSON.stringify(cat).replace(/"/g,'&quot;')})";
+            onClickAttr = `onclick="selectCategory(${JSON.stringify(cat).replace(/"/g,'&quot;')})"`;
         } else if (clickHandlerName === 'selectSePayCategory') {
-            onClickAttr = onclick="selectSePayCategory('${cat.id}')";
+            onClickAttr = `onclick="selectSePayCategory('${cat.id}')"`;
         }
 
-        html += 
+        html += `
             <div ${onClickAttr} style="display:flex; align-items:center; padding:12px 16px; ${indent} border-bottom:${borderColor}; cursor:pointer; background:${bgColor}; transition:0.15s;">
                 <div style="width:${iconSize}; height:${iconSize}; border-radius:50%; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:${fontSize}; margin-right:12px; color:${cat.color}; flex-shrink:0;">${cat.icon}</div>
                 <div style="flex:1; min-width:0;">
@@ -777,7 +777,7 @@ function generateCategoryListHTML(cats, selectedId, clickHandlerName) {
                 </div>
                 ${checkMark}
             </div>
-        ;
+        `;
     });
 
     return html;
@@ -914,7 +914,7 @@ function openAddWallet() {
     document.getElementById('walletCurrency').value = 'VND';
     document.getElementById('walletExclude').checked = false;
     document.getElementById('walletDefault').checked = false;
-    document.getElementById('walletIconPreview').innerHTML = ${selectedIcon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>;
+    document.getElementById('walletIconPreview').innerHTML = `${selectedIcon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>`;
     document.getElementById('deleteWalletRow').style.display = 'none';
     switchPage('add-wallet');
 }
@@ -931,7 +931,7 @@ function openEditWallet(id) {
     document.getElementById('walletCurrency').value = w.currency || 'VND';
     document.getElementById('walletExclude').checked = w.excluded || false;
     document.getElementById('walletDefault').checked = w.isDefault || false;
-    document.getElementById('walletIconPreview').innerHTML = ${selectedIcon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>;
+    document.getElementById('walletIconPreview').innerHTML = `${selectedIcon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>`;
     document.getElementById('deleteWalletRow').style.display = 'block';
     switchPage('add-wallet');
 }
@@ -973,7 +973,7 @@ function handleDefaultWalletChange(checkbox) {
         const currentDefault = wallets.find(w => w.isDefault);
         const editId = document.getElementById('editWalletId').value;
         if (currentDefault && currentDefault.id !== editId) {
-            const confirmChange = confirm(Ví "${currentDefault.name}" �ang là ví mặc ��9nh. Bạn có mu�n ��"i sang ví này không?);
+            const confirmChange = confirm(`Ví "${currentDefault.name}" �ang là ví mặc ��9nh. Bạn có mu�n ��"i sang ví này không?`);
             if (!confirmChange) {
                 checkbox.checked = false;
             }
@@ -1009,18 +1009,18 @@ function openIconPickerForCat() {
 function renderIconGrid() {
     const grid = document.getElementById('iconGrid');
     if (!grid) return;
-    grid.innerHTML = ICONS.map(icon => 
+    grid.innerHTML = ICONS.map(icon => `
         <div class="icon-grid-item ${icon === selectedIcon ? 'selected' : ''}" onclick="selectIcon('${icon}')">
             ${icon}
         </div>
-    ).join('');
+    `).join('');
 }
 
 function selectIcon(icon) {
     selectedIcon = icon;
     if (iconTarget === 'wallet') {
         const preview = document.getElementById('walletIconPreview');
-        if (preview) preview.innerHTML = ${icon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>;
+        if (preview) preview.innerHTML = `${icon} <i class="fas fa-chevron-up" style="font-size:9px;color:#aaa"></i>`;
     } else if (iconTarget === 'category') {
         const preview = document.getElementById('catIconPreview');
         if (preview) preview.innerText = icon;
@@ -1146,15 +1146,15 @@ function renderChart() {
         const dd = String(now.getDate()).padStart(2, '0');
         const mm = String(now.getMonth() + 1).padStart(2, '0');
         const yyyy = now.getFullYear();
-        const todayDateFormatted = ${dd}/${mm}/${yyyy};
+        const todayDateFormatted = `${dd}/${mm}/${yyyy}`;
         
-        chartDateEl.innerHTML = ${todayDateFormatted}: <strong class="${type === 'expense' ? 'expense-text' : 'income-text'}">${new Intl.NumberFormat('vi-VN').format(todaySpend)}</strong>;
+        chartDateEl.innerHTML = `${todayDateFormatted}: <strong class="${type === 'expense' ? 'expense-text' : 'income-text'}">${new Intl.NumberFormat('vi-VN').format(todaySpend)}</strong>`;
     }
 
     // Update Report Title with Date Range
     const reportTitleEl = document.querySelector('.section-title');
     if (reportTitleEl && reportTitleEl.innerText.includes('Báo cáo')) {
-        reportTitleEl.innerText = Báo cáo (${firstLabel} - ${lastLabel});
+        reportTitleEl.innerText = `Báo cáo (${firstLabel} - ${lastLabel})`;
     }
 
     chartInstance = new Chart(ctx.getContext('2d'), {
@@ -1270,8 +1270,8 @@ function renderManageCategories() {
     const incBtn = document.getElementById('catManageIncomeBtn');
     const debtBtn = document.getElementById('catManageDebtBtn');
     
-    const activeStyle = flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);;
-    const inactiveStyle = flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;;
+    const activeStyle = `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);`;
+    const inactiveStyle = `flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;`;
     
     if(expBtn) expBtn.style.cssText = catManageType === 'expense' ? activeStyle : inactiveStyle;
     if(incBtn) incBtn.style.cssText = catManageType === 'income' ? activeStyle : inactiveStyle;
@@ -1310,9 +1310,9 @@ function renderManageCategories() {
 
         let subtitle = '';
         if (isChild) {
-            subtitle = <div style="font-size:12px; color:#6b7280; margin-top:1px;">${parentName}</div>;
+            subtitle = `<div style="font-size:12px; color:#6b7280; margin-top:1px;">${parentName}</div>`;
         } else if (childCount > 0) {
-            subtitle = <div style="font-size:12px; color:#9ca3af; margin-top:1px;">${childCount} nhóm con</div>;
+            subtitle = `<div style="font-size:12px; color:#9ca3af; margin-top:1px;">${childCount} nhóm con</div>`;
         }
 
         const indent = isChild ? 'padding-left:28px;' : '';
@@ -1321,7 +1321,7 @@ function renderManageCategories() {
         const nameSize = isChild ? '14px' : '15px';
         const nameWeight = isChild ? '400' : '500';
 
-        html += 
+        html += `
             <div onclick="openEditCategory('${cat.id}')" style="display:flex; align-items:center; padding:12px 16px; ${indent} border-bottom:${isLast ? 'none' : '1px solid #f3f4f6'}; cursor:pointer; background:${isChild ? '#fafafa' : 'white'};">
                 <div style="width:${iconSize}; height:${iconSize}; border-radius:50%; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:${fontSize}; margin-right:12px; color:${cat.color}; flex-shrink:0;">${cat.icon}</div>
                 <div style="flex:1; min-width:0;">
@@ -1330,7 +1330,7 @@ function renderManageCategories() {
                 </div>
                 <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
             </div>
-        ;
+        `;
     });
 
     list.innerHTML = html || '<div style="padding:20px; text-align:center; color:#9ca3af; font-size:13px;">Chưa có nhóm nào.</div>';
@@ -1389,8 +1389,8 @@ function setAddCatType(type) {
     const incBtn = document.getElementById('addCatIncomeBtn');
     const expBtn = document.getElementById('addCatExpenseBtn');
     
-    const activeStyle = padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);;
-    const inactiveStyle = padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;;
+    const activeStyle = `padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);`;
+    const inactiveStyle = `padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280; box-shadow:none;`;
     
     if(expBtn) expBtn.style.cssText = type === 'expense' ? activeStyle : inactiveStyle;
     if(incBtn) incBtn.style.cssText = type === 'income' ? activeStyle : inactiveStyle;
@@ -1473,21 +1473,21 @@ function openParentCatPicker() {
     const currentId = document.getElementById('editCatId').value;
     const validParents = cats.filter(c => c.id !== currentId && !c.parentId); // Only top-level cats can be parents, prevent infinite nesting
     
-    let html = 
+    let html = `
         <div onclick="selectParentCategory(null)" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${editCatParentId === null ? '#f0fdf4' : 'transparent'};">
             <div style="font-size:24px;">�xa�</div>
             <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Không có</div>
             ${editCatParentId === null ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
         </div>
-    ;
+    `;
     
-    html += validParents.map(cat => 
+    html += validParents.map(cat => `
         <div onclick="selectParentCategory('${cat.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${cat.id === editCatParentId ? '#f0fdf4' : 'transparent'};">
             <div style="width:32px; height:32px; border-radius:50%; background:${cat.color}20; display:flex; align-items:center; justify-content:center; font-size:16px; color:${cat.color};">${cat.icon}</div>
             <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${cat.name}</div>
             ${cat.id === editCatParentId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
         </div>
-    ).join('');
+    `).join('');
     
     list.innerHTML = html;
     document.getElementById('parentCatPickerOverlay').style.display = 'flex';
@@ -1544,14 +1544,14 @@ async function sendTelegramNotification(txn, wallet) {
     const totalBalanceStr = formatter.format(totalBalance) + ' �';
     const walletName = wallet ? wallet.name : 'Chưa rõ ví';
     
-    const message = BIẾN Đ��NG SỐ DƯ "${walletName}"
+    const message = `BIẾN Đ��NG SỐ DƯ "${walletName}"
 ${sign} ${amountStr}
 N��I DUNG: "${txn.note || txn.category}"
 SỐ DƯ VÍ: "${walletBalanceStr}"
-T�NG SỐ DƯ: "${totalBalanceStr}";
+T�NG SỐ DƯ: "${totalBalanceStr}"`;
 
     try {
-        await fetch(https://api.telegram.org/bot${botToken}/sendMessage, {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1601,7 +1601,7 @@ function renderSePayMappings() {
     let html = '';
     sepayConfig.mappings.forEach((m, index) => {
         const wallet = wallets.find(w => w.id === m.walletId);
-        const wName = wallet ? ${wallet.emoji || '�x�'} ${wallet.name} : 'Chưa chọn Ví';
+        const wName = wallet ? `${wallet.emoji || '�x�'} ${wallet.name}` : 'Chưa chọn Ví';
         
         let cName = 'Chưa chọn Nhóm';
         let cIcon = '�';
@@ -1616,7 +1616,7 @@ function renderSePayMappings() {
             }
         }
 
-        html += 
+        html += `
             <div class="card" style="padding:16px; margin-bottom:12px; position:relative;">
                 <button onclick="removeSePayMapping(${index})" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer;"><i class="fas fa-trash"></i></button>
                 <div style="margin-bottom:12px;">
@@ -1635,7 +1635,7 @@ function renderSePayMappings() {
                     </div>
                 </div>
             </div>
-        ;
+        `;
     });
     list.innerHTML = html;
 }
@@ -1715,12 +1715,12 @@ function openSePayWalletPicker(index) {
     
     let html = '';
     wallets.forEach(w => {
-        html += 
+        html += `
             <div onclick="selectSePayWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer;">
                 <div style="width:36px; height:36px; border-radius:50%; background:#f3f4f6; display:flex; align-items:center; justify-content:center; font-size:18px;">${w.icon}</div>
                 <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
             </div>
-        ;
+        `;
     });
     list.innerHTML = html;
     document.getElementById('txnWalletPickerOverlay').style.display = 'flex';
@@ -1790,7 +1790,7 @@ async function runSePaySync(silent = false) {
         // If proxy is available, use it to bypass CORS. 
         // We MUST NOT send custom headers to avoid triggering an OPTIONS preflight request.
         if (sepayConfig.proxyUrl) {
-            url = ${sepayConfig.proxyUrl}?token=${encodeURIComponent(apiToken)}&limit=50;
+            url = `${sepayConfig.proxyUrl}?token=${encodeURIComponent(apiToken)}&limit=50`;
             options = {}; // No custom headers
         }
         
@@ -1800,12 +1800,12 @@ async function runSePaySync(silent = false) {
         
         const json = await res.json();
         console.log('SePay raw response:', json);
-        logBox.innerHTML += Phản h�i: status=${json.status}, error="${json.error || 'none'}"<br>;
+        logBox.innerHTML += `Phản h�i: status=${json.status}, error="${json.error || 'none'}"<br>`;
         
         if (json.status !== 200 && json.status !== '200') throw new Error(json.messages || json.error || 'L�i lấy dữ li�!u từ SePay');
         
         const records = json.transactions || [];
-        logBox.innerHTML += Tìm thấy ${records.length} giao d�9ch gần �ây.<br>;
+        logBox.innerHTML += `Tìm thấy ${records.length} giao d�9ch gần �ây.<br>`;
         
         if (!sepayConfig.lastSyncIds) sepayConfig.lastSyncIds = [];
         let newCount = 0;
@@ -1816,7 +1816,7 @@ async function runSePaySync(silent = false) {
             if (sepayConfig.lastSyncIds.includes(txIdStr)) return;
             
             console.log('Processing tx:', tx.id, 'account:', tx.account_number, 'mappings:', sepayConfig.mappings.map(m => m.bankAcc));
-            logBox.innerHTML += TX ${tx.id}: tài khoản="${tx.account_number}"<br>;
+            logBox.innerHTML += `TX ${tx.id}: tài khoản="${tx.account_number}"<br>`;
             
             const map = sepayConfig.mappings.find(m => m.bankAcc && m.bankAcc.trim() === String(tx.account_number).trim());
             if (!map) return;
@@ -1902,11 +1902,11 @@ async function runSePaySync(silent = false) {
         renderAll();
         
         if (!silent) {
-            logBox.innerHTML += <strong style="color:#10b981;">Hoàn tất! Đã ��ng b�" ${newCount} giao d�9ch m�:i.</strong>;
+            logBox.innerHTML += `<strong style="color:#10b981;">Hoàn tất! Đã ��ng b�" ${newCount} giao d�9ch m�:i.</strong>`;
         }
         
     } catch (e) {
-        if (!silent) logBox.innerHTML += <strong style="color:#ef4444;">L�i: ${e.message}</strong>;
+        if (!silent) logBox.innerHTML += `<strong style="color:#ef4444;">L�i: ${e.message}</strong>`;
     } finally {
         if (!silent) {
             btn.innerHTML = '<i class="fas fa-sync-alt"></i> Đ�ng b�" ngay';
@@ -1973,10 +1973,10 @@ function renderReceivingInfoList() {
     }
     
     if (filteredInfos.length === 0) {
-        listEl.innerHTML = <div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px; width:100%;">
+        listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px; width:100%;">
             <div style="font-size:40px; margin-bottom:12px;">�x!</div>
             Chưa có thông tin nhận tiền nào
-        </div>;
+        </div>`;
         dotsEl.innerHTML = '';
         return;
     }
@@ -1995,12 +1995,12 @@ function renderReceivingInfoList() {
     listEl.innerHTML = displayInfos.map((info, dIdx) => {
         const originalIndex = infos.indexOf(infos.find(i => i.accountNumber === info.accountNumber));
         const tagsHtml = (info.tags || []).length > 0 
-            ? <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
-                ${info.tags.map(t => <span style="background:#e0e7ff; color:#4f46e5; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600;">${t}</span>).join('')}
-               </div>
+            ? `<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+                ${info.tags.map(t => `<span style="background:#e0e7ff; color:#4f46e5; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600;">${t}</span>`).join('')}
+               </div>`
             : '';
             
-        return 
+        return `
         <div class="recv-slide">
             <div class="card aw-card" style="padding:16px; height: 100%; position:relative;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
@@ -2010,16 +2010,16 @@ function renderReceivingInfoList() {
                 <div style="font-size:20px; font-weight:700; font-family:monospace; margin-bottom:4px; letter-spacing:1px;">${info.accountNumber || ''}</div>
                 <div style="font-size:14px; color:#6b7280; text-transform:uppercase; margin-bottom:8px;">${info.accountName || ''}</div>
                 ${tagsHtml}
-                ${info.imageUrl ? <img src="${info.imageUrl}" style="width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); pointer-events:none;"> : ''}
+                ${info.imageUrl ? `<img src="${info.imageUrl}" style="width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); pointer-events:none;">` : ''}
             </div>
         </div>
-        ;
+        `;
     }).join('');
 
     // Render dots (only for real items)
-    dotsEl.innerHTML = filteredInfos.map((_, i) => 
+    dotsEl.innerHTML = filteredInfos.map((_, i) => `
         <div class="recv-dot ${i === 0 ? 'active' : ''}"></div>
-    ).join('');
+    `).join('');
 
     // Handle initial scroll for loop
     if (isLooping) {
@@ -2126,7 +2126,7 @@ function previewReceivingImage(url) {
     if (finalUrl.includes('gyazo.com') && !finalUrl.includes('i.gyazo.com')) {
         const hash = finalUrl.split('gyazo.com/')[1];
         if (hash) {
-            finalUrl = https://i.gyazo.com/${hash}.png;
+            finalUrl = `https://i.gyazo.com/${hash}.png`;
         }
     }
     
@@ -2155,7 +2155,7 @@ function saveReceivingInfo() {
     if (url.includes('gyazo.com') && !url.includes('i.gyazo.com')) {
         const hash = url.split('gyazo.com/')[1];
         if (hash) {
-            imageUrl = https://i.gyazo.com/${hash}.png;
+            imageUrl = `https://i.gyazo.com/${hash}.png`;
         }
     }
     
@@ -2268,7 +2268,7 @@ function renderBudgetsPage() {
         const remainColor = remain < 0 ? '#ef4444' : '#6b7280';
         const barColor = remain < 0 ? '#ef4444' : color;
 
-        listHtml += 
+        listHtml += `
             <div class="card aw-card" style="padding: 16px; cursor:pointer;" onclick="openBudgetDetail('${b.id}')">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
@@ -2288,7 +2288,7 @@ function renderBudgetsPage() {
                     <div style="font-size: 11px; color: #9ca3af;">${Math.round(percent)}%</div>
                 </div>
             </div>
-        ;
+        `;
     });
 
     budgetListEl.innerHTML = listHtml;
@@ -2306,7 +2306,7 @@ function renderBudgetsPage() {
     if (globalPercent < 0) globalPercent = 0;
     
     const deg = -135 + (180 * globalPercent);
-    document.getElementById('budgetGlobalProgress').style.transform = rotate(${deg}deg);
+    document.getElementById('budgetGlobalProgress').style.transform = `rotate(${deg}deg)`;
     document.getElementById('budgetGlobalProgress').style.borderColor = globalAvailable < 0 ? '#ef4444' : '#10b981';
     document.getElementById('budgetGlobalProgress').style.borderBottomColor = 'transparent';
     document.getElementById('budgetGlobalProgress').style.borderRightColor = 'transparent';
@@ -2416,8 +2416,8 @@ function openBudgetDetail(id) {
     document.getElementById('detailBudgetTodayText').style.left = timePercent + '%';
 
     const monthStr = (currentMonth + 1).toString().padStart(2, '0');
-    document.getElementById('detailBudgetDateRange').innerText = 01/${monthStr} - ${lastDayOfMonth}/${monthStr};
-    document.getElementById('detailBudgetDaysLeft').innerText = Còn ${daysLeft} ngày;
+    document.getElementById('detailBudgetDateRange').innerText = `01/${monthStr} - ${lastDayOfMonth}/${monthStr}`;
+    document.getElementById('detailBudgetDaysLeft').innerText = `Còn ${daysLeft} ngày`;
     document.getElementById('detailBudgetRepeatText').innerText = b.isRepeating ? 'Ngân sách �ược tự ��"ng lặp lại �x kỳ hạn tiếp theo.' : 'Ngân sách không lặp lại.';
 
     const recDaily = remain > 0 && daysLeft > 0 ? remain / daysLeft : 0;
@@ -2478,24 +2478,24 @@ function openBudgetWalletPicker() {
     let listHtml = '';
     
     const allCheck = currentWalletId === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += <div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">�xR�</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">T�"ng c�"ng</div>${allCheck}</div>;
+    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">�xR�</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">T�"ng c�"ng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = currentWalletId === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-        listHtml += <div onclick="selectBudgetWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'�x�'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>;
+        listHtml += `<div onclick="selectBudgetWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'�x�'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
     });
     
     const overlay = document.createElement('div');
     overlay.id = 'budgetWalletOverlay';
     overlay.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;';
-    overlay.innerHTML = 
+    overlay.innerHTML = `
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
                 <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn ví</h3>
                 <button onclick="closeBudgetWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">�S"</button>
             </div>
             <div style="flex:1; overflow-y:auto;">${listHtml}</div>
-        </div>;
+        </div>`;
     overlay.addEventListener('click', function(e) { if (e.target === overlay) closeBudgetWalletPicker(); });
     document.body.appendChild(overlay);
 }
@@ -2525,24 +2525,24 @@ function openBudgetGlobalWalletPicker() {
     
     let listHtml = '';
     const allCheck = budgetGlobalWalletFilter === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += <div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">�xR�</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">T�"ng c�"ng</div>${allCheck}</div>;
+    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">�xR�</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">T�"ng c�"ng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = budgetGlobalWalletFilter === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-        listHtml += <div onclick="selectBudgetGlobalWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'�x�'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>;
+        listHtml += `<div onclick="selectBudgetGlobalWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'�x�'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
     });
     
     const overlay = document.createElement('div');
     overlay.id = 'budgetGlobalWalletOverlay';
     overlay.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;';
-    overlay.innerHTML = 
+    overlay.innerHTML = `
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
                 <h3 style="font-size:16px; font-weight:700; margin:0;">Lọc theo ví</h3>
                 <button onclick="closeBudgetGlobalWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">�S"</button>
             </div>
             <div style="flex:1; overflow-y:auto;">${listHtml}</div>
-        </div>;
+        </div>`;
     overlay.addEventListener('click', function(e) { if (e.target === overlay) closeBudgetGlobalWalletPicker(); });
     document.body.appendChild(overlay);
 }
