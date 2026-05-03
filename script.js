@@ -2638,6 +2638,7 @@ function showToast(message, type = 'info', duration = 3000) {
     }, duration);
 }
 
+
 function checkBudgetsThreshold(txn) {
     if (txn.type !== 'expense' || txn.excluded) return;
     
@@ -2649,7 +2650,6 @@ function checkBudgetsThreshold(txn) {
             const spent = getBudgetSpent(b);
             const percent = (spent / b.amount) * 100;
             
-            // Get category name for better message
             let catName = 'Nhóm chi tiêu';
             if (b.categoryId === 'all') {
                 catName = 'Tổng ngân sách';
@@ -2658,18 +2658,15 @@ function checkBudgetsThreshold(txn) {
                 if (cat) catName = cat.name;
             }
 
-            if (percent >= 100) {
-                showToast('Cảnh báo: Ngân sách [' + catName + '] đã hết!', 'error', 5000);
+            if (spent > b.amount) {
+                const overAmount = spent - b.amount;
+                showToast('BÁO ĐỘNG: Ngân sách [' + catName + '] đã VƯỢT ' + formatMoney(overAmount) + '!', 'error', 6000);
+            } else if (percent >= 100) {
+                showToast('Cảnh báo: Ngân sách [' + catName + '] đã hết sạch!', 'error', 5000);
             } else if (percent >= 90) {
                 showToast('Sắp hết: Ngân sách [' + catName + '] đã dùng ' + Math.round(percent) + '%', 'warning', 4000);
             }
         }
     });
 }
-
-
-
-
-
-
 
