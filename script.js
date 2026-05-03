@@ -195,7 +195,7 @@ function switchPage(pageName) {
 
     // Hide bottom nav on certain pages
     const hideNavPages = ['add-transaction', 'add-wallet', 'sepay', 'receiving-info', 'add-receiving', 'add-budget', 'budget-detail'];
-    const nav = document.querySelector('.nav');
+    const nav = document.querySelector('.bottom-nav');
     if (nav) nav.style.display = hideNavPages.includes(pageName) ? 'none' : 'flex';
 
     renderAll(true); // Force render when navigating between pages
@@ -2365,8 +2365,8 @@ function openBudgetDetail(id) {
     document.getElementById('detailBudgetTodayText').style.left = timePercent + '%';
 
     const monthStr = (currentMonth + 1).toString().padStart(2, '0');
-    document.getElementById('detailBudgetDateRange').innerText = \`01/\${monthStr} - \${lastDayOfMonth}/\${monthStr}\`;
-    document.getElementById('detailBudgetDaysLeft').innerText = \`Còn \${daysLeft} ngày\`;
+    document.getElementById('detailBudgetDateRange').innerText = `01/${monthStr} - ${lastDayOfMonth}/${monthStr}`;
+    document.getElementById('detailBudgetDaysLeft').innerText = `Còn ${daysLeft} ngày`;
     document.getElementById('detailBudgetRepeatText').innerText = b.isRepeating ? 'Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.' : 'Ngân sách không lặp lại.';
 
     const recDaily = remain > 0 && daysLeft > 0 ? remain / daysLeft : 0;
@@ -2426,4 +2426,9 @@ if (typeof originalRenderAll === 'undefined') {
         }
     };
 }
+
+
+
+
+function formatMoney(amount) { return formatCurrency(amount, 'VND'); }
 
