@@ -2168,6 +2168,35 @@ function deleteReceivingInfo() {
 
 
 // === BUDGET LOGIC ===
+function getBudgetSpent(b) {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    let spent = 0;
+    transactions.forEach(t => {
+        if (t.type !== 'expense') return;
+        if (t.excluded) return;
+        
+        const tDate = new Date(t.date);
+        if (tDate.getMonth() !== currentMonth || tDate.getFullYear() !== currentYear) return;
+        
+        // Match category: budget's categoryId matches transaction's categoryId OR category name
+        const catMatch = b.categoryId === 'all' || 
+                         t.categoryId === b.categoryId || 
+                         t.category === b.categoryId;
+        if (!catMatch) return;
+        
+        // Match wallet: if budget is for a specific wallet, only count that wallet's transactions
+        if (b.walletId && b.walletId !== 'all') {
+            if (t.walletId !== b.walletId) return;
+        }
+        
+        spent += t.amount;
+    });
+    return spent;
+}
+
 function renderBudgetsPage() {
     const today = new Date();
     const currentMonth = today.getMonth();
@@ -2182,21 +2211,18 @@ function renderBudgetsPage() {
     if (!budgetListEl) return;
     let listHtml = '';
 
-    const activeBudgets = budgets || [];
+    const allBudgets = budgets || [];
+    
+    // Filter budgets by the global wallet filter on the dashboard
+    const filteredBudgets = allBudgets.filter(b => {
+        if (typeof budgetGlobalWalletFilter === 'undefined' || budgetGlobalWalletFilter === 'all') return true;
+        return !b.walletId || b.walletId === 'all' || b.walletId === budgetGlobalWalletFilter;
+    });
 
-    activeBudgets.forEach((b) => {
+    filteredBudgets.forEach((b) => {
+        const spent = getBudgetSpent(b);
+        
         totalBudget += b.amount;
-        
-        let spent = 0;
-        transactions.forEach(t => {
-            const tDate = new Date(t.date);
-            if (tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear && t.type === 'expense') {
-                if (b.categoryId === 'all' || t.category === b.categoryId) {
-                    spent += t.amount;
-                }
-            }
-        });
-        
         totalSpent += spent;
         const remain = b.amount - spent;
         const percent = Math.min(100, Math.max(0, (spent / b.amount) * 100));
@@ -2208,6 +2234,8 @@ function renderBudgetsPage() {
         const icon = catObj ? catObj.icon : '💰';
         const name = catObj ? catObj.name : 'Tổng cộng';
         const color = catObj ? catObj.color : '#10b981';
+        const remainColor = remain < 0 ? '#ef4444' : '#6b7280';
+        const barColor = remain < 0 ? '#ef4444' : color;
 
         listHtml += `
             <div class="card aw-card" style="padding: 16px; cursor:pointer;" onclick="openBudgetDetail('${b.id}')">
@@ -2218,13 +2246,16 @@ function renderBudgetsPage() {
                     </div>
                     <div style="text-align: right;">
                         <div style="font-weight: 600; font-size: 16px; color:#1f2937;">${formatMoney(b.amount)}</div>
-                        <div style="font-size: 12px; color: #6b7280;">Còn lại ${formatMoney(remain)}</div>
+                        <div style="font-size: 12px; color: ${remainColor};">Còn lại ${formatMoney(remain)}</div>
                     </div>
                 </div>
                 <div style="width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin-top: 8px;">
-                    <div style="height: 100%; background: ${color}; width: ${percent}%;"></div>
+                    <div style="height: 100%; background: ${barColor}; width: ${percent}%; transition: width 0.3s;"></div>
                 </div>
-                <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Hôm nay</div>
+                <div style="display:flex; justify-content:space-between; margin-top: 4px;">
+                    <div style="font-size: 11px; color: #9ca3af;">Đã chi ${formatMoney(spent)}</div>
+                    <div style="font-size: 11px; color: #9ca3af;">${Math.round(percent)}%</div>
+                </div>
             </div>
         `;
     });
@@ -2346,15 +2377,7 @@ function openBudgetDetail(id) {
     const daysLeft = lastDayOfMonth - today.getDate();
     const daysPassed = today.getDate();
 
-    let spent = 0;
-    transactions.forEach(t => {
-        const tDate = new Date(t.date);
-        if (tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear && t.type === 'expense') {
-            if (b.categoryId === 'all' || t.category === b.categoryId) {
-                spent += t.amount;
-            }
-        }
-    });
+    const spent = getBudgetSpent(b);
 
     const remain = b.amount - spent;
     let percent = (spent / b.amount) * 100;
@@ -2573,4 +2596,5 @@ if (typeof originalRenderAll === 'undefined') {
 }
 
 function formatMoney(amount) { return formatCurrency(amount, 'VND'); }
+
 
