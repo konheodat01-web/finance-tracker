@@ -1,1006 +1,1006 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
- đ đ<meta charset="UTF-8">
- đ đ<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
- đ đ<title>Finance App</title>
- đ đ<link rel="icon" type="image/png" href="favicon.png?v=1.0.55">
- đ đ<link rel="icon" type="image/png" href="favicon.png?v=1.0.63">
- đ đ<link rel="apple-touch-icon" href="apple-touch-icon.png?v=1.0.63">
- đ đ<link rel="manifest" href="manifest.json?v=1.0.63">
- đ đ<meta name="mobile-web-app-capable" content="yes">
- đ đ<meta name="apple-mobile-web-app-capable" content="yes">
- đ đ<meta name="apple-mobile-web-app-title" content="Finance">
- đ đ<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- đ đ<link rel="stylesheet" href="style.css?v=1.0.71">
- đ đ<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
- đ đ<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
- đ đ<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- đ đ
- đ đ<!-- Firebase SDKs -->
- đ đ<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
- đ đ<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
- đ đ<style>
- đ đ đ đ/* === SPLASH SCREEN === */
- đ đ đ đ#splash-screen {
- đ đ đ đ đ đposition: fixed;
- đ đ đ đ đ đtop: 0;
- đ đ đ đ đ đleft: 0;
- đ đ đ đ đ đwidth: 100%;
- đ đ đ đ đ đheight: 100%;
- đ đ đ đ đ đbackground-color: #ffffff;
- đ đ đ đ đ đz-index: 999999;
- đ đ đ đ đ đdisplay: flex;
- đ đ đ đ đ đflex-direction: column;
- đ đ đ đ đ đalign-items: center;
- đ đ đ đ đ đjustify-content: center;
- đ đ đ đ đ đtransition: opacity 0.4s ease;
- đ đ đ đ}
- đ đ đ đ#splash-screen img {
- đ đ đ đ đ đwidth: 100px;
- đ đ đ đ đ đheight: 100px;
- đ đ đ đ đ đborder-radius: 20px;
- đ đ đ đ đ đmargin-bottom: 30px;
- đ đ đ đ đ đbox-shadow: 0 10px 25px rgba(0,0,0,0.1);
- đ đ đ đ đ đanimation: pulse 2s infinite;
- đ đ đ đ}
- đ đ đ đ.loader-spinner {
- đ đ đ đ đ đwidth: 40px;
- đ đ đ đ đ đheight: 40px;
- đ đ đ đ đ đborder: 4px solid #f3f3f3;
- đ đ đ đ đ đborder-top: 4px solid #10b981;
- đ đ đ đ đ đborder-radius: 50%;
- đ đ đ đ đ đanimation: spin 1s linear infinite;
- đ đ đ đ}
- đ đ đ đ@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
- đ đ đ đ@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
- đ đ</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finance App</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=1.0.55">
+    <link rel="icon" type="image/png" href="favicon.png?v=1.0.63">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1.0.63">
+    <link rel="manifest" href="manifest.json?v=1.0.63">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Finance">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="style.css?v=1.0.71">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        /* === SPLASH SCREEN === */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease;
+        }
+        #splash-screen img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            animation: pulse 2s infinite;
+        }
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    </style>
 </head>
 <body>
- đ đ<!-- Splash Screen -->
- đ đ<div id="splash-screen">
- đ đ đ đ<img src="apple-touch-icon.png?v=1.0.63" alt="App Icon">
- đ đ đ đ<div class="loader-spinner"></div>
- đ đ</div>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img src="apple-touch-icon.png?v=1.0.63" alt="App Icon">
+        <div class="loader-spinner"></div>
+    </div>
 
- đ đ<div class="app-container">
+    <div class="app-container">
 
- đ đ đ đ<!-- ===================== PAGE: TỔNG QUAN ===================== -->
- đ đ đ đ<div id="page-home" class="page active">
- đ đ đ đ đ đ<header class="header">
- đ đ đ đ đ đ đ đ<div class="header-top">
- đ đ đ đ đ đ đ đ đ đ<div class="balance-section">
- đ đ đ đ đ đ đ đ đ đ đ đ<div class="balance-wrapper">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span id="mainTotalBalance">0</span> <span class="currency">đ</span>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-eye" id="toggleBalanceBtn" onclick="toggleBalance()"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div class="balance-label">Tổng số dư <i class="fas fa-question-circle" style="color: #cbd5e1; font-size: 12px;"></i></div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="header-actions">
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="location.reload()" style="color:#6b7280; font-size:18px;"><i class="fas fa-sync-alt"></i></button>
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('settings')" style="color:#6b7280; font-size:20px;"><i class="fas fa-cog"></i></button>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content">
- đ đ đ đ đ đ đ đ<!-- Wallets Card -->
- đ đ đ đ đ đ đ đ<div class="card">
- đ đ đ đ đ đ đ đ đ đ<div class="card-header">
- đ đ đ đ đ đ đ đ đ đ đ đ<h3 class="card-title">Ví của tôi</h3>
- đ đ đ đ đ đ đ đ đ đ đ đ<a href="#" class="card-link" onclick="switchPage('accounts'); return false;">Xem tất cả</a>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="wallet-list" id="walletListHome"></div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<!-- Report Card -->
- đ đ đ đ đ đ đ đ<div class="report-section-header">
- đ đ đ đ đ đ đ đ đ đ<h3 class="section-title">Báo cáo tháng này</h3>
- đ đ đ đ đ đ đ đ đ đ<a href="#" class="card-link">Xem báo cáo</a>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<div class="card report-card">
- đ đ đ đ đ đ đ đ đ đ<div class="report-tabs">
- đ đ đ đ đ đ đ đ đ đ đ đ<div class="tab active" onclick="switchTab('expense')">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="tab-label">Tổng đã chi</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="tab-value expense">0</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div class="tab" onclick="switchTab('income')">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="tab-label">Tổng thu</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="tab-value income">0</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="chart-info">
- đ đ đ đ đ đ đ đ đ đ đ đ<div class="chart-date">02/05/2026: <strong class="expense-text">0</strong></div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div class="chart-avg">Trung bình 3 tháng trước: <strong>0</strong></div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="chart-container">
- đ đ đ đ đ đ đ đ đ đ đ đ<canvas id="reportChart"></canvas>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="chart-legend">
- đ đ đ đ đ đ đ đ đ đ đ đ<div class="legend-item"><span class="dot red"></span> Tháng này</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div class="legend-item"><span class="dot gray"></span> Trung bình 3 tháng trước <i class="fas fa-question-circle" style="color:#cbd5e1;"></i></div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+        <!-- ===================== PAGE: TỔNG QUAN ===================== -->
+        <div id="page-home" class="page active">
+            <header class="header">
+                <div class="header-top">
+                    <div class="balance-section">
+                        <div class="balance-wrapper">
+                            <span id="mainTotalBalance">0</span> <span class="currency">đ</span>
+                            <i class="fas fa-eye" id="toggleBalanceBtn" onclick="toggleBalance()"></i>
+                        </div>
+                        <div class="balance-label">Tổng số dư <i class="fas fa-question-circle" style="color: #cbd5e1; font-size: 12px;"></i></div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-link" onclick="location.reload()" style="color:#6b7280; font-size:18px;"><i class="fas fa-sync-alt"></i></button>
+                        <button class="btn-link" onclick="switchPage('settings')" style="color:#6b7280; font-size:20px;"><i class="fas fa-cog"></i></button>
+                    </div>
+                </div>
+            </header>
+            <main class="content">
+                <!-- Wallets Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Ví của tôi</h3>
+                        <a href="#" class="card-link" onclick="switchPage('accounts'); return false;">Xem tất cả</a>
+                    </div>
+                    <div class="wallet-list" id="walletListHome"></div>
+                </div>
+                <!-- Report Card -->
+                <div class="report-section-header">
+                    <h3 class="section-title">Báo cáo tháng này</h3>
+                    <a href="#" class="card-link">Xem báo cáo</a>
+                </div>
+                <div class="card report-card">
+                    <div class="report-tabs">
+                        <div class="tab active" onclick="switchTab('expense')">
+                            <div class="tab-label">Tổng đã chi</div>
+                            <div class="tab-value expense">0</div>
+                        </div>
+                        <div class="tab" onclick="switchTab('income')">
+                            <div class="tab-label">Tổng thu</div>
+                            <div class="tab-value income">0</div>
+                        </div>
+                    </div>
+                    <div class="chart-info">
+                        <div class="chart-date">02/05/2026: <strong class="expense-text">0</strong></div>
+                        <div class="chart-avg">Trung bình 3 tháng trước: <strong>0</strong></div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="reportChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><span class="dot red"></span> Tháng này</div>
+                        <div class="legend-item"><span class="dot gray"></span> Trung bình 3 tháng trước <i class="fas fa-question-circle" style="color:#cbd5e1;"></i></div>
+                    </div>
+                </div>
+            </main>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: TÀI KHOẢN (Chọn Ví) ===================== -->
- đ đ đ đ<div id="page-accounts" class="page">
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('home')">Đóng</button>
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title">Chọn Ví</h2>
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; gap:14px; align-items:center;">
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="btn-link" style="font-size:18px; color:#6b7280;" onclick="switchPage('settings')" title="Cài đặt"><i class="fas fa-cog"></i></button>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content">
- đ đ đ đ đ đ đ đ<!-- Tổng cộng -->
- đ đ đ đ đ đ đ đ<div class="card wallet-total-card">
- đ đ đ đ đ đ đ đ đ đ<div class="wallet-item-full">
- đ đ đ đ đ đ đ đ đ đ đ đ<div class="wallet-icon icon-globe"><i class="fas fa-globe"></i></div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="wallet-name-big">Tổng cộng</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="wallet-balance-sub" id="accountsTotalBalance">0 đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
+        <!-- ===================== PAGE: TÀI KHOẢN (Chọn Ví) ===================== -->
+        <div id="page-accounts" class="page">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('home')">Đóng</button>
+                    <h2 class="page-title">Chọn Ví</h2>
+                    <div style="display:flex; gap:14px; align-items:center;">
+                        <button class="btn-link" style="font-size:18px; color:#6b7280;" onclick="switchPage('settings')" title="Cài đặt"><i class="fas fa-cog"></i></button>
+                    </div>
+                </div>
+            </header>
+            <main class="content">
+                <!-- Tổng cộng -->
+                <div class="card wallet-total-card">
+                    <div class="wallet-item-full">
+                        <div class="wallet-icon icon-globe"><i class="fas fa-globe"></i></div>
+                        <div>
+                            <div class="wallet-name-big">Tổng cộng</div>
+                            <div class="wallet-balance-sub" id="accountsTotalBalance">0 đ</div>
+                        </div>
+                    </div>
+                </div>
 
- đ đ đ đ đ đ đ đ<!-- Danh sách ví -->
- đ đ đ đ đ đ đ đ<div class="section-label">TÍNH VÀO TỔNG</div>
- đ đ đ đ đ đ đ đ<div class="card wallet-list-card" id="walletListAccounts"></div>
+                <!-- Danh sách ví -->
+                <div class="section-label">TÍNH VÀO TỔNG</div>
+                <div class="card wallet-list-card" id="walletListAccounts"></div>
 
- đ đ đ đ đ đ đ đ<!-- Actions -->
- đ đ đ đ đ đ đ đ<div class="card wallet-actions-card">
- đ đ đ đ đ đ đ đ đ đ<button class="wallet-action-row" onclick="openAddWallet()">
- đ đ đ đ đ đ đ đ đ đ đ đ<span class="action-icon green"><i class="fas fa-plus"></i></span>
- đ đ đ đ đ đ đ đ đ đ đ đ<span class="action-text green">Thêm ví</span>
- đ đ đ đ đ đ đ đ đ đ</button>
- đ đ đ đ đ đ đ đ đ đ<div class="divider-thin"></div>
- đ đ đ đ đ đ đ đ đ đ<button class="wallet-action-row" onclick="openReceivingInfoPage()">
- đ đ đ đ đ đ đ đ đ đ đ đ<span class="action-icon green"><i class="fas fa-qrcode"></i></span>
- đ đ đ đ đ đ đ đ đ đ đ đ<span class="action-text green">Thông tin nhận tiền</span>
- đ đ đ đ đ đ đ đ đ đ</button>
- đ đ đ đ đ đ đ đ</div>
+                <!-- Actions -->
+                <div class="card wallet-actions-card">
+                    <button class="wallet-action-row" onclick="openAddWallet()">
+                        <span class="action-icon green"><i class="fas fa-plus"></i></span>
+                        <span class="action-text green">Thêm ví</span>
+                    </button>
+                    <div class="divider-thin"></div>
+                    <button class="wallet-action-row" onclick="openReceivingInfoPage()">
+                        <span class="action-icon green"><i class="fas fa-qrcode"></i></span>
+                        <span class="action-text green">Thông tin nhận tiền</span>
+                    </button>
+                </div>
 
- đ đ đ đ đ đ đ đ<!-- Version Info -->
- đ đ đ đ đ đ đ đ<div class="version-tag">Phiên bản v1.0.79</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+                <!-- Version Info -->
+                <div class="version-tag">Phiên bản v1.0.81</div>
+            </main>
+        </div>
 
- đ đ đ đ<div id="toastContainer" class="toast-container"></div>
+        <div id="toastContainer" class="toast-container"></div>
 
- đ đ đ đ<!-- ===================== PAGE: CÀI ĐẶT ===================== -->
- đ đ đ đ<div id="page-settings" class="page page-light">
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('accounts')">
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại
- đ đ đ đ đ đ đ đ đ đ</button>
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title">Cài Đặt</h2>
- đ đ đ đ đ đ đ đ đ đ<span style="width:70px;"></span>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content">
- đ đ đ đ đ đ đ đ<div class="section-label" style="margin-top:8px;">HIỂN THỊ</div>
- đ đ đ đ đ đ đ đ<div class="card" style="padding:0; overflow:hidden; margin-bottom:12px;">
+        <!-- ===================== PAGE: CÀI ĐẶT ===================== -->
+        <div id="page-settings" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('accounts')">
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại
+                    </button>
+                    <h2 class="page-title">Cài Đặt</h2>
+                    <span style="width:70px;"></span>
+                </div>
+            </header>
+            <main class="content">
+                <div class="section-label" style="margin-top:8px;">HIỂN THỊ</div>
+                <div class="card" style="padding:0; overflow:hidden; margin-bottom:12px;">
 
- đ đ đ đ đ đ đ đ đ đ<!-- Định dạng thời gian -->
- đ đ đ đ đ đ đ đ đ đ<div onclick="openSettingPicker('dateFormat')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:15px; font-weight:500; color:#1f2937;">Định dạng thời gian</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span id="val-dateFormat" style="font-size:14px; font-weight:500; color:#22c55e;">DD/MM/YYYY</span>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Định dạng thời gian -->
+                    <div onclick="openSettingPicker('dateFormat')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Định dạng thời gian</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-dateFormat" style="font-size:14px; font-weight:500; color:#22c55e;">DD/MM/YYYY</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
+                        </div>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Đơn vị tiền cho ví Tổng -->
- đ đ đ đ đ đ đ đ đ đ<div onclick="openSettingPicker('totalCurrency')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:15px; font-weight:500; color:#1f2937;">Đơn vị tiền cho ví Tổng</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span id="val-totalCurrency" style="font-size:14px; font-weight:500; color:#22c55e;">VND</span>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Đơn vị tiền cho ví Tổng -->
+                    <div onclick="openSettingPicker('totalCurrency')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đơn vị tiền cho ví Tổng</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-totalCurrency" style="font-size:14px; font-weight:500; color:#22c55e;">VND</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
+                        </div>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Chọn ngày đầu tuần -->
- đ đ đ đ đ đ đ đ đ đ<div onclick="openSettingPicker('firstDayOfWeek')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:15px; font-weight:500; color:#1f2937;">Chọn ngày đầu tuần</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span id="val-firstDayOfWeek" style="font-size:14px; font-weight:500; color:#22c55e;">Thứ Hai</span>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Chọn ngày đầu tuần -->
+                    <div onclick="openSettingPicker('firstDayOfWeek')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Chọn ngày đầu tuần</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-firstDayOfWeek" style="font-size:14px; font-weight:500; color:#22c55e;">Thứ Hai</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
+                        </div>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Đặt ngày đầu tiên của tháng -->
- đ đ đ đ đ đ đ đ đ đ<div onclick="openSettingPicker('firstDayOfMonth')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:15px; font-weight:500; color:#1f2937;">Đặt ngày đầu tiên của tháng</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span id="val-firstDayOfMonth" style="font-size:14px; font-weight:500; color:#22c55e;">1</span>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Đặt ngày đầu tiên của tháng -->
+                    <div onclick="openSettingPicker('firstDayOfMonth')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đặt ngày đầu tiên của tháng</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-firstDayOfMonth" style="font-size:14px; font-weight:500; color:#22c55e;">1</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
+                        </div>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Chọn tháng đầu tiên của năm -->
- đ đ đ đ đ đ đ đ đ đ<div onclick="openSettingPicker('firstMonthOfYear')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer;">
- đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:15px; font-weight:500; color:#1f2937;">Chọn tháng đầu tiên của năm</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span id="val-firstMonthOfYear" style="font-size:14px; font-weight:500; color:#22c55e;">Tháng Một</span>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Chọn tháng đầu tiên của năm -->
+                    <div onclick="openSettingPicker('firstMonthOfYear')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Chọn tháng đầu tiên của năm</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span id="val-firstMonthOfYear" style="font-size:14px; font-weight:500; color:#22c55e;">Tháng Một</span>
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
+                        </div>
+                    </div>
 
- đ đ đ đ đ đ đ đ</div>
+                </div>
 
- đ đ đ đ đ đ đ đ<div class="section-label" style="margin-top:8px;">DỮ LIỆU</div>
- đ đ đ đ đ đ đ đ<div class="card" style="padding:0; overflow:hidden; margin-bottom:12px;">
- đ đ đ đ đ đ đ đ đ đ<!-- Quản lý nhóm -->
- đ đ đ đ đ đ đ đ đ đ<div onclick="openManageCategories()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:15px; font-weight:500; color:#1f2937;">Quản lý nhóm chi tiêu</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<!-- Đồng bộ SePay -->
- đ đ đ đ đ đ đ đ đ đ<div onclick="openSePaySync()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer;">
- đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:15px; font-weight:500; color:#1f2937;">Đồng bộ ngân hàng (SePay)</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+                <div class="section-label" style="margin-top:8px;">DỮ LIỆU</div>
+                <div class="card" style="padding:0; overflow:hidden; margin-bottom:12px;">
+                    <!-- Quản lý nhóm -->
+                    <div onclick="openManageCategories()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Quản lý nhóm chi tiêu</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
+                        </div>
+                    </div>
+                    <!-- Đồng bộ SePay -->
+                    <div onclick="openSePaySync()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer;">
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đồng bộ ngân hàng (SePay)</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: RECEIVING INFO ===================== -->
- đ đ đ đ<div id="page-receiving-info" class="page page-light">
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('accounts')">Đóng</button>
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title">Thông tin nhận tiền</h2>
- đ đ đ đ đ đ đ đ đ đ<div>
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="toggleReceivingSearch()" style="color:#6b7280; margin-right:8px;"><i class="fas fa-search"></i></button>
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="openAddReceivingInfo()" style="color:#10b981; font-weight:600;"><i class="fas fa-plus"></i> Thêm</button>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<div id="receivingSearchContainer" style="display:none; padding: 0 16px 12px 16px;">
- đ đ đ đ đ đ đ đ đ đ<input type="text" id="receivingSearchInput" placeholder="Tìm theo tên, NH, STK hoặc tag..." style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #e5e7eb; outline:none; font-family:'Inter', sans-serif; font-size:14px; background:#f9fafb;" oninput="renderReceivingInfoList()">
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content" style="padding-top:16px; padding-left:0; padding-right:0;">
- đ đ đ đ đ đ đ đ<div class="recv-carousel-container">
- đ đ đ đ đ đ đ đ đ đ<div id="receivingInfoList" class="recv-carousel">
- đ đ đ đ đ đ đ đ đ đ đ đ<!-- Slides -->
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="recv-nav-controls" style="display:flex; align-items:center; justify-content:center; gap:20px; margin-top:-10px; padding-bottom:20px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="scrollReceiving(-1)" style="color:#6b7280; font-size:18px; padding:10px;"><i class="fas fa-chevron-left"></i></button>
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="receivingInfoDots" class="recv-dots" style="margin:0; padding:0;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<!-- Dots -->
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="scrollReceiving(1)" style="color:#6b7280; font-size:18px; padding:10px;"><i class="fas fa-chevron-right"></i></button>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+        <!-- ===================== PAGE: RECEIVING INFO ===================== -->
+        <div id="page-receiving-info" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('accounts')">Đóng</button>
+                    <h2 class="page-title">Thông tin nhận tiền</h2>
+                    <div>
+                        <button class="btn-link" onclick="toggleReceivingSearch()" style="color:#6b7280; margin-right:8px;"><i class="fas fa-search"></i></button>
+                        <button class="btn-link" onclick="openAddReceivingInfo()" style="color:#10b981; font-weight:600;"><i class="fas fa-plus"></i> Thêm</button>
+                    </div>
+                </div>
+                <div id="receivingSearchContainer" style="display:none; padding: 0 16px 12px 16px;">
+                    <input type="text" id="receivingSearchInput" placeholder="Tìm theo tên, NH, STK hoặc tag..." style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #e5e7eb; outline:none; font-family:'Inter', sans-serif; font-size:14px; background:#f9fafb;" oninput="renderReceivingInfoList()">
+                </div>
+            </header>
+            <main class="content" style="padding-top:16px; padding-left:0; padding-right:0;">
+                <div class="recv-carousel-container">
+                    <div id="receivingInfoList" class="recv-carousel">
+                        <!-- Slides -->
+                    </div>
+                    <div class="recv-nav-controls" style="display:flex; align-items:center; justify-content:center; gap:20px; margin-top:-10px; padding-bottom:20px;">
+                        <button class="btn-link" onclick="scrollReceiving(-1)" style="color:#6b7280; font-size:18px; padding:10px;"><i class="fas fa-chevron-left"></i></button>
+                        <div id="receivingInfoDots" class="recv-dots" style="margin:0; padding:0;">
+                            <!-- Dots -->
+                        </div>
+                        <button class="btn-link" onclick="scrollReceiving(1)" style="color:#6b7280; font-size:18px; padding:10px;"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </main>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: ADD/EDIT RECEIVING INFO ===================== -->
- đ đ đ đ<div id="page-add-receiving" class="page page-light">
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('receiving-info')">Hủy</button>
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title" id="addReceivingTitle">Thêm thông tin</h2>
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="saveReceivingInfo()" style="color:#10b981; font-weight:600;">Lưu</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content" style="padding-top:16px;">
- đ đ đ đ đ đ đ đ<input type="hidden" id="editReceivingId">
- đ đ đ đ đ đ đ đ<div class="card aw-card">
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="aw-field-label">Ngân hàng / Ví</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="recvBank" class="aw-balance-input" style="font-size:16px; width:100%;" placeholder="Ví dụ: VietinBank">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="aw-field-label">Số tài khoản</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="recvNumber" class="aw-balance-input" style="font-size:16px; font-family:monospace; width:100%;" placeholder="Nhập số tài khoản">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="aw-field-label">Tên chủ tài khoản</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="recvName" class="aw-balance-input" style="font-size:16px; text-transform:uppercase; width:100%;" placeholder="Tên in hoa không dấu">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="aw-field-label">Tags (Phân cách bằng dấu phẩy)</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="recvTags" class="aw-balance-input" style="font-size:14px; width:100%; color:#6b7280;" placeholder="Ví dụ: Cá nhân, Công ty, Crypto...">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row" style="border-bottom:none;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="aw-field-label">Link ảnh QR (Gyazo, Imgur...)</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="recvImageLink" class="aw-balance-input" style="font-size:14px; color:#3b82f6; width:100%;" placeholder="Dán link ảnh vào đây" oninput="previewReceivingImage(this.value)">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<div id="recvImagePreviewContainer" style="margin-top:16px; text-align:center; display:none;">
- đ đ đ đ đ đ đ đ đ đ<img id="recvImagePreview" style="max-width:100%; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1);" src="">
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<button id="deleteReceivingRow" class="btn-link" style="color:#ef4444; width:100%; text-align:center; margin-top:24px; padding:12px; background:white; border-radius:12px; display:none;" onclick="deleteReceivingInfo()">Xóa thông tin này</button>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+        <!-- ===================== PAGE: ADD/EDIT RECEIVING INFO ===================== -->
+        <div id="page-add-receiving" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('receiving-info')">Hủy</button>
+                    <h2 class="page-title" id="addReceivingTitle">Thêm thông tin</h2>
+                    <button class="btn-link" onclick="saveReceivingInfo()" style="color:#10b981; font-weight:600;">Lưu</button>
+                </div>
+            </header>
+            <main class="content" style="padding-top:16px;">
+                <input type="hidden" id="editReceivingId">
+                <div class="card aw-card">
+                    <div class="aw-field-row">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Ngân hàng / Ví</div>
+                            <input type="text" id="recvBank" class="aw-balance-input" style="font-size:16px; width:100%;" placeholder="Ví dụ: VietinBank">
+                        </div>
+                    </div>
+                    <div class="aw-field-row">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Số tài khoản</div>
+                            <input type="text" id="recvNumber" class="aw-balance-input" style="font-size:16px; font-family:monospace; width:100%;" placeholder="Nhập số tài khoản">
+                        </div>
+                    </div>
+                    <div class="aw-field-row">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Tên chủ tài khoản</div>
+                            <input type="text" id="recvName" class="aw-balance-input" style="font-size:16px; text-transform:uppercase; width:100%;" placeholder="Tên in hoa không dấu">
+                        </div>
+                    </div>
+                    <div class="aw-field-row">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Tags (Phân cách bằng dấu phẩy)</div>
+                            <input type="text" id="recvTags" class="aw-balance-input" style="font-size:14px; width:100%; color:#6b7280;" placeholder="Ví dụ: Cá nhân, Công ty, Crypto...">
+                        </div>
+                    </div>
+                    <div class="aw-field-row" style="border-bottom:none;">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Link ảnh QR (Gyazo, Imgur...)</div>
+                            <input type="text" id="recvImageLink" class="aw-balance-input" style="font-size:14px; color:#3b82f6; width:100%;" placeholder="Dán link ảnh vào đây" oninput="previewReceivingImage(this.value)">
+                        </div>
+                    </div>
+                </div>
+                <div id="recvImagePreviewContainer" style="margin-top:16px; text-align:center; display:none;">
+                    <img id="recvImagePreview" style="max-width:100%; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1);" src="">
+                </div>
+                <button id="deleteReceivingRow" class="btn-link" style="color:#ef4444; width:100%; text-align:center; margin-top:24px; padding:12px; background:white; border-radius:12px; display:none;" onclick="deleteReceivingInfo()">Xóa thông tin này</button>
+            </main>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: THÊM / SỬA VÍ ===================== -->
- đ đ đ đ<div id="page-add-wallet" class="page page-light">
- đ đ đ đ đ đ<!-- Header -->
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" id="btnCancelWallet" onclick="closeAddWalletPage()">Huỷ</button>
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title" id="addWalletPageTitle">Thêm Ví</h2>
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link btn-link-primary" onclick="saveWallet()">Lưu</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content">
- đ đ đ đ đ đ đ đ<input type="hidden" id="editWalletId">
+        <!-- ===================== PAGE: THÊM / SỬA VÍ ===================== -->
+        <div id="page-add-wallet" class="page page-light">
+            <!-- Header -->
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" id="btnCancelWallet" onclick="closeAddWalletPage()">Huỷ</button>
+                    <h2 class="page-title" id="addWalletPageTitle">Thêm Ví</h2>
+                    <button class="btn-link btn-link-primary" onclick="saveWallet()">Lưu</button>
+                </div>
+            </header>
+            <main class="content">
+                <input type="hidden" id="editWalletId">
 
- đ đ đ đ đ đ đ đ<!-- Tên + Icon -->
- đ đ đ đ đ đ đ đ<div class="card aw-card">
- đ đ đ đ đ đ đ đ đ đ<div class="aw-name-row">
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="aw-icon-btn" id="walletIconPreview" onclick="openIconPicker()">💰 <i class="fas fa-chevron-up" style="font-size:9px; color:#aaa;"></i></button>
- đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="walletName" class="aw-name-input" placeholder="Tên">
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
+                <!-- Tên + Icon -->
+                <div class="card aw-card">
+                    <div class="aw-name-row">
+                        <button class="aw-icon-btn" id="walletIconPreview" onclick="openIconPicker()">💰 <i class="fas fa-chevron-up" style="font-size:9px; color:#aaa;"></i></button>
+                        <input type="text" id="walletName" class="aw-name-input" placeholder="Tên">
+                    </div>
+                </div>
 
- đ đ đ đ đ đ đ đ<!-- Tiền tệ + Số dư -->
- đ đ đ đ đ đ đ đ<div class="card aw-card">
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row" style="border-bottom: 1px solid var(--border-color);">
- đ đ đ đ đ đ đ đ đ đ đ đ<span class="aw-field-icon">💲</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="aw-field-label" style="margin-bottom:0;">Đơn vị tiền tệ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<select id="walletCurrency" style="width:100%; border:none; outline:none; background:transparent; font-size:15px; font-weight:600; color:var(--text-primary); cursor:pointer; font-family:'Inter', sans-serif;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ<option value="VND">Việt Nam Đồng (VND)</option>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ<option value="USD">Đô la Mỹ (USD)</option>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ</select>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right aw-field-arrow"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex: 1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="aw-field-label">Số tiền hiện có</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="walletBalance" class="aw-balance-input" placeholder="0" oninput="formatWalletBalance(this)">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
+                <!-- Tiền tệ + Số dư -->
+                <div class="card aw-card">
+                    <div class="aw-field-row" style="border-bottom: 1px solid var(--border-color);">
+                        <span class="aw-field-icon">💲</span>
+                        <div style="flex:1;">
+                            <div class="aw-field-label" style="margin-bottom:0;">Đơn vị tiền tệ</div>
+                            <select id="walletCurrency" style="width:100%; border:none; outline:none; background:transparent; font-size:15px; font-weight:600; color:var(--text-primary); cursor:pointer; font-family:'Inter', sans-serif;">
+                                <option value="VND">Việt Nam Đồng (VND)</option>
+                                <option value="USD">Đô la Mỹ (USD)</option>
+                            </select>
+                        </div>
+                        <i class="fas fa-chevron-right aw-field-arrow"></i>
+                    </div>
+                    <div class="aw-field-row">
+                        <div style="flex: 1;">
+                            <div class="aw-field-label">Số tiền hiện có</div>
+                            <input type="text" id="walletBalance" class="aw-balance-input" placeholder="0" oninput="formatWalletBalance(this)">
+                        </div>
+                    </div>
+                </div>
 
- đ đ đ đ đ đ đ đ<!-- Liên kết dịch vụ -->
- đ đ đ đ đ đ đ đ<div class="card aw-card aw-link-card">
- đ đ đ đ đ đ đ đ đ đ<button class="aw-link-btn">Liên kết dịch vụ</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<p class="aw-hint">Kết nối tới các dịch vụ ngay trong app.</p>
+                <!-- Liên kết dịch vụ -->
+                <div class="card aw-card aw-link-card">
+                    <button class="aw-link-btn">Liên kết dịch vụ</button>
+                </div>
+                <p class="aw-hint">Kết nối tới các dịch vụ ngay trong app.</p>
 
- đ đ đ đ đ đ đ đ<!-- Toggle Không tính vào tổng -->
- đ đ đ đ đ đ đ đ<div class="card aw-card">
- đ đ đ đ đ đ đ đ đ đ<!-- Exclude Toggle -->
- đ đ đ đ đ đ đ đ đ đ<div class="aw-toggle-row">
- đ đ đ đ đ đ đ đ đ đ đ đ<span class="aw-toggle-label">Không tính vào báo cáo</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<label class="aw-switch">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="checkbox" id="walletExclude">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span class="aw-slider"></span>
- đ đ đ đ đ đ đ đ đ đ đ đ</label>
- đ đ đ đ đ đ đ đ đ đ</div>
+                <!-- Toggle Không tính vào tổng -->
+                <div class="card aw-card">
+                    <!-- Exclude Toggle -->
+                    <div class="aw-toggle-row">
+                        <span class="aw-toggle-label">Không tính vào báo cáo</span>
+                        <label class="aw-switch">
+                            <input type="checkbox" id="walletExclude">
+                            <span class="aw-slider"></span>
+                        </label>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Default Toggle -->
- đ đ đ đ đ đ đ đ đ đ<div class="aw-toggle-row">
- đ đ đ đ đ đ đ đ đ đ đ đ<span class="aw-toggle-label">Chọn làm ví mặc định</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<label class="aw-switch">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="checkbox" id="walletDefault" onchange="handleDefaultWalletChange(this)">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span class="aw-slider"></span>
- đ đ đ đ đ đ đ đ đ đ đ đ</label>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<p class="aw-hint">Bỏ qua ví này và số dư khỏi "Tổng".</p>
+                    <!-- Default Toggle -->
+                    <div class="aw-toggle-row">
+                        <span class="aw-toggle-label">Chọn làm ví mặc định</span>
+                        <label class="aw-switch">
+                            <input type="checkbox" id="walletDefault" onchange="handleDefaultWalletChange(this)">
+                            <span class="aw-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <p class="aw-hint">Bỏ qua ví này và số dư khỏi "Tổng".</p>
 
- đ đ đ đ đ đ đ đ<!-- Nút xóa (khi sửa) -->
- đ đ đ đ đ đ đ đ<div id="deleteWalletRow" style="display:none; margin-top:10px;">
- đ đ đ đ đ đ đ đ đ đ<button onclick="deleteWallet()" class="aw-delete-btn">🗑 Xóa ví này</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+                <!-- Nút xóa (khi sửa) -->
+                <div id="deleteWalletRow" style="display:none; margin-top:10px;">
+                    <button onclick="deleteWallet()" class="aw-delete-btn">🗑 Xóa ví này</button>
+                </div>
+            </main>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: QUẢN LÝ NHÓM ===================== -->
- đ đ đ đ<div id="page-categories" class="page page-light">
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top" style="align-items: center;">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('settings')">
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại
- đ đ đ đ đ đ đ đ đ đ</button>
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title">Nhóm</h2>
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; gap:14px; align-items:center;">
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="btn-link" style="font-size:18px; color:#1f2937;"><i class="fas fa-globe"></i></button>
- đ đ đ đ đ đ đ đ đ đ đ đ<button class="btn-link" style="font-size:18px; color:#1f2937;"><i class="fas fa-search"></i></button>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content">
- đ đ đ đ đ đ đ đ<!-- Tabs: Khoản chi | Khoản thu | Vay/Nợ -->
- đ đ đ đ đ đ đ đ<div style="display:flex; background:#f3f4f6; margin-bottom:16px; border-radius:8px; padding:2px;">
- đ đ đ đ đ đ đ đ đ đ<button id="catManageExpenseBtn" onclick="setCatManageType('expense')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
- đ đ đ đ đ đ đ đ đ đ<button id="catManageIncomeBtn" onclick="setCatManageType('income')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
- đ đ đ đ đ đ đ đ đ đ<button id="catManageDebtBtn" onclick="setCatManageType('debt')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Vay/Nợ</button>
- đ đ đ đ đ đ đ đ</div>
+        <!-- ===================== PAGE: QUẢN LÝ NHÓM ===================== -->
+        <div id="page-categories" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top" style="align-items: center;">
+                    <button class="btn-link" onclick="switchPage('settings')">
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại
+                    </button>
+                    <h2 class="page-title">Nhóm</h2>
+                    <div style="display:flex; gap:14px; align-items:center;">
+                        <button class="btn-link" style="font-size:18px; color:#1f2937;"><i class="fas fa-globe"></i></button>
+                        <button class="btn-link" style="font-size:18px; color:#1f2937;"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </header>
+            <main class="content">
+                <!-- Tabs: Khoản chi | Khoản thu | Vay/Nợ -->
+                <div style="display:flex; background:#f3f4f6; margin-bottom:16px; border-radius:8px; padding:2px;">
+                    <button id="catManageExpenseBtn" onclick="setCatManageType('expense')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
+                    <button id="catManageIncomeBtn" onclick="setCatManageType('income')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
+                    <button id="catManageDebtBtn" onclick="setCatManageType('debt')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Vay/Nợ</button>
+                </div>
 
- đ đ đ đ đ đ đ đ<div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:8px; background:white; cursor:pointer;" onclick="openAddCategoryPage()">
- đ đ đ đ đ đ đ đ đ đ<div style="padding:14px; text-align:center; color:#10b981; font-weight:600; font-size:15px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-plus-circle" style="margin-right:6px;"></i> Nhóm mới
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
+                <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:8px; background:white; cursor:pointer;" onclick="openAddCategoryPage()">
+                    <div style="padding:14px; text-align:center; color:#10b981; font-weight:600; font-size:15px;">
+                        <i class="fas fa-plus-circle" style="margin-right:6px;"></i> Nhóm mới
+                    </div>
+                </div>
 
- đ đ đ đ đ đ đ đ<div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; margin-bottom:16px;" id="manageCategoryList">
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+                <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; margin-bottom:16px;" id="manageCategoryList">
+                </div>
+            </main>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: THÊM / SỬA NHÓM ===================== -->
- đ đ đ đ<div id="page-add-category" class="page page-light">
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('categories')">
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-left" style="margin-right:4px;"></i>Nhóm
- đ đ đ đ đ đ đ đ đ đ</button>
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title" id="addCatPageTitle">Nhóm mới</h2>
- đ đ đ đ đ đ đ đ đ đ<span style="width:70px;"></span>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content">
- đ đ đ đ đ đ đ đ<input type="hidden" id="editCatId">
- đ đ đ đ đ đ đ đ<div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:12px; background:white;">
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<button id="catIconPreview" onclick="openIconPickerForCat()" style="width:50px; height:50px; border-radius:50%; background:#e5e7eb; border:none; font-size:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-right:12px;">❤️</button>
- đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="catNameInput" placeholder="Tên nhóm" oninput="checkCatValid()" style="flex:1; border:none; outline:none; font-size:18px; color:#1f2937; background:transparent; font-weight:500;">
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size:20px; color:#1f2937;">+/-</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; background:#f3f4f6; border-radius:8px; padding:2px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<button id="addCatIncomeBtn" onclick="setAddCatType('income')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<button id="addCatExpenseBtn" onclick="setAddCatType('expense')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; justify-content:space-between; padding:16px; cursor:pointer;" onclick="openParentCatPicker()">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:12px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size:18px; color:#1f2937;"><i class="fas fa-box-open"></i></div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size:12px; color:#9ca3af;">Nhóm cha</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size:15px; color:#1f2937; font-weight:500;" id="parentCatNameDisplay">Không có</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
+        <!-- ===================== PAGE: THÊM / SỬA NHÓM ===================== -->
+        <div id="page-add-category" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top">
+                    <button class="btn-link" onclick="switchPage('categories')">
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Nhóm
+                    </button>
+                    <h2 class="page-title" id="addCatPageTitle">Nhóm mới</h2>
+                    <span style="width:70px;"></span>
+                </div>
+            </header>
+            <main class="content">
+                <input type="hidden" id="editCatId">
+                <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:12px; background:white;">
+                    <div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
+                        <button id="catIconPreview" onclick="openIconPickerForCat()" style="width:50px; height:50px; border-radius:50%; background:#e5e7eb; border:none; font-size:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-right:12px;">❤️</button>
+                        <input type="text" id="catNameInput" placeholder="Tên nhóm" oninput="checkCatValid()" style="flex:1; border:none; outline:none; font-size:18px; color:#1f2937; background:transparent; font-weight:500;">
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border-bottom:1px solid #f3f4f6;">
+                        <div style="font-size:20px; color:#1f2937;">+/-</div>
+                        <div style="display:flex; background:#f3f4f6; border-radius:8px; padding:2px;">
+                            <button id="addCatIncomeBtn" onclick="setAddCatType('income')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
+                            <button id="addCatExpenseBtn" onclick="setAddCatType('expense')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; cursor:pointer;" onclick="openParentCatPicker()">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="font-size:18px; color:#1f2937;"><i class="fas fa-box-open"></i></div>
+                            <div>
+                                <div style="font-size:12px; color:#9ca3af;">Nhóm cha</div>
+                                <div style="font-size:15px; color:#1f2937; font-weight:500;" id="parentCatNameDisplay">Không có</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
+                    </div>
+                </div>
 
- đ đ đ đ đ đ đ đ<div id="deleteCatRow" style="display:none; margin-top:10px;">
- đ đ đ đ đ đ đ đ đ đ<button onclick="deleteCategory()" class="aw-delete-btn">🗑 Xóa nhóm này</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ đ đ<div style="padding:16px; background:white; border-top:1px solid #f3f4f6; padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px)); z-index:10; position:relative;">
- đ đ đ đ đ đ đ đ<button onclick="saveCategory()" style="width:100%; background:#d1d5db; color:white; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s;" id="saveCatBtn" disabled>Lưu</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ</div>
+                <div id="deleteCatRow" style="display:none; margin-top:10px;">
+                    <button onclick="deleteCategory()" class="aw-delete-btn">🗑 Xóa nhóm này</button>
+                </div>
+            </main>
+            <div style="padding:16px; background:white; border-top:1px solid #f3f4f6; padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px)); z-index:10; position:relative;">
+                <button onclick="saveCategory()" style="width:100%; background:#d1d5db; color:white; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s;" id="saveCatBtn" disabled>Lưu</button>
+            </div>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: CHỌN VÍ (SỔ GIAO DỊCH) ===================== -->
- đ đ đ đ<div id="page-select-wallet" class="page" style="background:#f4f5f7; flex-direction:column; height:100vh; z-index:3000;">
- đ đ đ đ đ đ<div style="background:white; flex-shrink:0; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ<div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px;">
- đ đ đ đ đ đ đ đ đ đ<button onclick="switchPage('transactions')" style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;">Đóng</button>
- đ đ đ đ đ đ đ đ đ đ<h2 style="font-size:16px; font-weight:600; margin:0; color:#000;">Chọn Ví</h2>
- đ đ đ đ đ đ đ đ đ đ<button style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;">Sửa</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</div>
- đ đ đ đ đ đ<main class="content" style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:10px 15px 20px 15px; background:var(--bg-main);" id="selectWalletList">
- đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ<div class="card" style="margin-top:20px; padding:0; border-radius:12px; background:white; overflow:hidden;">
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid #f3f4f6; cursor:pointer;" onclick="openAddWallet()">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="width:28px; height:28px; border-radius:50%; background:#10b981; display:flex; align-items:center; justify-content:center; color:white; margin-right:12px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-plus" style="font-size:14px;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:15px; color:#10b981; font-weight:500;">Thêm ví</span>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; padding:14px 16px; cursor:pointer;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="width:28px; height:28px; border-radius:50%; background:#10b981; display:flex; align-items:center; justify-content:center; color:white; margin-right:12px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-link" style="font-size:12px;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:15px; color:#10b981; font-weight:500;">Liên kết dịch vụ</span>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+        <!-- ===================== PAGE: CHỌN VÍ (SỔ GIAO DỊCH) ===================== -->
+        <div id="page-select-wallet" class="page" style="background:#f4f5f7; flex-direction:column; height:100vh; z-index:3000;">
+            <div style="background:white; flex-shrink:0; border-bottom:1px solid #f3f4f6;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px;">
+                    <button onclick="switchPage('transactions')" style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;">Đóng</button>
+                    <h2 style="font-size:16px; font-weight:600; margin:0; color:#000;">Chọn Ví</h2>
+                    <button style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;">Sửa</button>
+                </div>
+            </div>
+            <main class="content" style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:10px 15px 20px 15px; background:var(--bg-main);" id="selectWalletList">
+                
+                <div class="card" style="margin-top:20px; padding:0; border-radius:12px; background:white; overflow:hidden;">
+                    <div style="display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid #f3f4f6; cursor:pointer;" onclick="openAddWallet()">
+                        <div style="width:28px; height:28px; border-radius:50%; background:#10b981; display:flex; align-items:center; justify-content:center; color:white; margin-right:12px;">
+                            <i class="fas fa-plus" style="font-size:14px;"></i>
+                        </div>
+                        <span style="font-size:15px; color:#10b981; font-weight:500;">Thêm ví</span>
+                    </div>
+                    <div style="display:flex; align-items:center; padding:14px 16px; cursor:pointer;">
+                        <div style="width:28px; height:28px; border-radius:50%; background:#10b981; display:flex; align-items:center; justify-content:center; color:white; margin-right:12px;">
+                            <i class="fas fa-link" style="font-size:12px;"></i>
+                        </div>
+                        <span style="font-size:15px; color:#10b981; font-weight:500;">Liên kết dịch vụ</span>
+                    </div>
+                </div>
+            </main>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: SỔ GIAO DỊCH ===================== -->
- đ đ đ đ<div id="page-transactions" class="page">
- đ đ đ đ đ đ<div style="background:white; flex-shrink:0; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ<!-- Top bar -->
- đ đ đ đ đ đ đ đ<div style="display:flex; justify-content:space-between; align-items:center; padding:14px 16px 10px;">
- đ đ đ đ đ đ đ đ đ đ<button style="background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;width:36px;"><i class="fas fa-question-circle"></i></button>
- đ đ đ đ đ đ đ đ đ đ<!-- Wallet switcher -->
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:6px; cursor:pointer;" onclick="openSelectWalletPage()">
- đ đ đ đ đ đ đ đ đ đ đ đ<span id="txnWalletIcon" style="font-size:20px;">💰</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<span id="txnWalletName" style="font-size:13px;font-weight:600;color:#1f2937;">Tất cả</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-down" style="font-size:10px;color:#9ca3af;"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; gap:14px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<button style="background:none;border:none;cursor:pointer;font-size:18px;color:#1f2937;"><i class="fas fa-search"></i></button>
- đ đ đ đ đ đ đ đ đ đ đ đ<button style="background:none;border:none;cursor:pointer;font-size:18px;color:#1f2937;"><i class="fas fa-ellipsis-h"></i></button>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<!-- Balance -->
- đ đ đ đ đ đ đ đ<div style="text-align:center; padding:0 16px 10px;">
- đ đ đ đ đ đ đ đ đ đ<div style="font-size:11px; color:#9ca3af; margin-bottom:2px;">Số dư</div>
- đ đ đ đ đ đ đ đ đ đ<div id="txnBalance" style="font-size:22px; font-weight:700; color:#1f2937;">0 đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<!-- Period tabs -->
- đ đ đ đ đ đ đ đ<div id="periodTabs" style="display:flex; overflow-x:auto; scrollbar-width:none; border-top:1px solid #f3f4f6;"></div>
- đ đ đ đ đ đ</div>
- đ đ đ đ đ đ<!-- Transaction list -->
- đ đ đ đ đ đ<main style="flex:1; overflow-y:auto; background:#f4f5f7; padding:10px 12px 20px;">
- đ đ đ đ đ đ đ đ<div id="txnList"></div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+        <!-- ===================== PAGE: SỔ GIAO DỊCH ===================== -->
+        <div id="page-transactions" class="page">
+            <div style="background:white; flex-shrink:0; border-bottom:1px solid #f3f4f6;">
+                <!-- Top bar -->
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 16px 10px;">
+                    <button style="background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;width:36px;"><i class="fas fa-question-circle"></i></button>
+                    <!-- Wallet switcher -->
+                    <div style="display:flex; align-items:center; gap:6px; cursor:pointer;" onclick="openSelectWalletPage()">
+                        <span id="txnWalletIcon" style="font-size:20px;">💰</span>
+                        <span id="txnWalletName" style="font-size:13px;font-weight:600;color:#1f2937;">Tất cả</span>
+                        <i class="fas fa-chevron-down" style="font-size:10px;color:#9ca3af;"></i>
+                    </div>
+                    <div style="display:flex; gap:14px;">
+                        <button style="background:none;border:none;cursor:pointer;font-size:18px;color:#1f2937;"><i class="fas fa-search"></i></button>
+                        <button style="background:none;border:none;cursor:pointer;font-size:18px;color:#1f2937;"><i class="fas fa-ellipsis-h"></i></button>
+                    </div>
+                </div>
+                <!-- Balance -->
+                <div style="text-align:center; padding:0 16px 10px;">
+                    <div style="font-size:11px; color:#9ca3af; margin-bottom:2px;">Số dư</div>
+                    <div id="txnBalance" style="font-size:22px; font-weight:700; color:#1f2937;">0 đ</div>
+                </div>
+                <!-- Period tabs -->
+                <div id="periodTabs" style="display:flex; overflow-x:auto; scrollbar-width:none; border-top:1px solid #f3f4f6;"></div>
+            </div>
+            <!-- Transaction list -->
+            <main style="flex:1; overflow-y:auto; background:#f4f5f7; padding:10px 12px 20px;">
+                <div id="txnList"></div>
+            </main>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: THÊM GIAO DỊCH ===================== -->
- đ đ đ đ<div id="page-add-transaction" class="page" style="background:#f4f5f7; flex-direction:column; height:100vh; z-index:2000;">
- đ đ đ đ đ đ<!-- Header (White) -->
- đ đ đ đ đ đ<div style="background:white; flex-shrink:0; border-radius: 0 0 16px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); position:relative; z-index:10;">
- đ đ đ đ đ đ đ đ<div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px;">
- đ đ đ đ đ đ đ đ đ đ<button onclick="closeAddTransaction()" style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;padding:0;">Huỷ</button>
- đ đ đ đ đ đ đ đ đ đ<h2 style="font-size:16px; font-weight:600; margin:0; color:#000;">Thêm Giao Dịch</h2>
- đ đ đ đ đ đ đ đ đ đ<span style="width:30px;"></span> <!-- Spacer for centering -->
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</div>
+        <!-- ===================== PAGE: THÊM GIAO DỊCH ===================== -->
+        <div id="page-add-transaction" class="page" style="background:#f4f5f7; flex-direction:column; height:100vh; z-index:2000;">
+            <!-- Header (White) -->
+            <div style="background:white; flex-shrink:0; border-radius: 0 0 16px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); position:relative; z-index:10;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px;">
+                    <button onclick="closeAddTransaction()" style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;padding:0;">Huỷ</button>
+                    <h2 style="font-size:16px; font-weight:600; margin:0; color:#000;">Thêm Giao Dịch</h2>
+                    <span style="width:30px;"></span> <!-- Spacer for centering -->
+                </div>
+            </div>
 
- đ đ đ đ đ đ<!-- Form body -->
- đ đ đ đ đ đ<main class="content" style="flex:1; overflow-y:auto; padding:16px;">
- đ đ đ đ đ đ đ đ<input type="hidden" id="editTxnId">
+            <!-- Form body -->
+            <main class="content" style="flex:1; overflow-y:auto; padding:16px;">
+                <input type="hidden" id="editTxnId">
 
- đ đ đ đ đ đ đ đ<div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:8px; background:white; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
- đ đ đ đ đ đ đ đ đ đ<!-- Tabs: Khoản chi | Khoản thu | Vay/Nợ -->
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; background:#f3f4f6; margin:16px 16px 10px; border-radius:8px; padding:2px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<button id="typeExpenseBtn" onclick="setTxnType('expense')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
- đ đ đ đ đ đ đ đ đ đ đ đ<button id="typeIncomeBtn" onclick="setTxnType('income')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
- đ đ đ đ đ đ đ đ đ đ đ đ<button id="typeDebtBtn" onclick="setTxnType('debt')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Vay/Nợ</button>
- đ đ đ đ đ đ đ đ đ đ</div>
+                <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:8px; background:white; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <!-- Tabs: Khoản chi | Khoản thu | Vay/Nợ -->
+                    <div style="display:flex; background:#f3f4f6; margin:16px 16px 10px; border-radius:8px; padding:2px;">
+                        <button id="typeExpenseBtn" onclick="setTxnType('expense')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
+                        <button id="typeIncomeBtn" onclick="setTxnType('income')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
+                        <button id="typeDebtBtn" onclick="setTxnType('debt')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Vay/Nợ</button>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Wallet -->
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #f3f4f6; cursor:pointer;" onclick="openTxnWalletPicker()">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="selectedWalletIconTxn" style="font-size:18px;">💰</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="selectedWalletNameTxn" style="font-size:14px; color:#000;">Chọn ví</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Wallet -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #f3f4f6; cursor:pointer;" onclick="openTxnWalletPicker()">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div id="selectedWalletIconTxn" style="font-size:18px;">💰</div>
+                            <div id="selectedWalletNameTxn" style="font-size:14px; color:#000;">Chọn ví</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Amount -->
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="border:1px solid #e5e7eb; border-radius:6px; padding:4px 8px; font-size:12px; color:#6b7280; font-weight:600; margin-right:12px;" id="txnCurrencyLabel">VND</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size:11px; color:#9ca3af; margin-bottom:2px;">Số tiền</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="txnAmount" placeholder="0" oninput="formatTxnAmount(this)" style="width:100%; border:none; outline:none; font-size:28px; font-weight:500; color:#000; background:transparent; padding:0;">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Amount -->
+                    <div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
+                        <div style="border:1px solid #e5e7eb; border-radius:6px; padding:4px 8px; font-size:12px; color:#6b7280; font-weight:600; margin-right:12px;" id="txnCurrencyLabel">VND</div>
+                        <div style="flex:1;">
+                            <div style="font-size:11px; color:#9ca3af; margin-bottom:2px;">Số tiền</div>
+                            <input type="text" id="txnAmount" placeholder="0" oninput="formatTxnAmount(this)" style="width:100%; border:none; outline:none; font-size:28px; font-weight:500; color:#000; background:transparent; padding:0;">
+                        </div>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Category -->
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border-bottom:1px solid #f3f4f6; cursor:pointer;" onclick="openTxnCategoryPicker()">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:12px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="selectedCatIconTxn" style="width:32px; height:32px; border-radius:50%; background:#d1d5db; display:flex; align-items:center; justify-content:center; font-size:16px; color:white;"></div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="selectedCatNameTxn" style="font-size:15px; color:#9ca3af;">Chọn nhóm</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Category -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border-bottom:1px solid #f3f4f6; cursor:pointer;" onclick="openTxnCategoryPicker()">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div id="selectedCatIconTxn" style="width:32px; height:32px; border-radius:50%; background:#d1d5db; display:flex; align-items:center; justify-content:center; font-size:16px; color:white;"></div>
+                            <div id="selectedCatNameTxn" style="font-size:15px; color:#9ca3af;">Chọn nhóm</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Note -->
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-align-left" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="txnNote" placeholder="Ghi chú" style="flex:1; border:none; outline:none; font-size:14px; color:#000; background:transparent; padding:0;">
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px; opacity:0;"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Note -->
+                    <div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
+                        <i class="fas fa-align-left" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
+                        <input type="text" id="txnNote" placeholder="Ghi chú" style="flex:1; border:none; outline:none; font-size:14px; color:#000; background:transparent; padding:0;">
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px; opacity:0;"></i>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Date -->
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="far fa-calendar-alt" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex:1; display:flex; align-items:center; justify-content:space-between; background:#f4f5f7; border-radius:6px; padding:6px 10px; cursor:pointer;" onclick="document.getElementById('txnDate').showPicker()">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<button onclick="event.stopPropagation(); changeTxnDate(-1)" style="width:24px; height:24px; border-radius:50%; border:none; background:white; color:#10b981; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05); padding:0;"><i class="fas fa-chevron-left" style="font-size:10px;"></i></button>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="txnDateDisplay" style="font-size:13px; color:#10b981; font-weight:500;">Hôm nay</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<button onclick="event.stopPropagation(); changeTxnDate(1)" style="width:24px; height:24px; border-radius:50%; border:none; background:white; color:#10b981; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05); padding:0;"><i class="fas fa-chevron-right" style="font-size:10px;"></i></button>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="date" id="txnDate" style="position:absolute; visibility:hidden; width:0; height:0;" onchange="updateTxnDateDisplay()">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
+                    <!-- Date -->
+                    <div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
+                        <i class="far fa-calendar-alt" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
+                        <div style="flex:1; display:flex; align-items:center; justify-content:space-between; background:#f4f5f7; border-radius:6px; padding:6px 10px; cursor:pointer;" onclick="document.getElementById('txnDate').showPicker()">
+                            <button onclick="event.stopPropagation(); changeTxnDate(-1)" style="width:24px; height:24px; border-radius:50%; border:none; background:white; color:#10b981; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05); padding:0;"><i class="fas fa-chevron-left" style="font-size:10px;"></i></button>
+                            <div id="txnDateDisplay" style="font-size:13px; color:#10b981; font-weight:500;">Hôm nay</div>
+                            <button onclick="event.stopPropagation(); changeTxnDate(1)" style="width:24px; height:24px; border-radius:50%; border:none; background:white; color:#10b981; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05); padding:0;"><i class="fas fa-chevron-right" style="font-size:10px;"></i></button>
+                            <input type="date" id="txnDate" style="position:absolute; visibility:hidden; width:0; height:0;" onchange="updateTxnDateDisplay()">
+                        </div>
+                    </div>
 
- đ đ đ đ đ đ đ đ đ đ<!-- Exclude from report -->
- đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; justify-content:space-between; padding:16px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-eye-slash" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span style="font-size:14px; color:#1f2937;">Không tính vào báo cáo</span>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<label class="aw-switch">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="checkbox" id="txnExclude">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<span class="aw-slider"></span>
- đ đ đ đ đ đ đ đ đ đ đ đ</label>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
+                    <!-- Exclude from report -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px;">
+                        <div style="display:flex; align-items:center;">
+                            <i class="fas fa-eye-slash" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
+                            <span style="font-size:14px; color:#1f2937;">Không tính vào báo cáo</span>
+                        </div>
+                        <label class="aw-switch">
+                            <input type="checkbox" id="txnExclude">
+                            <span class="aw-slider"></span>
+                        </label>
+                    </div>
+                </div>
 
- đ đ đ đ đ đ đ đ<!-- Thêm chi tiết button -->
- đ đ đ đ đ đ đ đ<button style="width:100%; background:white; border:none; border-radius:8px; padding:14px; color:#10b981; font-size:14px; font-weight:500; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.05);">Thêm chi tiết</button>
+                <!-- Thêm chi tiết button -->
+                <button style="width:100%; background:white; border:none; border-radius:8px; padding:14px; color:#10b981; font-size:14px; font-weight:500; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.05);">Thêm chi tiết</button>
 
- đ đ đ đ đ đ đ đ<!-- Delete button (when editing) -->
- đ đ đ đ đ đ đ đ<div id="deleteTxnRow" style="display:none; margin-top:16px;">
- đ đ đ đ đ đ đ đ đ đ<button onclick="deleteTransaction()" style="background:white; color:#ef4444; border:none; width:100%; padding:14px; border-radius:8px; font-size:14px; font-weight:500; box-shadow:0 1px 3px rgba(0,0,0,0.05); cursor:pointer;">Xóa giao dịch này</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
+                <!-- Delete button (when editing) -->
+                <div id="deleteTxnRow" style="display:none; margin-top:16px;">
+                    <button onclick="deleteTransaction()" style="background:white; color:#ef4444; border:none; width:100%; padding:14px; border-radius:8px; font-size:14px; font-weight:500; box-shadow:0 1px 3px rgba(0,0,0,0.05); cursor:pointer;">Xóa giao dịch này</button>
+                </div>
+            </main>
 
- đ đ đ đ đ đ<!-- Bottom Save Button -->
- đ đ đ đ đ đ<div style="padding:16px; background:white; border-top:1px solid #f3f4f6; padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px));">
- đ đ đ đ đ đ đ đ<button onclick="saveTransaction()" style="width:100%; background:#d1d5db; color:white; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s;" id="saveTxnBtn" disabled>Lưu</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ</div>
+            <!-- Bottom Save Button -->
+            <div style="padding:16px; background:white; border-top:1px solid #f3f4f6; padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px));">
+                <button onclick="saveTransaction()" style="width:100%; background:#d1d5db; color:white; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s;" id="saveTxnBtn" disabled>Lưu</button>
+            </div>
+        </div>
 
- đ đ đ đ<!-- ===================== PAGE: SEPAY SYNC ===================== -->
- đ đ đ đ<div id="page-sepay" class="page page-light">
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top" style="align-items: center;">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('settings')">
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-left" style="margin-right:4px;"></i>Cài đặt
- đ đ đ đ đ đ đ đ đ đ</button>
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title">Đồng bộ SePay</h2>
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="toggleSePayConfig()" id="btnToggleConfig" style="font-size:13px; color:#6b7280;">Cấu hình</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
+        <!-- ===================== PAGE: SEPAY SYNC ===================== -->
+        <div id="page-sepay" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top" style="align-items: center;">
+                    <button class="btn-link" onclick="switchPage('settings')">
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Cài đặt
+                    </button>
+                    <h2 class="page-title">Đồng bộ SePay</h2>
+                    <button class="btn-link" onclick="toggleSePayConfig()" id="btnToggleConfig" style="font-size:13px; color:#6b7280;">Cấu hình</button>
+                </div>
+            </header>
 
- đ đ đ đ đ đ<!-- Collapsible config section -->
- đ đ đ đ đ đ<div id="sepayConfigSection" style="display:none; padding:12px 16px; background:white; border-bottom:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ<div style="margin-bottom:10px;">
- đ đ đ đ đ đ đ đ đ đ<div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">API Token</div>
- đ đ đ đ đ đ đ đ đ đ<input type="text" id="sepayApiToken" placeholder="Nhập API Token..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:10px; font-size:13px; outline:none; box-sizing:border-box;" onchange="saveSePayConfig()">
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<div>
- đ đ đ đ đ đ đ đ đ đ<div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">Proxy URL (Google Apps Script)</div>
- đ đ đ đ đ đ đ đ đ đ<input type="text" id="sepayProxyUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:10px; font-size:13px; outline:none; box-sizing:border-box;" onchange="saveSePayConfig()">
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</div>
+            <!-- Collapsible config section -->
+            <div id="sepayConfigSection" style="display:none; padding:12px 16px; background:white; border-bottom:1px solid #f3f4f6;">
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">API Token</div>
+                    <input type="text" id="sepayApiToken" placeholder="Nhập API Token..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:10px; font-size:13px; outline:none; box-sizing:border-box;" onchange="saveSePayConfig()">
+                </div>
+                <div>
+                    <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">Proxy URL (Google Apps Script)</div>
+                    <input type="text" id="sepayProxyUrl" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:10px; font-size:13px; outline:none; box-sizing:border-box;" onchange="saveSePayConfig()">
+                </div>
+            </div>
 
- đ đ đ đ đ đ<main class="content" style="padding-bottom:80px;">
- đ đ đ đ đ đ đ đ<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
- đ đ đ đ đ đ đ đ đ đ<h3 style="font-size:13px; color:#6b7280; font-weight:600; text-transform:uppercase; margin:0;">Liên kết Ngân hàng</h3>
- đ đ đ đ đ đ đ đ đ đ<button onclick="addSePayMapping()" style="background:none; border:none; color:#10b981; font-weight:600; font-size:13px; cursor:pointer;"><i class="fas fa-plus"></i> Thêm</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ<div id="sepayMappingList">
- đ đ đ đ đ đ đ đ đ đ<!-- Mappings will be rendered here -->
- đ đ đ đ đ đ đ đ</div>
+            <main class="content" style="padding-bottom:80px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h3 style="font-size:13px; color:#6b7280; font-weight:600; text-transform:uppercase; margin:0;">Liên kết Ngân hàng</h3>
+                    <button onclick="addSePayMapping()" style="background:none; border:none; color:#10b981; font-weight:600; font-size:13px; cursor:pointer;"><i class="fas fa-plus"></i> Thêm</button>
+                </div>
+                
+                <div id="sepayMappingList">
+                    <!-- Mappings will be rendered here -->
+                </div>
 
- đ đ đ đ đ đ đ đ<div id="sepaySyncLog" style="margin-top:12px; font-size:12px; color:#4b5563; background:#f9fafb; padding:10px; border-radius:8px; display:none; max-height:150px; overflow-y:auto;">
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
+                <div id="sepaySyncLog" style="margin-top:12px; font-size:12px; color:#4b5563; background:#f9fafb; padding:10px; border-radius:8px; display:none; max-height:150px; overflow-y:auto;">
+                </div>
+            </main>
 
- đ đ đ đ đ đ<!-- Sticky sync button -->
- đ đ đ đ đ đ<div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; padding:12px 16px; background:white; border-top:1px solid #f3f4f6; box-sizing:border-box; z-index:100;">
- đ đ đ đ đ đ đ đ<button onclick="runSePaySync()" id="btnRunSePaySync" style="width:100%; background:#10b981; color:white; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(16,185,129,0.3); display:flex; justify-content:center; align-items:center; gap:8px;">
- đ đ đ đ đ đ đ đ đ đ<i class="fas fa-sync-alt"></i> Đồng bộ ngay
- đ đ đ đ đ đ đ đ</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ</div>
-
-
- đ đ đ đ<!-- ===================== PAGE: NGÂN SÁCH ===================== -->
- đ đ đ đ<div id="page-budgets" class="page page-light">
- đ đ đ đ đ đ<header class="header">
- đ đ đ đ đ đ đ đ<div class="header-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title" style="margin: 0; text-align: left;">Ngân sách Đang áp dụng</h2>
- đ đ đ đ đ đ đ đ đ đ<div onclick="openBudgetGlobalWalletPicker()" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:6px 10px; border:1px solid #e5e7eb; border-radius:20px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<i id="budgetGlobalWalletIcon" class="fas fa-globe" style="color:#10b981; font-size:16px;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ<span id="budgetGlobalWalletLabel" style="font-size:13px; color:#374151; font-weight:500;">Tổng</span>
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-down" style="font-size:9px; color:#9ca3af;"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ<div class="date-navigator" style="justify-content: flex-start; padding-left: 16px; border-bottom: 1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ<div style="font-weight: 600; padding-bottom: 8px; border-bottom: 2px solid #10b981; color:#10b981;">Tháng này</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content">
- đ đ đ đ đ đ đ đ<div class="card" style="text-align: center; padding: 30px 16px 20px; position: relative; margin-bottom: 16px;">
- đ đ đ đ đ đ đ đ đ đ<!-- Speedometer / Semi-circle chart -->
- đ đ đ đ đ đ đ đ đ đ<div style="position: relative; width: 220px; height: 110px; margin: 0 auto 20px; overflow: hidden;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #f3f4f6; position: absolute; top: 0; left: 0; box-sizing: border-box;"></div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="budgetGlobalProgress" style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #10b981; position: absolute; top: 0; left: 0; box-sizing: border-box; border-bottom-color: transparent; border-right-color: transparent; transform: rotate(-135deg); transition: transform 0.5s;"></div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="position: absolute; bottom: 0; width: 100%; text-align: center;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">Số tiền bạn có thể chi</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="budgetGlobalAvailable" style="font-size: 28px; font-weight: 700; color: #10b981;">0</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<div style="display: flex; justify-content: space-between; text-align: center; margin-bottom: 20px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex: 1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="budgetGlobalTotal" style="font-weight: 600; font-size: 15px; color:#1f2937;">0</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size: 12px; color: #9ca3af;">Tổng ngân sách</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="width: 1px; background: #e5e7eb;"></div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex: 1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="budgetGlobalSpent" style="font-weight: 600; font-size: 15px; color:#1f2937;">0</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size: 12px; color: #9ca3af;">Tổng đã chi</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="width: 1px; background: #e5e7eb;"></div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex: 1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="budgetGlobalDays" style="font-weight: 600; font-size: 15px; color:#1f2937;">0 ngày</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size: 12px; color: #9ca3af;">Đến cuối tháng</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<button onclick="openAddBudget()" style="background: #10b981; color: white; border: none; border-radius: 20px; padding: 10px 24px; font-weight: 600; font-size: 15px; cursor: pointer;">Tạo Ngân sách</button>
- đ đ đ đ đ đ đ đ</div>
-
- đ đ đ đ đ đ đ đ<div id="budgetList" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 80px;">
- đ đ đ đ đ đ đ đ đ đ<!-- Budget list cards -->
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
-
- đ đ đ đ<!-- ===================== PAGE: ADD BUDGET ===================== -->
- đ đ đ đ<div id="page-add-budget" class="page page-light">
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top" style="justify-content: center; position: relative;">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('budgets')" style="position: absolute; left: 16px; color: #4b5563;">Huỷ</button>
- đ đ đ đ đ đ đ đ đ đ<h2 class="page-title" id="budgetTitle">Thêm ngân sách</h2>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content">
- đ đ đ đ đ đ đ đ<div class="card" style="padding: 0; margin-bottom: 16px;">
- đ đ đ đ đ đ đ đ đ đ<input type="hidden" id="editBudgetId">
- đ đ đ đ đ đ đ đ đ đ<input type="hidden" id="budgetCatId">
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<!-- Chọn nhóm -->
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row" onclick="openBudgetCategoryPicker()" style="cursor: pointer;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:12px; flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="budgetCategoryIcon" style="width:32px; height:32px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; color:#9ca3af; font-size:16px;"><i class="fas fa-question"></i></div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="budgetCategoryName" style="font-size:16px; color:#9ca3af;">Chọn nhóm</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<!-- Số tiền -->
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row" style="align-items: flex-end;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div class="aw-field-label">Số tiền</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="display: flex; align-items: center; gap: 8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="padding: 4px 8px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; color: #6b7280; font-weight: 600;">VND</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="text" id="budgetAmount" class="aw-balance-input" style="font-size:24px; font-weight:600; width:100%; border:none; outline:none;" placeholder="0" inputmode="numeric" oninput="formatCurrencyInput(this)">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<!-- Thời gian -->
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row" style="cursor: pointer;" onclick="openBudgetPeriodPicker()">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:12px; flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="far fa-calendar-alt" style="color:#4b5563; font-size:18px;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="budgetPeriodStr" style="font-size:15px; color:#1f2937;">Tháng này</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="hidden" id="budgetPeriodStart">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="hidden" id="budgetPeriodEnd">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<!-- Chọn ví -->
- đ đ đ đ đ đ đ đ đ đ<div class="aw-field-row" style="border-bottom: none; cursor: pointer;" onclick="openBudgetWalletPicker()">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display:flex; align-items:center; gap:12px; flex:1;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-globe" style="color:#10b981; font-size:18px;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="budgetWalletName" style="font-size:15px; color:#1f2937;">Tổng cộng</div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<input type="hidden" id="budgetWalletId" value="all">
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ<div class="card" style="display: flex; justify-content: space-between; align-items: center;">
- đ đ đ đ đ đ đ đ đ đ<div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size: 15px; font-weight: 500; margin-bottom: 4px;">Lặp lại ngân sách này</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size: 13px; color: #6b7280;">Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<label class="toggle-switch">
- đ đ đ đ đ đ đ đ đ đ đ đ<input type="checkbox" id="budgetRepeat" checked>
- đ đ đ đ đ đ đ đ đ đ đ đ<span class="slider round"></span>
- đ đ đ đ đ đ đ đ đ đ</label>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ<button id="btnDeleteBudget" onclick="deleteBudget()" style="width:100%; margin-top:20px; padding:15px; background:none; border:1px solid #ef4444; border-radius:12px; color:#ef4444; font-weight:600; font-size:15px; cursor:pointer; display:none;">
- đ đ đ đ đ đ đ đ đ đXóa Ngân Sách
- đ đ đ đ đ đ đ đ</button>
- đ đ đ đ đ đ</main>
- đ đ đ đ đ đ<div style="position:fixed; bottom:0; width:100%; max-width:480px; padding:16px; background:white; z-index:100; border-top:1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ<button onclick="saveBudget()" style="width:100%; background:#10b981; color:white; border:none; border-radius:24px; padding:14px; font-size:16px; font-weight:600; cursor:pointer;">Lưu</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ</div>
-
- đ đ đ đ<!-- ===================== PAGE: BUDGET DETAIL ===================== -->
- đ đ đ đ<div id="page-budget-detail" class="page page-light">
- đ đ đ đ đ đ<header class="header header-modal-style">
- đ đ đ đ đ đ đ đ<div class="header-top" style="justify-content: space-between;">
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="switchPage('budgets')"><i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại</button>
- đ đ đ đ đ đ đ đ đ đ<button class="btn-link" onclick="editBudgetFromDetail()">Sửa</button>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</header>
- đ đ đ đ đ đ<main class="content">
- đ đ đ đ đ đ đ đ<div class="card" style="margin-bottom: 16px;">
- đ đ đ đ đ đ đ đ đ đ<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetIcon" style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:18px;"></div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetCategory" style="font-size: 18px; font-weight: 600;"></div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetAmount" style="font-size: 24px; font-weight: 700; margin-bottom: 12px; color:#1f2937;"></div>
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<div style="display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-bottom: 8px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div>Đã chi <br><div id="detailBudgetSpent" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="text-align: right;">Còn lại <br><div id="detailBudgetRemain" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-bottom: 8px; position:relative;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetBar" style="height: 100%; background: #10b981; width: 0%; position:absolute; top:0; left:0; z-index:1;"></div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetTodayMarker" style="position:absolute; top:0; bottom:0; width:2px; background:#9ca3af; z-index:2;"></div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div style="font-size: 11px; color: #9ca3af; position:relative; height: 16px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetTodayText" style="position:absolute; display:inline-block; background:#f3f4f6; padding:2px 6px; border-radius:4px; top:0; transform:translateX(-50%);">Hôm nay</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ
- đ đ đ đ đ đ đ đ đ đ<div style="margin-top: 24px;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="far fa-calendar-alt" style="font-size: 20px; color: #4b5563; width: 24px; text-align: center;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetDateRange" style="font-size: 15px; color: #1f2937;"></div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetDaysLeft" style="font-size: 13px; color: #9ca3af;"></div>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-globe" style="font-size: 20px; color: #10b981; width: 24px; text-align: center;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size: 15px; color: #1f2937;">Tổng cộng</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="display: flex; align-items: flex-start; gap: 12px;">
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<i class="fas fa-redo-alt" style="font-size: 20px; color: #4b5563; width: 24px; text-align: center;"></i>
- đ đ đ đ đ đ đ đ đ đ đ đ đ đ<div style="font-size: 15px; color: #1f2937;" id="detailBudgetRepeatText">Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.</div>
- đ đ đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
-
- đ đ đ đ đ đ đ đ<div class="card">
- đ đ đ đ đ đ đ đ đ đ<div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="color: #6b7280; font-size: 14px;">Nên chi hàng ngày</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetRecDaily" style="font-weight: 500; font-size: 15px; color:#1f2937;"></div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="color: #6b7280; font-size: 14px;">Dự kiến chi tiêu</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetProjected" style="font-weight: 500; font-size: 15px; color:#1f2937;">0</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ đ đ<div style="display: flex; justify-content: space-between; padding: 12px 0;">
- đ đ đ đ đ đ đ đ đ đ đ đ<div style="color: #6b7280; font-size: 14px;">Thực tế chi tiêu hàng ngày</div>
- đ đ đ đ đ đ đ đ đ đ đ đ<div id="detailBudgetActualDaily" style="font-weight: 500; font-size: 15px; color:#1f2937;">0</div>
- đ đ đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ đ đ</div>
- đ đ đ đ đ đ</main>
- đ đ đ đ</div>
+            <!-- Sticky sync button -->
+            <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; padding:12px 16px; background:white; border-top:1px solid #f3f4f6; box-sizing:border-box; z-index:100;">
+                <button onclick="runSePaySync()" id="btnRunSePaySync" style="width:100%; background:#10b981; color:white; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(16,185,129,0.3); display:flex; justify-content:center; align-items:center; gap:8px;">
+                    <i class="fas fa-sync-alt"></i> Đồng bộ ngay
+                </button>
+            </div>
+        </div>
 
 
- đ đ đ đ<!-- ===================== BOTTOM NAV ===================== -->
- đ đ đ đ<nav class="bottom-nav">
- đ đ đ đ đ đ<a href="#" class="nav-item active" id="nav-home" onclick="switchPage('home'); return false;">
- đ đ đ đ đ đ đ đ<i class="fas fa-home"></i>
- đ đ đ đ đ đ đ đ<span>Tổng quan</span>
- đ đ đ đ đ đ</a>
- đ đ đ đ đ đ<a href="#" class="nav-item" id="nav-transactions" onclick="switchPage('transactions'); return false;">
- đ đ đ đ đ đ đ đ<i class="fas fa-wallet"></i>
- đ đ đ đ đ đ đ đ<span>Sổ giao dịch</span>
- đ đ đ đ đ đ</a>
- đ đ đ đ đ đ<div class="nav-fab-wrapper">
- đ đ đ đ đ đ đ đ<button class="fab-btn" onclick="openAddTransaction()">
- đ đ đ đ đ đ đ đ đ đ<i class="fas fa-plus"></i>
- đ đ đ đ đ đ đ đ</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ đ đ<a href="#" class="nav-item" id="nav-budgets" onclick="switchPage('budgets'); return false;">
- đ đ đ đ đ đ đ đ<i class="fas fa-book"></i>
- đ đ đ đ đ đ đ đ<span>Ngân sách</span>
- đ đ đ đ đ đ</a>
- đ đ đ đ đ đ<a href="#" class="nav-item" id="nav-accounts" onclick="switchPage('accounts'); return false;">
- đ đ đ đ đ đ đ đ<i class="far fa-user"></i>
- đ đ đ đ đ đ đ đ<span>Tài khoản</span>
- đ đ đ đ đ đ</a>
- đ đ đ đ</nav>
- đ đ</div> <!-- End .app-container -->
+        <!-- ===================== PAGE: NGÂN SÁCH ===================== -->
+        <div id="page-budgets" class="page page-light">
+            <header class="header">
+                <div class="header-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <h2 class="page-title" style="margin: 0; text-align: left;">Ngân sách Đang áp dụng</h2>
+                    <div onclick="openBudgetGlobalWalletPicker()" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:6px 10px; border:1px solid #e5e7eb; border-radius:20px;">
+                        <i id="budgetGlobalWalletIcon" class="fas fa-globe" style="color:#10b981; font-size:16px;"></i>
+                        <span id="budgetGlobalWalletLabel" style="font-size:13px; color:#374151; font-weight:500;">Tổng</span>
+                        <i class="fas fa-chevron-down" style="font-size:9px; color:#9ca3af;"></i>
+                    </div>
+                </div>
+                <div class="date-navigator" style="justify-content: flex-start; padding-left: 16px; border-bottom: 1px solid #f3f4f6;">
+                    <div style="font-weight: 600; padding-bottom: 8px; border-bottom: 2px solid #10b981; color:#10b981;">Tháng này</div>
+                </div>
+            </header>
+            <main class="content">
+                <div class="card" style="text-align: center; padding: 30px 16px 20px; position: relative; margin-bottom: 16px;">
+                    <!-- Speedometer / Semi-circle chart -->
+                    <div style="position: relative; width: 220px; height: 110px; margin: 0 auto 20px; overflow: hidden;">
+                        <div style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #f3f4f6; position: absolute; top: 0; left: 0; box-sizing: border-box;"></div>
+                        <div id="budgetGlobalProgress" style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #10b981; position: absolute; top: 0; left: 0; box-sizing: border-box; border-bottom-color: transparent; border-right-color: transparent; transform: rotate(-135deg); transition: transform 0.5s;"></div>
+                        <div style="position: absolute; bottom: 0; width: 100%; text-align: center;">
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">Số tiền bạn có thể chi</div>
+                            <div id="budgetGlobalAvailable" style="font-size: 28px; font-weight: 700; color: #10b981;">0</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; text-align: center; margin-bottom: 20px;">
+                        <div style="flex: 1;">
+                            <div id="budgetGlobalTotal" style="font-weight: 600; font-size: 15px; color:#1f2937;">0</div>
+                            <div style="font-size: 12px; color: #9ca3af;">Tổng ngân sách</div>
+                        </div>
+                        <div style="width: 1px; background: #e5e7eb;"></div>
+                        <div style="flex: 1;">
+                            <div id="budgetGlobalSpent" style="font-weight: 600; font-size: 15px; color:#1f2937;">0</div>
+                            <div style="font-size: 12px; color: #9ca3af;">Tổng đã chi</div>
+                        </div>
+                        <div style="width: 1px; background: #e5e7eb;"></div>
+                        <div style="flex: 1;">
+                            <div id="budgetGlobalDays" style="font-weight: 600; font-size: 15px; color:#1f2937;">0 ngày</div>
+                            <div style="font-size: 12px; color: #9ca3af;">Đến cuối tháng</div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="openAddBudget()" style="background: #10b981; color: white; border: none; border-radius: 20px; padding: 10px 24px; font-weight: 600; font-size: 15px; cursor: pointer;">Tạo Ngân sách</button>
+                </div>
 
- đ đ<style>
- đ đ đ đ.app-container {
- đ đ đ đ đ đwidth: 100%;
- đ đ đ đ đ đmax-width: 480px;
- đ đ đ đ đ đheight: 100vh;
- đ đ đ đ đ đheight: 100dvh;
- đ đ đ đ đ đbackground: var(--bg-main);
- đ đ đ đ đ đposition: relative;
- đ đ đ đ đ đdisplay: flex;
- đ đ đ đ đ đflex-direction: column;
- đ đ đ đ đ đoverflow: hidden;
- đ đ đ đ đ đbox-shadow: 0 0 20px rgba(0,0,0,0.1);
- đ đ đ đ}
- đ đ đ đ.bottom-nav {
- đ đ đ đ đ đflex-shrink: 0;
- đ đ đ đ đ đdisplay: flex;
- đ đ đ đ đ đjustify-content: space-around;
- đ đ đ đ đ đalign-items: center;
- đ đ đ đ đ đbackground: white;
- đ đ đ đ đ đpadding: 8px 0 calc(env(safe-area-inset-bottom, 0px) + 8px);
- đ đ đ đ đ đborder-top: 1px solid #f3f4f6;
- đ đ đ đ đ đz-index: 1000;
- đ đ đ đ}
- đ đ</style>
+                <div id="budgetList" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 80px;">
+                    <!-- Budget list cards -->
+                </div>
+            </main>
+        </div>
 
- đ đ<!-- ===================== ICON PICKER OVERLAY ===================== -->
- đ đ<div id="iconPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:3000; justify-content:center; align-items:center;">
- đ đ đ đ<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
- đ đ đ đ đ đ<div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
- đ đ đ đ đ đ đ đ<h3 style="font-size:16px; font-weight:700; margin:0;">Chọn biểu tượng</h3>
- đ đ đ đ đ đ đ đ<button onclick="closeIconPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ đ đ<div style="flex:1; overflow-y:auto; padding:16px;">
- đ đ đ đ đ đ đ đ<div id="iconGrid" style="display:grid; grid-template-columns: repeat(6, 1fr); gap:10px; text-align:center;"></div>
- đ đ đ đ đ đ</div>
- đ đ đ đ</div>
- đ đ</div>
+        <!-- ===================== PAGE: ADD BUDGET ===================== -->
+        <div id="page-add-budget" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top" style="justify-content: center; position: relative;">
+                    <button class="btn-link" onclick="switchPage('budgets')" style="position: absolute; left: 16px; color: #4b5563;">Huỷ</button>
+                    <h2 class="page-title" id="budgetTitle">Thêm ngân sách</h2>
+                </div>
+            </header>
+            <main class="content">
+                <div class="card" style="padding: 0; margin-bottom: 16px;">
+                    <input type="hidden" id="editBudgetId">
+                    <input type="hidden" id="budgetCatId">
+                    
+                    <!-- Chọn nhóm -->
+                    <div class="aw-field-row" onclick="openBudgetCategoryPicker()" style="cursor: pointer;">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                            <div id="budgetCategoryIcon" style="width:32px; height:32px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; color:#9ca3af; font-size:16px;"><i class="fas fa-question"></i></div>
+                            <div id="budgetCategoryName" style="font-size:16px; color:#9ca3af;">Chọn nhóm</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
+                    </div>
+                    
+                    <!-- Số tiền -->
+                    <div class="aw-field-row" style="align-items: flex-end;">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Số tiền</div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="padding: 4px 8px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; color: #6b7280; font-weight: 600;">VND</div>
+                                <input type="text" id="budgetAmount" class="aw-balance-input" style="font-size:24px; font-weight:600; width:100%; border:none; outline:none;" placeholder="0" inputmode="numeric" oninput="formatCurrencyInput(this)">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Thời gian -->
+                    <div class="aw-field-row" style="cursor: pointer;" onclick="openBudgetPeriodPicker()">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                            <i class="far fa-calendar-alt" style="color:#4b5563; font-size:18px;"></i>
+                            <div id="budgetPeriodStr" style="font-size:15px; color:#1f2937;">Tháng này</div>
+                            <input type="hidden" id="budgetPeriodStart">
+                            <input type="hidden" id="budgetPeriodEnd">
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
+                    </div>
+                    
+                    <!-- Chọn ví -->
+                    <div class="aw-field-row" style="border-bottom: none; cursor: pointer;" onclick="openBudgetWalletPicker()">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                            <i class="fas fa-globe" style="color:#10b981; font-size:18px;"></i>
+                            <div id="budgetWalletName" style="font-size:15px; color:#1f2937;">Tổng cộng</div>
+                            <input type="hidden" id="budgetWalletId" value="all">
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
+                    </div>
+                </div>
+                
+                <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 500; margin-bottom: 4px;">Lặp lại ngân sách này</div>
+                        <div style="font-size: 13px; color: #6b7280;">Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="budgetRepeat" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                
+                <button id="btnDeleteBudget" onclick="deleteBudget()" style="width:100%; margin-top:20px; padding:15px; background:none; border:1px solid #ef4444; border-radius:12px; color:#ef4444; font-weight:600; font-size:15px; cursor:pointer; display:none;">
+                    Xóa Ngân Sách
+                </button>
+            </main>
+            <div style="position:fixed; bottom:0; width:100%; max-width:480px; padding:16px; background:white; z-index:100; border-top:1px solid #f3f4f6;">
+                <button onclick="saveBudget()" style="width:100%; background:#10b981; color:white; border:none; border-radius:24px; padding:14px; font-size:16px; font-weight:600; cursor:pointer;">Lưu</button>
+            </div>
+        </div>
 
- đ đ<!-- ===================== SETTINGS PICKER OVERLAY ===================== -->
- đ đ<div id="settingPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:3000; justify-content:center; align-items:center;">
- đ đ đ đ<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
- đ đ đ đ đ đ<div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
- đ đ đ đ đ đ đ đ<h3 id="settingPickerTitle" style="font-size:16px; font-weight:700; margin:0;"></h3>
- đ đ đ đ đ đ đ đ<button onclick="closeSettingPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ đ đ<div style="flex:1; overflow-y:auto;">
- đ đ đ đ đ đ đ đ<div id="settingPickerList" style="padding:8px 0;"></div>
- đ đ đ đ đ đ</div>
- đ đ đ đ</div>
- đ đ</div>
+        <!-- ===================== PAGE: BUDGET DETAIL ===================== -->
+        <div id="page-budget-detail" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top" style="justify-content: space-between;">
+                    <button class="btn-link" onclick="switchPage('budgets')"><i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại</button>
+                    <button class="btn-link" onclick="editBudgetFromDetail()">Sửa</button>
+                </div>
+            </header>
+            <main class="content">
+                <div class="card" style="margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                        <div id="detailBudgetIcon" style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:18px;"></div>
+                        <div id="detailBudgetCategory" style="font-size: 18px; font-weight: 600;"></div>
+                    </div>
+                    
+                    <div id="detailBudgetAmount" style="font-size: 24px; font-weight: 700; margin-bottom: 12px; color:#1f2937;"></div>
+                    
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-bottom: 8px;">
+                        <div>Đã chi <br><div id="detailBudgetSpent" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
+                        <div style="text-align: right;">Còn lại <br><div id="detailBudgetRemain" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
+                    </div>
+                    
+                    <div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-bottom: 8px; position:relative;">
+                        <div id="detailBudgetBar" style="height: 100%; background: #10b981; width: 0%; position:absolute; top:0; left:0; z-index:1;"></div>
+                        <div id="detailBudgetTodayMarker" style="position:absolute; top:0; bottom:0; width:2px; background:#9ca3af; z-index:2;"></div>
+                    </div>
+                    <div style="font-size: 11px; color: #9ca3af; position:relative; height: 16px;">
+                        <div id="detailBudgetTodayText" style="position:absolute; display:inline-block; background:#f3f4f6; padding:2px 6px; border-radius:4px; top:0; transform:translateX(-50%);">Hôm nay</div>
+                    </div>
+                    
+                    <div style="margin-top: 24px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
+                            <i class="far fa-calendar-alt" style="font-size: 20px; color: #4b5563; width: 24px; text-align: center;"></i>
+                            <div>
+                                <div id="detailBudgetDateRange" style="font-size: 15px; color: #1f2937;"></div>
+                                <div id="detailBudgetDaysLeft" style="font-size: 13px; color: #9ca3af;"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fas fa-globe" style="font-size: 20px; color: #10b981; width: 24px; text-align: center;"></i>
+                            <div style="font-size: 15px; color: #1f2937;">Tổng cộng</div>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 12px;">
+                            <i class="fas fa-redo-alt" style="font-size: 20px; color: #4b5563; width: 24px; text-align: center;"></i>
+                            <div style="font-size: 15px; color: #1f2937;" id="detailBudgetRepeatText">Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.</div>
+                        </div>
+                    </div>
+                </div>
 
- đ đ<!-- ===================== TXN WALLET PICKER OVERLAY ===================== -->
- đ đ<div id="txnWalletPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
- đ đ đ đ<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
- đ đ đ đ đ đ<div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
- đ đ đ đ đ đ đ đ<h3 style="font-size:16px; font-weight:700; margin:0;">Chọn ví</h3>
- đ đ đ đ đ đ đ đ<button onclick="closeTxnWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ đ đ<div style="flex:1; overflow-y:auto;">
- đ đ đ đ đ đ đ đ<div id="txnWalletPickerList" style="padding:8px 0;"></div>
- đ đ đ đ đ đ</div>
- đ đ đ đ</div>
- đ đ</div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <div style="color: #6b7280; font-size: 14px;">Nên chi hàng ngày</div>
+                        <div id="detailBudgetRecDaily" style="font-weight: 500; font-size: 15px; color:#1f2937;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <div style="color: #6b7280; font-size: 14px;">Dự kiến chi tiêu</div>
+                        <div id="detailBudgetProjected" style="font-weight: 500; font-size: 15px; color:#1f2937;">0</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <div style="color: #6b7280; font-size: 14px;">Thực tế chi tiêu hàng ngày</div>
+                        <div id="detailBudgetActualDaily" style="font-weight: 500; font-size: 15px; color:#1f2937;">0</div>
+                    </div>
+                </div>
+            </main>
+        </div>
 
- đ đ<!-- ===================== TXN CATEGORY PICKER OVERLAY ===================== -->
- đ đ<div id="txnCategoryPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
- đ đ đ đ<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
- đ đ đ đ đ đ<div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
- đ đ đ đ đ đ đ đ<h3 style="font-size:16px; font-weight:700; margin:0;">Chọn nhóm</h3>
- đ đ đ đ đ đ đ đ<button onclick="closeTxnCategoryPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ đ đ<div style="flex:1; overflow-y:auto; padding:0;">
- đ đ đ đ đ đ đ đ<div id="txnCategoryPickerList" style="padding:8px 0;"></div>
- đ đ đ đ đ đ</div>
- đ đ đ đ</div>
- đ đ</div>
 
- đ đ<!-- ===================== PARENT CATEGORY PICKER OVERLAY ===================== -->
- đ đ<div id="parentCatPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
- đ đ đ đ<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
- đ đ đ đ đ đ<div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
- đ đ đ đ đ đ đ đ<h3 style="font-size:16px; font-weight:700; margin:0;">Chọn nhóm cha</h3>
- đ đ đ đ đ đ đ đ<button onclick="closeParentCatPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
- đ đ đ đ đ đ</div>
- đ đ đ đ đ đ<div style="flex:1; overflow-y:auto;">
- đ đ đ đ đ đ đ đ<div id="parentCatPickerList" style="padding:8px 0;"></div>
- đ đ đ đ đ đ</div>
- đ đ đ đ</div>
- đ đ</div>
+        <!-- ===================== BOTTOM NAV ===================== -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" id="nav-home" onclick="switchPage('home'); return false;">
+                <i class="fas fa-home"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="#" class="nav-item" id="nav-transactions" onclick="switchPage('transactions'); return false;">
+                <i class="fas fa-wallet"></i>
+                <span>Sổ giao dịch</span>
+            </a>
+            <div class="nav-fab-wrapper">
+                <button class="fab-btn" onclick="openAddTransaction()">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <a href="#" class="nav-item" id="nav-budgets" onclick="switchPage('budgets'); return false;">
+                <i class="fas fa-book"></i>
+                <span>Ngân sách</span>
+            </a>
+            <a href="#" class="nav-item" id="nav-accounts" onclick="switchPage('accounts'); return false;">
+                <i class="far fa-user"></i>
+                <span>Tài khoản</span>
+            </a>
+        </nav>
+    </div> <!-- End .app-container -->
 
- đ đ<script src="script.js?v=1.0.79"></script>
+    <style>
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-main);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .bottom-nav {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: white;
+            padding: 8px 0 calc(env(safe-area-inset-bottom, 0px) + 8px);
+            border-top: 1px solid #f3f4f6;
+            z-index: 1000;
+        }
+    </style>
+
+    <!-- ===================== ICON PICKER OVERLAY ===================== -->
+    <div id="iconPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn biểu tượng</h3>
+                <button onclick="closeIconPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div style="flex:1; overflow-y:auto; padding:16px;">
+                <div id="iconGrid" style="display:grid; grid-template-columns: repeat(6, 1fr); gap:10px; text-align:center;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== SETTINGS PICKER OVERLAY ===================== -->
+    <div id="settingPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
+                <h3 id="settingPickerTitle" style="font-size:16px; font-weight:700; margin:0;"></h3>
+                <button onclick="closeSettingPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div style="flex:1; overflow-y:auto;">
+                <div id="settingPickerList" style="padding:8px 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== TXN WALLET PICKER OVERLAY ===================== -->
+    <div id="txnWalletPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
+        <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn ví</h3>
+                <button onclick="closeTxnWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div style="flex:1; overflow-y:auto;">
+                <div id="txnWalletPickerList" style="padding:8px 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== TXN CATEGORY PICKER OVERLAY ===================== -->
+    <div id="txnCategoryPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
+        <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn nhóm</h3>
+                <button onclick="closeTxnCategoryPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div style="flex:1; overflow-y:auto; padding:0;">
+                <div id="txnCategoryPickerList" style="padding:8px 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== PARENT CATEGORY PICKER OVERLAY ===================== -->
+    <div id="parentCatPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
+        <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn nhóm cha</h3>
+                <button onclick="closeParentCatPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+            </div>
+            <div style="flex:1; overflow-y:auto;">
+                <div id="parentCatPickerList" style="padding:8px 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=1.0.81"></script>
 </body>
 </html>
