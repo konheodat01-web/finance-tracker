@@ -122,7 +122,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.66</div>
+                <div class="version-tag">Phiên bản v1.0.68</div>
             </main>
         </div>
 
@@ -647,6 +647,196 @@
         </div>
 
 
+        <!-- ===================== PAGE: NGÂN SÁCH ===================== -->
+        <div id="page-budgets" class="page page-light">
+            <header class="header">
+                <div class="header-top">
+                    <h2 class="page-title">Ngân sách Đang áp dụng <i class="fas fa-globe" style="color:#6b7280; font-size:16px;"></i></h2>
+                    <div>
+                        <button class="btn-icon"><i class="far fa-question-circle"></i></button>
+                    </div>
+                </div>
+                <div class="date-navigator" style="justify-content: flex-start; padding-left: 16px; border-bottom: 1px solid #f3f4f6;">
+                    <div style="font-weight: 600; padding-bottom: 8px; border-bottom: 2px solid #10b981; color:#10b981;">Tháng này</div>
+                </div>
+            </header>
+            <main class="content">
+                <div class="card" style="text-align: center; padding: 30px 16px 20px; position: relative; margin-bottom: 16px;">
+                    <!-- Speedometer / Semi-circle chart -->
+                    <div style="position: relative; width: 220px; height: 110px; margin: 0 auto 20px; overflow: hidden;">
+                        <div style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #f3f4f6; position: absolute; top: 0; left: 0; box-sizing: border-box;"></div>
+                        <div id="budgetGlobalProgress" style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #10b981; position: absolute; top: 0; left: 0; box-sizing: border-box; border-bottom-color: transparent; border-right-color: transparent; transform: rotate(-45deg); transition: transform 0.5s;"></div>
+                        <div style="position: absolute; bottom: 0; width: 100%; text-align: center;">
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">Số tiền bạn có thể chi</div>
+                            <div id="budgetGlobalAvailable" style="font-size: 28px; font-weight: 700; color: #10b981;">0</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; text-align: center; margin-bottom: 20px;">
+                        <div style="flex: 1;">
+                            <div id="budgetGlobalTotal" style="font-weight: 600; font-size: 15px; color:#1f2937;">0</div>
+                            <div style="font-size: 12px; color: #9ca3af;">Tổng ngân sách</div>
+                        </div>
+                        <div style="width: 1px; background: #e5e7eb;"></div>
+                        <div style="flex: 1;">
+                            <div id="budgetGlobalSpent" style="font-weight: 600; font-size: 15px; color:#1f2937;">0</div>
+                            <div style="font-size: 12px; color: #9ca3af;">Tổng đã chi</div>
+                        </div>
+                        <div style="width: 1px; background: #e5e7eb;"></div>
+                        <div style="flex: 1;">
+                            <div id="budgetGlobalDays" style="font-weight: 600; font-size: 15px; color:#1f2937;">0 ngày</div>
+                            <div style="font-size: 12px; color: #9ca3af;">Đến cuối tháng</div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="openAddBudget()" style="background: #10b981; color: white; border: none; border-radius: 20px; padding: 10px 24px; font-weight: 600; font-size: 15px; cursor: pointer;">Tạo Ngân sách</button>
+                </div>
+
+                <div id="budgetList" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 80px;">
+                    <!-- Budget list cards -->
+                </div>
+            </main>
+        </div>
+
+        <!-- ===================== PAGE: ADD BUDGET ===================== -->
+        <div id="page-add-budget" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top" style="justify-content: center; position: relative;">
+                    <button class="btn-link" onclick="switchPage('budgets')" style="position: absolute; left: 16px; color: #4b5563;">Huỷ</button>
+                    <h2 class="page-title" id="budgetTitle">Thêm ngân sách</h2>
+                </div>
+            </header>
+            <main class="content">
+                <div class="card" style="padding: 0; margin-bottom: 16px;">
+                    <input type="hidden" id="editBudgetId">
+                    <input type="hidden" id="budgetCatId">
+                    
+                    <!-- Chọn nhóm -->
+                    <div class="aw-field-row" onclick="openBudgetCategoryPicker()" style="cursor: pointer;">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                            <div id="budgetCategoryIcon" style="width:32px; height:32px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; color:#9ca3af; font-size:16px;"><i class="fas fa-question"></i></div>
+                            <div id="budgetCategoryName" style="font-size:16px; color:#9ca3af;">Chọn nhóm</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
+                    </div>
+                    
+                    <!-- Số tiền -->
+                    <div class="aw-field-row" style="align-items: flex-end;">
+                        <div style="flex:1;">
+                            <div class="aw-field-label">Số tiền</div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="padding: 4px 8px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; color: #6b7280; font-weight: 600;">VND</div>
+                                <input type="text" id="budgetAmount" class="aw-balance-input" style="font-size:24px; font-weight:600; width:100%; border:none; outline:none;" placeholder="0" inputmode="numeric" oninput="formatCurrencyInput(this)">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Thời gian -->
+                    <div class="aw-field-row" style="cursor: pointer;">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                            <i class="far fa-calendar-alt" style="color:#4b5563; font-size:18px;"></i>
+                            <div id="budgetPeriodStr" style="font-size:15px; color:#1f2937;">Tháng này</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
+                    </div>
+                    
+                    <!-- Chọn ví -->
+                    <div class="aw-field-row" style="border-bottom: none; cursor: pointer;">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                            <i class="fas fa-globe" style="color:#10b981; font-size:18px;"></i>
+                            <div style="font-size:15px; color:#1f2937;">Tổng cộng</div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
+                    </div>
+                </div>
+                
+                <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 500; margin-bottom: 4px;">Lặp lại ngân sách này</div>
+                        <div style="font-size: 13px; color: #6b7280;">Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="budgetRepeat" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                
+                <button id="btnDeleteBudget" onclick="deleteBudget()" style="width:100%; margin-top:20px; padding:15px; background:none; border:1px solid #ef4444; border-radius:12px; color:#ef4444; font-weight:600; font-size:15px; cursor:pointer; display:none;">
+                    Xóa Ngân Sách
+                </button>
+            </main>
+            <div style="position:fixed; bottom:0; width:100%; max-width:480px; padding:16px; background:white; z-index:100; border-top:1px solid #f3f4f6;">
+                <button onclick="saveBudget()" style="width:100%; background:#10b981; color:white; border:none; border-radius:24px; padding:14px; font-size:16px; font-weight:600; cursor:pointer;">Lưu</button>
+            </div>
+        </div>
+
+        <!-- ===================== PAGE: BUDGET DETAIL ===================== -->
+        <div id="page-budget-detail" class="page page-light">
+            <header class="header header-modal-style">
+                <div class="header-top" style="justify-content: space-between;">
+                    <button class="btn-link" onclick="switchPage('budgets')"><i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại</button>
+                    <button class="btn-link" onclick="editBudgetFromDetail()">Sửa</button>
+                </div>
+            </header>
+            <main class="content">
+                <div class="card" style="margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                        <div id="detailBudgetIcon" style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:18px;"></div>
+                        <div id="detailBudgetCategory" style="font-size: 18px; font-weight: 600;"></div>
+                    </div>
+                    
+                    <div id="detailBudgetAmount" style="font-size: 24px; font-weight: 700; margin-bottom: 12px; color:#1f2937;"></div>
+                    
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-bottom: 8px;">
+                        <div>Đã chi <br><div id="detailBudgetSpent" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
+                        <div style="text-align: right;">Còn lại <br><div id="detailBudgetRemain" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
+                    </div>
+                    
+                    <div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-bottom: 8px; position:relative;">
+                        <div id="detailBudgetBar" style="height: 100%; background: #10b981; width: 0%; position:absolute; top:0; left:0; z-index:1;"></div>
+                        <div id="detailBudgetTodayMarker" style="position:absolute; top:0; bottom:0; width:2px; background:#9ca3af; z-index:2;"></div>
+                    </div>
+                    <div style="font-size: 11px; color: #9ca3af; position:relative; height: 16px;">
+                        <div id="detailBudgetTodayText" style="position:absolute; display:inline-block; background:#f3f4f6; padding:2px 6px; border-radius:4px; top:0; transform:translateX(-50%);">Hôm nay</div>
+                    </div>
+                    
+                    <div style="margin-top: 24px;">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
+                            <i class="far fa-calendar-alt" style="font-size: 20px; color: #4b5563; width: 24px; text-align: center;"></i>
+                            <div>
+                                <div id="detailBudgetDateRange" style="font-size: 15px; color: #1f2937;"></div>
+                                <div id="detailBudgetDaysLeft" style="font-size: 13px; color: #9ca3af;"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <i class="fas fa-globe" style="font-size: 20px; color: #10b981; width: 24px; text-align: center;"></i>
+                            <div style="font-size: 15px; color: #1f2937;">Tổng cộng</div>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 12px;">
+                            <i class="fas fa-redo-alt" style="font-size: 20px; color: #4b5563; width: 24px; text-align: center;"></i>
+                            <div style="font-size: 15px; color: #1f2937;" id="detailBudgetRepeatText">Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <div style="color: #6b7280; font-size: 14px;">Nên chi hàng ngày</div>
+                        <div id="detailBudgetRecDaily" style="font-weight: 500; font-size: 15px; color:#1f2937;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
+                        <div style="color: #6b7280; font-size: 14px;">Dự kiến chi tiêu</div>
+                        <div id="detailBudgetProjected" style="font-weight: 500; font-size: 15px; color:#1f2937;">0</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <div style="color: #6b7280; font-size: 14px;">Thực tế chi tiêu hàng ngày</div>
+                        <div id="detailBudgetActualDaily" style="font-weight: 500; font-size: 15px; color:#1f2937;">0</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+
         <!-- ===================== BOTTOM NAV ===================== -->
         <nav class="bottom-nav">
             <a href="#" class="nav-item active" id="nav-home" onclick="switchPage('home'); return false;">
@@ -662,7 +852,7 @@
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
-            <a href="#" class="nav-item" onclick="return false;">
+            <a href="#" class="nav-item" id="nav-budgets" onclick="switchPage('budgets'); return false;">
                 <i class="fas fa-book"></i>
                 <span>Ngân sách</span>
             </a>
@@ -763,6 +953,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.66"></script>
+    <script src="script.js?v=1.0.68"></script>
 </body>
 </html>
