@@ -1,4 +1,4 @@
-﻿// === STATE ===
+// === STATE ===
 let wallets = [];
 let transactions = [];
 let budgets = [];
@@ -1238,6 +1238,15 @@ window.onload = () => {
     // Update eye icon state based on loaded data
     document.getElementById('toggleBalanceBtn').className = isBalanceVisible ? 'fas fa-eye' : 'fas fa-eye-slash';
     renderAll();
+    
+    // Hide splash screen after a short delay
+    setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+            splash.style.opacity = '0';
+            setTimeout(() => splash.remove(), 400); // Remove from DOM after fade transition
+        }
+    }, 500);
 };
 
 // === MANAGE CATEGORIES ===

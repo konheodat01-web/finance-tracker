@@ -20,8 +20,49 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        /* === SPLASH SCREEN === */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease;
+        }
+        #splash-screen img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            animation: pulse 2s infinite;
+        }
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    </style>
 </head>
 <body>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img src="apple-touch-icon.png?v=1.0.63" alt="App Icon">
+        <div class="loader-spinner"></div>
+    </div>
+
     <div class="app-container">
 
         <!-- ===================== PAGE: TỔNG QUAN ===================== -->
@@ -122,7 +163,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Phiên bản v1.0.78</div>
+                <div class="version-tag">Phiên bản v1.0.79</div>
             </main>
         </div>
 
@@ -960,6 +1001,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=1.0.78"></script>
+    <script src="script.js?v=1.0.79"></script>
 </body>
 </html>
