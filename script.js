@@ -7,7 +7,7 @@ let currentTab = 'expense';
 let editModeActive = false;
 let selectedWalletId = null;
 let chartInstance = null;
-let selectedIcon = '�x�';
+let selectedIcon = 'ðŸ’°';
 let prevPage = 'accounts';
 let currentTxnWalletIndex = -1; // -1 = Tất cả
 let currentPeriodIndex = 3; 
@@ -43,55 +43,55 @@ let settings = {
     totalCurrency: 'VND',
     firstDayOfWeek: 'Thứ Hai',
     firstDayOfMonth: 1,
-    firstMonthOfYear: 'Tháng M�"t'
+    firstMonthOfYear: 'Tháng Một'
 };
 
 let sepayConfig = { apiToken: '', proxyUrl: '', mappings: [], lastSyncIds: [] };
 let userCategories = {
     expense: [
-        { id: 'cat1', name: '�n u�ng', icon: '�x�', color: '#f97316' },
-        { id: 'cat2', name: 'Di chuyỒn', icon: '�xa', color: '#3b82f6' },
-        { id: 'cat3', name: 'Mua sắm', icon: '�x:�️', color: '#ec4899' },
-        { id: 'cat4', name: 'Nhà cửa', icon: '�x��', color: '#8b5cf6' },
-        { id: 'cat5', name: 'Giải trí', icon: '�x}�', color: '#f59e0b' }
+        { id: 'cat1', name: 'Ä‚n uống', icon: 'ðŸ”', color: '#f97316' },
+        { id: 'cat2', name: 'Di chuyển', icon: 'ðŸš—', color: '#3b82f6' },
+        { id: 'cat3', name: 'Mua sắm', icon: 'ðŸ›ï¸', color: '#ec4899' },
+        { id: 'cat4', name: 'Nhà cửa', icon: 'ðŸ ', color: '#8b5cf6' },
+        { id: 'cat5', name: 'Giải trí', icon: 'ðŸŽ®', color: '#f59e0b' }
     ],
     income: [
-        { id: 'cat6', name: 'Tiền lương', icon: '�x�', color: '#10b981' },
-        { id: 'cat7', name: 'Tiền thư�xng', icon: '�x}�', color: '#3b82f6' },
-        { id: 'cat8', name: 'Thu nhập khác', icon: '�x�', color: '#10b981' }
+        { id: 'cat6', name: 'Tiá»n lương', icon: 'ðŸ’¸', color: '#10b981' },
+        { id: 'cat7', name: 'Tiá»n thưởng', icon: 'ðŸŽ', color: '#3b82f6' },
+        { id: 'cat8', name: 'Thu nhập khác', icon: 'ðŸ’°', color: '#10b981' }
     ],
     debt: [
-        { id: 'cat9', name: 'Cho vay', icon: '�x�', color: '#ef4444' },
-        { id: 'cat10', name: 'Đi vay', icon: '�x�', color: '#10b981' },
-        { id: 'cat11', name: 'Thu nợ', icon: '�x�', color: '#10b981' },
-        { id: 'cat12', name: 'Trả nợ', icon: '�x�', color: '#ef4444' }
+        { id: 'cat9', name: 'Cho vay', icon: 'ðŸ“¤', color: '#ef4444' },
+        { id: 'cat10', name: 'Äi vay', icon: 'ðŸ“¥', color: '#10b981' },
+        { id: 'cat11', name: 'Thu nợ', icon: 'ðŸ“¥', color: '#10b981' },
+        { id: 'cat12', name: 'Trả nợ', icon: 'ðŸ“¤', color: '#ef4444' }
     ]
 };
 let receivingInfos = [];
 
 const SETTING_OPTIONS = {
     dateFormat: {
-        title: 'Đ�9nh dạng thời gian',
+        title: 'Äịnh dạng thá»i gian',
         options: ['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY/MM/DD',
                   'DD-MM-YYYY', 'MM-DD-YYYY', 'D MMM YYYY']
     },
     totalCurrency: {
-        title: 'Đơn v�9 tiền cho ví T�"ng',
+        title: 'Äơn vị tiá»n cho ví Tổng',
         options: ['VND', 'USD']
     },
     firstDayOfWeek: {
-        title: 'Chọn ngày �ầu tuần',
-        options: ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ NĒm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật']
+        title: 'Chá»n ngày đầu tuần',
+        options: ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật']
     },
     firstDayOfMonth: {
-        title: 'Đặt ngày �ầu tiên của tháng',
+        title: 'Äặt ngày đầu tiên của tháng',
         options: Array.from({length: 28}, (_, i) => i + 1)
     },
     firstMonthOfYear: {
-        title: 'Chọn tháng �ầu tiên của nĒm',
-        options: ['Tháng M�"t','Tháng Hai','Tháng Ba','Tháng Tư','Tháng NĒm',
+        title: 'Chá»n tháng đầu tiên của năm',
+        options: ['Tháng Một','Tháng Hai','Tháng Ba','Tháng Tư','Tháng Năm',
                   'Tháng Sáu','Tháng Bảy','Tháng Tám','Tháng Chín',
-                  'Tháng Mười','Tháng Mười M�"t','Tháng Mười Hai']
+                  'Tháng Mưá»i','Tháng Mưá»i Một','Tháng Mưá»i Hai']
     }
 };
 
@@ -158,14 +158,14 @@ function loadData() {
 
 // === ICON LIBRARY ===
 const ICONS = [
-    '�x�','�x�','�x��','�x�','�x�','�x�',
-    '�x��','�x}�','�S�️','�xa','�xa�','�xa',
-    '�x��','�x��','�x��','�x��','�x�️','�x��',
-    '�x�','��"','�x�"','�x��','�x�','�x��',
-    '�a�','�x}�','�x�`','�x� ','�x}�','�x}�',
-    '�x�','�x�','�x�','�x','�R�️','�x�️',
-    '�x`','�x0','�x��','❤️','�x�','�x',
-    '�x}�','�x}�','�x}','�xa�','�xRx','⭐'
+    'ðŸ’°','ðŸ’³','ðŸ¦','ðŸ’µ','ðŸ’¸','ðŸ’´',
+    'ðŸ·','ðŸŽ¯','âœˆï¸','ðŸš—','ðŸš¢','ðŸš‚',
+    'ðŸ ','ðŸª','ðŸ¥','ðŸ«','ðŸ—ï¸','ðŸ¨',
+    'ðŸ”','â˜•','ðŸ•','ðŸº','ðŸ¥—','ðŸ±',
+    'âš½','ðŸŽ¾','ðŸŠ','ðŸ†','ðŸŽ®','ðŸŽµ',
+    'ðŸ’»','ðŸ“±','ðŸ“º','ðŸ“–','âŒ¨ï¸','ðŸ–¼ï¸',
+    'ðŸ’Š','ðŸ’‰','ðŸ§ ','â¤ï¸','ðŸ’¡','ðŸ”‘',
+    'ðŸŽ','ðŸŽ€','ðŸŽ„','ðŸš€','ðŸŒŸ','â­'
 ];
 
 // === UTILS ===
@@ -230,7 +230,7 @@ function updateBalanceDisplays() {
     const currency = settings.totalCurrency || 'VND';
     const total = getTotalBalance();
     const formatted = formatCurrency(total, currency);
-    // Strip trailing ' �' for main display if VND since we show '�' separately
+    // Strip trailing ' đ' for main display if VND since we show 'đ' separately
     document.getElementById('mainTotalBalance').innerText = currency === 'VND'
         ? new Intl.NumberFormat('vi-VN').format(total)
         : formatted;
@@ -241,7 +241,7 @@ function renderHomeWallets() {
     const list = document.getElementById('walletListHome');
     list.innerHTML = '';
     if (wallets.length === 0) {
-        list.innerHTML = '<div style="text-align:center; padding:20px; color:#9ca3af; font-size:13px;">Chưa có ví nào. Vào <strong>Tài khoản</strong> �Ồ thêm ví.</div>';
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:#9ca3af; font-size:13px;">Chưa có ví nào. Vào <strong>Tài khoản</strong> để thêm ví.</div>';
         return;
     }
     wallets.forEach(w => {
@@ -270,7 +270,7 @@ function renderAccountsPage() {
                     <div class="wallet-left">
                         <div class="wallet-icon ${w.bgClass}">${w.emoji}</div>
                         <div>
-                            <div class="wallet-name">${w.name} ${w.isDefault ? '<span style="font-size:10px; background:#10b981; color:white; padding:2px 6px; border-radius:10px; margin-left:6px; vertical-align:middle;">Mặc ��9nh</span>' : ''}</div>
+                            <div class="wallet-name">${w.name} ${w.isDefault ? '<span style="font-size:10px; background:#10b981; color:white; padding:2px 6px; border-radius:10px; margin-left:6px; vertical-align:middle;">Mặc định</span>' : ''}</div>
                             <div style="font-size:12px; color:#9ca3af;">${formatCurrency(w.balance, w.currency || 'VND')}</div>
                         </div>
                     </div>
@@ -353,12 +353,12 @@ function renderTransactionsPage() {
     }
 
     // Wallet selector
-    const allWallets = [{id:'all', name:'Tất cả', emoji:'�xR�'},...wallets];
+    const allWallets = [{id:'all', name:'Tất cả', emoji:'ðŸŒ'},...wallets];
     const idx = currentTxnWalletIndex < 0 ? 0 : currentTxnWalletIndex + 1;
     const w = allWallets[Math.min(idx, allWallets.length-1)];
     const walletEl = document.getElementById('txnWalletIcon');
     const nameEl = document.getElementById('txnWalletName');
-    if (walletEl) walletEl.innerText = w.emoji || '�xR�';
+    if (walletEl) walletEl.innerText = w.emoji || 'ðŸŒ';
     if (nameEl) nameEl.innerText = w.name;
 
     // Balance display
@@ -413,8 +413,8 @@ function renderTxnList(period) {
 
     if (filtered.length === 0) {
         listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px;">
-            <div style="font-size:40px; margin-bottom:12px;">�x9</div>
-            Chưa có giao d�9ch nào<br>trong kỳ này
+            <div style="font-size:40px; margin-bottom:12px;">ðŸ“‹</div>
+            Chưa có giao dịch nào<br>trong kỳ này
         </div>`;
         return;
     }
@@ -426,7 +426,7 @@ function renderTxnList(period) {
         groups[t.date].push(t);
     });
 
-    const DAY_NAMES = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ NĒm','Thứ Sáu','Thứ Bảy'];
+    const DAY_NAMES = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
     const MONTH_NAMES = ['tháng 1','tháng 2','tháng 3','tháng 4','tháng 5','tháng 6','tháng 7','tháng 8','tháng 9','tháng 10','tháng 11','tháng 12'];
 
     const sortedDates = Object.keys(groups).sort((a,b) => b.localeCompare(a));
@@ -448,7 +448,7 @@ function renderTxnList(period) {
             const amtStr = new Intl.NumberFormat('vi-VN').format(t.amount);
             return `
             <div onclick="openEditTransaction('${t.id}')" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-top:1px solid #f3f4f6; cursor:pointer;">
-                <div style="width:38px;height:38px;border-radius:50%;background:${t.categoryColor||'#9ca3af'};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${t.categoryIcon||'�x�'}</div>
+                <div style="width:38px;height:38px;border-radius:50%;background:${t.categoryColor||'#9ca3af'};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${t.categoryIcon||'ðŸ’¸'}</div>
                 <div style="flex:1; min-width:0;">
                     <div style="font-size:14px;font-weight:600;color:#1f2937;">${t.category||'Khác'}</div>
                     ${t.note ? `<div style="font-size:12px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.note}</div>` : ''}
@@ -491,15 +491,15 @@ function renderSelectWalletList() {
     let html = `
         <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
             <div style="display:flex; align-items:center; padding:16px; cursor:pointer; background:${currentTxnWalletIndex === -1 ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(-1)">
-                <div style="width:44px; height:44px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; font-size:24px; margin-right:12px;">�xR�</div>
+                <div style="width:44px; height:44px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; font-size:24px; margin-right:12px;">ðŸŒ</div>
                 <div style="flex:1;">
-                    <div style="font-size:16px; font-weight:700; color:#000;">T�"ng c�"ng</div>
+                    <div style="font-size:16px; font-weight:700; color:#000;">Tổng cộng</div>
                     <div style="font-size:13px; color:#6b7280;">${new Intl.NumberFormat('vi-VN').format(totalBalance)} ${currency}</div>
                 </div>
                 ${currentTxnWalletIndex === -1 ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
             </div>
         </div>
-        <div style="font-size:11px; color:#9ca3af; font-weight:600; margin-bottom:8px; padding-left:4px; letter-spacing:0.5px; text-transform:uppercase;">TÍNH VìO T�NG</div>
+        <div style="font-size:11px; color:#9ca3af; font-weight:600; margin-bottom:8px; padding-left:4px; letter-spacing:0.5px; text-transform:uppercase;">TÃNH VÃ€O Tá»”NG</div>
         <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
     `;
 
@@ -507,7 +507,7 @@ function renderSelectWalletList() {
         const isSelected = currentTxnWalletIndex === idx;
         html += `
             <div style="display:flex; align-items:center; padding:16px; cursor:pointer; border-bottom:${idx === wallets.length - 1 ? 'none' : '1px solid #f3f4f6'}; background:${isSelected ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(${idx})">
-                <div style="width:40px; height:40px; border-radius:50%; background:${w.bgClass || '#3b82f6'}; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:white;">${w.emoji || '�x�'}</div>
+                <div style="width:40px; height:40px; border-radius:50%; background:${w.bgClass || '#3b82f6'}; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:white;">${w.emoji || 'ðŸ’°'}</div>
                 <div style="flex:1;">
                     <div style="font-size:15px; font-weight:600; color:#000;">${w.name}</div>
                     <div style="font-size:13px; color:#6b7280;">${new Intl.NumberFormat('vi-VN').format(w.balance)} ${w.currency || 'VND'}</div>
@@ -625,7 +625,7 @@ function updateTxnDateDisplay() {
     if (isToday) {
         document.getElementById('txnDateDisplay').innerText = 'Hôm nay';
     } else {
-        const DAY_NAMES = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ NĒm','Thứ Sáu','Thứ Bảy'];
+        const DAY_NAMES = ['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
         const dd = String(d.getDate()).padStart(2, '0');
         const mm = String(d.getMonth() + 1).padStart(2, '0');
         const yyyy = d.getFullYear();
@@ -650,16 +650,16 @@ function updateSelectedWalletDisplay() {
     const currEl = document.getElementById('txnCurrencyLabel');
     
     if (w) {
-        if(iconEl) iconEl.innerText = w.emoji || '�x�';
+        if(iconEl) iconEl.innerText = w.emoji || 'ðŸ’°';
         if(nameEl) {
             nameEl.innerText = w.name;
             nameEl.style.color = '#000';
         }
         if(currEl) currEl.innerText = w.currency || 'VND';
     } else {
-        if(iconEl) iconEl.innerText = '�x�';
+        if(iconEl) iconEl.innerText = 'ðŸ’°';
         if(nameEl) {
-            nameEl.innerText = 'Chọn ví';
+            nameEl.innerText = 'Chá»n ví';
             nameEl.style.color = '#9ca3af';
         }
         if(currEl) currEl.innerText = settings.totalCurrency || 'VND';
@@ -685,7 +685,7 @@ function updateSelectedCategoryDisplay() {
             iconEl.style.background = '#e5e7eb';
         }
         if(nameEl) {
-            nameEl.innerText = 'Chọn nhóm';
+            nameEl.innerText = 'Chá»n nhóm';
             nameEl.style.color = '#9ca3af';
         }
     }
@@ -697,7 +697,7 @@ function openTxnWalletPicker() {
     
     list.innerHTML = wallets.map(w => `
         <div onclick="selectTxnWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${w.id === txnSelectedWalletId ? '#f0fdf4' : 'transparent'};">
-            <div style="font-size:24px;">${w.emoji||'�x�'}</div>
+            <div style="font-size:24px;">${w.emoji||'ðŸ’°'}</div>
             <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
             ${w.id === txnSelectedWalletId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
         </div>
@@ -843,7 +843,7 @@ function saveTransaction() {
     
     if (!amount || !date || !walletId || !selectedCategory) return;
 
-    const isIncome = currentTxnType === 'income' || (currentTxnType === 'debt' && (selectedCategory.name === 'Đi vay' || selectedCategory.name === 'Thu nợ'));
+    const isIncome = currentTxnType === 'income' || (currentTxnType === 'debt' && (selectedCategory.name === 'Äi vay' || selectedCategory.name === 'Thu nợ'));
 
     const oldTxn = id ? transactions.find(t => t.id === id) : null;
 
@@ -860,7 +860,7 @@ function saveTransaction() {
     if (id) {
         const oldTxn = transactions.find(t => t.id === id);
         if (oldTxn) {
-            const oldIsIncome = oldTxn.type === 'income' || (oldTxn.type === 'debt' && (oldTxn.category === 'Đi vay' || oldTxn.category === 'Thu nợ'));
+            const oldIsIncome = oldTxn.type === 'income' || (oldTxn.type === 'debt' && (oldTxn.category === 'Äi vay' || oldTxn.category === 'Thu nợ'));
             const w = wallets.find(x => x.id === oldTxn.walletId);
             if (w) w.balance += oldIsIncome ? -oldTxn.amount : oldTxn.amount;
         }
@@ -882,16 +882,16 @@ function saveTransaction() {
     syncData();
     renderAll();
     checkBudgetsThreshold(txn);
-    showToast('� l�u giao d�ch!', 'success');
+    showToast('Đã lưu giao dịch!', 'success');
     switchPage('transactions');
 }
 
 function deleteTransaction() {
     const id = document.getElementById('editTxnId').value;
-    if (!id || !confirm('Xóa giao d�9ch này?')) return;
+    if (!id || !confirm('Xóa giao dịch này?')) return;
     const t = transactions.find(x => x.id === id);
     if (t) {
-        const isIncome = t.type === 'income' || (t.type === 'debt' && (t.category === 'Đi vay' || t.category === 'Thu nợ'));
+        const isIncome = t.type === 'income' || (t.type === 'debt' && (t.category === 'Äi vay' || t.category === 'Thu nợ'));
         const w = wallets.find(x => x.id === t.walletId);
         if (w) w.balance += isIncome ? -t.amount : t.amount;
     }
@@ -899,14 +899,14 @@ function deleteTransaction() {
     syncData();
     renderAll();
     checkBudgetsThreshold(txn);
-    showToast('� l�u giao d�ch!', 'success');
+    showToast('Đã lưu giao dịch!', 'success');
     switchPage('transactions');
 }
 
 // === ADD WALLET PAGE ===
 function openAddWallet() {
     prevPage = document.querySelector('.page.active')?.id.replace('page-','') || 'accounts';
-    selectedIcon = '�x�';
+    selectedIcon = 'ðŸ’°';
     document.getElementById('addWalletPageTitle').innerText = 'Thêm Ví';
     document.getElementById('editWalletId').value = '';
     document.getElementById('walletName').value = '';
@@ -923,7 +923,7 @@ function openEditWallet(id) {
     const w = wallets.find(x => x.id === id);
     if (!w) return;
     prevPage = 'accounts';
-    selectedIcon = w.emoji || '�x�';
+    selectedIcon = w.emoji || 'ðŸ’°';
     document.getElementById('addWalletPageTitle').innerText = 'Sửa Ví';
     document.getElementById('editWalletId').value = w.id;
     document.getElementById('walletName').value = w.name;
@@ -973,7 +973,7 @@ function handleDefaultWalletChange(checkbox) {
         const currentDefault = wallets.find(w => w.isDefault);
         const editId = document.getElementById('editWalletId').value;
         if (currentDefault && currentDefault.id !== editId) {
-            const confirmChange = confirm(`Ví "${currentDefault.name}" �ang là ví mặc ��9nh. Bạn có mu�n ��"i sang ví này không?`);
+            const confirmChange = confirm(`Ví "${currentDefault.name}" đang là ví mặc định. Bạn có muốn đổi sang ví này không?`);
             if (!confirmChange) {
                 checkbox.checked = false;
             }
@@ -1198,7 +1198,7 @@ function renderChart() {
                         title: items => items[0]?.label?.split('-').slice(1).reverse().join('/') || '',
                         label: items => {
                             const v = items.raw * 1000;
-                            return new Intl.NumberFormat('vi-VN').format(v) + ' �';
+                            return new Intl.NumberFormat('vi-VN').format(v) + ' đ';
                         }
                     }
                 }
@@ -1337,11 +1337,11 @@ function renderManageCategories() {
 }
 
 function openAddCategoryPage() {
-    document.getElementById('addCatPageTitle').innerText = 'Nhóm m�:i';
+    document.getElementById('addCatPageTitle').innerText = 'Nhóm mới';
     document.getElementById('editCatId').value = '';
     document.getElementById('catNameInput').value = '';
     
-    selectedIcon = '❤️';
+    selectedIcon = 'â¤ï¸';
     const iconBtn = document.getElementById('catIconPreview');
     if(iconBtn) {
         iconBtn.innerText = selectedIcon;
@@ -1475,7 +1475,7 @@ function openParentCatPicker() {
     
     let html = `
         <div onclick="selectParentCategory(null)" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${editCatParentId === null ? '#f0fdf4' : 'transparent'};">
-            <div style="font-size:24px;">�xa�</div>
+            <div style="font-size:24px;">ðŸš«</div>
             <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Không có</div>
             ${editCatParentId === null ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
         </div>
@@ -1530,7 +1530,7 @@ async function sendTelegramNotification(txn, wallet) {
     const chatId = '-5124834913';
     if (!botToken || !chatId) return;
 
-    const isIncome = txn.type === 'income' || (txn.type === 'debt' && (txn.category === 'Đi vay' || txn.category === 'Thu nợ'));
+    const isIncome = txn.type === 'income' || (txn.type === 'debt' && (txn.category === 'Äi vay' || txn.category === 'Thu nợ'));
     const sign = isIncome ? '+' : '-';
     
     let totalBalance = 0;
@@ -1539,16 +1539,16 @@ async function sendTelegramNotification(txn, wallet) {
     }
     
     const formatter = new Intl.NumberFormat('vi-VN');
-    const amountStr = formatter.format(txn.amount) + ' �';
-    const walletBalanceStr = wallet ? formatter.format(wallet.balance) + ' �' : '0 �';
-    const totalBalanceStr = formatter.format(totalBalance) + ' �';
+    const amountStr = formatter.format(txn.amount) + ' đ';
+    const walletBalanceStr = wallet ? formatter.format(wallet.balance) + ' đ' : '0 đ';
+    const totalBalanceStr = formatter.format(totalBalance) + ' đ';
     const walletName = wallet ? wallet.name : 'Chưa rõ ví';
     
-    const message = `BIẾN Đ��NG SỐ DƯ "${walletName}"
+    const message = `BIáº¾N Äá»˜NG Sá» DÆ¯ "${walletName}"
 ${sign} ${amountStr}
-N��I DUNG: "${txn.note || txn.category}"
-SỐ DƯ VÍ: "${walletBalanceStr}"
-T�NG SỐ DƯ: "${totalBalanceStr}"`;
+Ná»˜I DUNG: "${txn.note || txn.category}"
+Sá» DÆ¯ VÃ: "${walletBalanceStr}"
+Tá»”NG Sá» DÆ¯: "${totalBalanceStr}"`;
 
     try {
         await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -1601,10 +1601,10 @@ function renderSePayMappings() {
     let html = '';
     sepayConfig.mappings.forEach((m, index) => {
         const wallet = wallets.find(w => w.id === m.walletId);
-        const wName = wallet ? `${wallet.emoji || '�x�'} ${wallet.name}` : 'Chưa chọn Ví';
+        const wName = wallet ? `${wallet.emoji || 'ðŸ’°'} ${wallet.name}` : 'Chưa chá»n Ví';
         
-        let cName = 'Chưa chọn Nhóm';
-        let cIcon = '�';
+        let cName = 'Chưa chá»n Nhóm';
+        let cIcon = 'â“';
         let cColor = '#9ca3af';
         if (m.categoryId) {
             const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
@@ -1620,8 +1620,8 @@ function renderSePayMappings() {
             <div class="card" style="padding:16px; margin-bottom:12px; position:relative;">
                 <button onclick="removeSePayMapping(${index})" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer;"><i class="fas fa-trash"></i></button>
                 <div style="margin-bottom:12px;">
-                    <div style="font-size:11px; color:#9ca3af; text-transform:uppercase; font-weight:600; margin-bottom:4px;">S� tài khoản</div>
-                    <input type="text" placeholder="Nhập s� tài khoản..." value="${m.bankAcc}" onchange="updateSePayMapping(${index}, 'bankAcc', this.value)" style="width:calc(100% - 30px); border:none; outline:none; border-bottom:1px solid #e5e7eb; padding:4px 0; font-size:15px; font-weight:600; color:#1f2937;">
+                    <div style="font-size:11px; color:#9ca3af; text-transform:uppercase; font-weight:600; margin-bottom:4px;">Số tài khoản</div>
+                    <input type="text" placeholder="Nhập số tài khoản..." value="${m.bankAcc}" onchange="updateSePayMapping(${index}, 'bankAcc', this.value)" style="width:calc(100% - 30px); border:none; outline:none; border-bottom:1px solid #e5e7eb; padding:4px 0; font-size:15px; font-weight:600; color:#1f2937;">
                 </div>
                 
                 <div style="display:flex; gap:12px;">
@@ -1763,7 +1763,7 @@ async function runSePaySync(silent = false) {
     const apiToken = sepayConfig.apiToken;
     
     if (!apiToken) {
-        if (!silent) alert('Vui lòng nhập API Token SePay trư�:c!');
+        if (!silent) alert('Vui lòng nhập API Token SePay trước!');
         return;
     }
     if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
@@ -1773,10 +1773,10 @@ async function runSePaySync(silent = false) {
 
     try {
         if (!silent) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải dữ li�!u...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Äang tải dữ liệu...';
             btn.disabled = true;
             logBox.style.display = 'block';
-            logBox.innerHTML = 'Đang kết n�i SePay qua Proxy...<br>';
+            logBox.innerHTML = 'Äang kết nối SePay qua Proxy...<br>';
         }
         
         let url = 'https://my.sepay.vn/api/transactions/list?limit=50';
@@ -1796,16 +1796,16 @@ async function runSePaySync(silent = false) {
         
         const res = await fetch(url, options);
         
-        if (!res.ok) throw new Error('L�i kết n�i API SePay. Vui lòng kiỒm tra lại API Token.');
+        if (!res.ok) throw new Error('Lỗi kết nối API SePay. Vui lòng kiểm tra lại API Token.');
         
         const json = await res.json();
         console.log('SePay raw response:', json);
-        logBox.innerHTML += `Phản h�i: status=${json.status}, error="${json.error || 'none'}"<br>`;
+        logBox.innerHTML += `Phản hồi: status=${json.status}, error="${json.error || 'none'}"<br>`;
         
-        if (json.status !== 200 && json.status !== '200') throw new Error(json.messages || json.error || 'L�i lấy dữ li�!u từ SePay');
+        if (json.status !== 200 && json.status !== '200') throw new Error(json.messages || json.error || 'Lỗi lấy dữ liệu từ SePay');
         
         const records = json.transactions || [];
-        logBox.innerHTML += `Tìm thấy ${records.length} giao d�9ch gần �ây.<br>`;
+        logBox.innerHTML += `Tìm thấy ${records.length} giao dịch gần đây.<br>`;
         
         if (!sepayConfig.lastSyncIds) sepayConfig.lastSyncIds = [];
         let newCount = 0;
@@ -1833,7 +1833,7 @@ async function runSePaySync(silent = false) {
             let type = isIncome ? 'income' : 'expense';
             let finalCatId = null;
             let finalCatName = isIncome ? 'Nạp quỹ' : 'Chưa phân loại';
-            let finalCatIcon = isIncome ? '�x�' : '�x�';
+            let finalCatIcon = isIncome ? 'ðŸ’°' : 'ðŸ’¸';
             let finalCatColor = '#9ca3af';
 
             if (isIncome) {
@@ -1848,7 +1848,7 @@ async function runSePaySync(silent = false) {
                     finalCatColor = otherIncomeCat.color;
                 } else {
                     finalCatName = 'Thu nhập khác';
-                    finalCatIcon = '�x�';
+                    finalCatIcon = 'ðŸ’µ';
                     finalCatColor = '#10b981';
                 }
             } else {
@@ -1902,14 +1902,14 @@ async function runSePaySync(silent = false) {
         renderAll();
         
         if (!silent) {
-            logBox.innerHTML += `<strong style="color:#10b981;">Hoàn tất! Đã ��ng b�" ${newCount} giao d�9ch m�:i.</strong>`;
+            logBox.innerHTML += `<strong style="color:#10b981;">Hoàn tất! Äã đồng bộ ${newCount} giao dịch mới.</strong>`;
         }
         
     } catch (e) {
-        if (!silent) logBox.innerHTML += `<strong style="color:#ef4444;">L�i: ${e.message}</strong>`;
+        if (!silent) logBox.innerHTML += `<strong style="color:#ef4444;">Lỗi: ${e.message}</strong>`;
     } finally {
         if (!silent) {
-            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Đ�ng b�" ngay';
+            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Äồng bộ ngay';
             btn.disabled = false;
         }
     }
@@ -1974,8 +1974,8 @@ function renderReceivingInfoList() {
     
     if (filteredInfos.length === 0) {
         listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px; width:100%;">
-            <div style="font-size:40px; margin-bottom:12px;">�x!</div>
-            Chưa có thông tin nhận tiền nào
+            <div style="font-size:40px; margin-bottom:12px;">ðŸ“‡</div>
+            Chưa có thông tin nhận tiá»n nào
         </div>`;
         dotsEl.innerHTML = '';
         return;
@@ -2135,7 +2135,7 @@ function previewReceivingImage(url) {
     
     // Handle error if image fails to load
     previewImg.onerror = function() {
-        this.src = 'https://placehold.co/400x200?text=L�i+tải+ảnh';
+        this.src = 'https://placehold.co/400x200?text=Lỗi+tải+ảnh';
     };
 }
 
@@ -2147,7 +2147,7 @@ function saveReceivingInfo() {
     const tagsStr = document.getElementById('recvTags').value.trim();
     
     if (!bankName && !accountNumber) {
-        alert('Vui lòng nhập Ngân hàng hoặc S� tài khoản!');
+        alert('Vui lòng nhập Ngân hàng hoặc Số tài khoản!');
         return;
     }
     
@@ -2174,7 +2174,7 @@ function saveReceivingInfo() {
 }
 
 function deleteReceivingInfo() {
-    const confirmDelete = confirm('Bạn có chắc chắn mu�n xóa thông tin nhận tiền này?');
+    const confirmDelete = confirm('Bạn có chắc chắn muốn xóa thông tin nhận tiá»n này?');
     if (!confirmDelete) return;
     
     const idxStr = document.getElementById('editReceivingId').value;
@@ -2262,8 +2262,8 @@ function renderBudgetsPage() {
         if (userCategories && userCategories.expense) {
             userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
         }
-        const icon = catObj ? catObj.icon : '�x�';
-        const name = catObj ? catObj.name : 'T�"ng c�"ng';
+        const icon = catObj ? catObj.icon : 'ðŸ’°';
+        const name = catObj ? catObj.name : 'Tổng cộng';
         const color = catObj ? catObj.color : '#10b981';
         const remainColor = remain < 0 ? '#ef4444' : '#6b7280';
         const barColor = remain < 0 ? '#ef4444' : color;
@@ -2284,7 +2284,7 @@ function renderBudgetsPage() {
                     <div style="height: 100%; background: ${barColor}; width: ${percent}%; transition: width 0.3s;"></div>
                 </div>
                 <div style="display:flex; justify-content:space-between; margin-top: 4px;">
-                    <div style="font-size: 11px; color: #9ca3af;">Đã chi ${formatMoney(spent)}</div>
+                    <div style="font-size: 11px; color: #9ca3af;">Äã chi ${formatMoney(spent)}</div>
                     <div style="font-size: 11px; color: #9ca3af;">${Math.round(percent)}%</div>
                 </div>
             </div>
@@ -2316,7 +2316,7 @@ function openAddBudget() {
     document.getElementById('editBudgetId').value = '';
     document.getElementById('budgetAmount').value = '';
     document.getElementById('budgetCatId').value = '';
-    document.getElementById('budgetCategoryName').innerText = 'Chọn nhóm';
+    document.getElementById('budgetCategoryName').innerText = 'Chá»n nhóm';
     document.getElementById('budgetCategoryIcon').innerHTML = '<i class="fas fa-question"></i>';
     document.getElementById('budgetCategoryIcon').style.background = '#e5e7eb';
     document.getElementById('budgetCategoryIcon').style.color = '#9ca3af';
@@ -2345,8 +2345,8 @@ function saveBudget() {
     const isRepeat = document.getElementById('budgetRepeat').checked;
     const walletId = document.getElementById('budgetWalletId') ? document.getElementById('budgetWalletId').value : 'all';
 
-    if (!catId) return alert('Vui lòng chọn nhóm chi tiêu!');
-    if (!amount || amount <= 0) return alert('Vui lòng nhập s� tiền hợp l�!!');
+    if (!catId) return alert('Vui lòng chá»n nhóm chi tiêu!');
+    if (!amount || amount <= 0) return alert('Vui lòng nhập số tiá»n hợp lệ!');
 
     if (id) {
         const b = budgets.find(x => x.id === id);
@@ -2357,7 +2357,7 @@ function saveBudget() {
             b.walletId = walletId;
         }
     } else {
-        showToast('� t�o ng�n s�ch!', 'success');
+        showToast('Đã tạo ngân sách!', 'success');
 budgets.push({
             id: 'b_' + Date.now(),
             categoryId: catId,
@@ -2384,8 +2384,8 @@ function openBudgetDetail(id) {
     if (userCategories && userCategories.expense) {
         userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
     }
-    const icon = catObj ? catObj.icon : '�x�';
-    const name = catObj ? catObj.name : 'T�"ng c�"ng';
+    const icon = catObj ? catObj.icon : 'ðŸ’°';
+    const name = catObj ? catObj.name : 'Tổng cộng';
     const color = catObj ? catObj.color : '#10b981';
 
     const today = new Date();
@@ -2418,7 +2418,7 @@ function openBudgetDetail(id) {
     const monthStr = (currentMonth + 1).toString().padStart(2, '0');
     document.getElementById('detailBudgetDateRange').innerText = `01/${monthStr} - ${lastDayOfMonth}/${monthStr}`;
     document.getElementById('detailBudgetDaysLeft').innerText = `Còn ${daysLeft} ngày`;
-    document.getElementById('detailBudgetRepeatText').innerText = b.isRepeating ? 'Ngân sách �ược tự ��"ng lặp lại �x kỳ hạn tiếp theo.' : 'Ngân sách không lặp lại.';
+    document.getElementById('detailBudgetRepeatText').innerText = b.isRepeating ? 'Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.' : 'Ngân sách không lặp lại.';
 
     const recDaily = remain > 0 && daysLeft > 0 ? remain / daysLeft : 0;
     const actualDaily = daysPassed > 0 ? spent / daysPassed : 0;
@@ -2439,8 +2439,8 @@ function editBudgetFromDetail() {
     if (userCategories && userCategories.expense) {
         userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
     }
-    const icon = catObj ? catObj.icon : '�x�';
-    const name = catObj ? catObj.name : 'T�"ng c�"ng';
+    const icon = catObj ? catObj.icon : 'ðŸ’°';
+    const name = catObj ? catObj.name : 'Tổng cộng';
     const color = catObj ? catObj.color : '#10b981';
 
     document.getElementById('editBudgetId').value = b.id;
@@ -2450,7 +2450,7 @@ function editBudgetFromDetail() {
     document.getElementById('budgetCategoryIcon').style.background = color;
     document.getElementById('budgetCategoryIcon').style.color = 'white';
     
-    document.getElementById('budgetAmount').value = formatMoney(b.amount).replace(/�/g, '').trim();
+    document.getElementById('budgetAmount').value = formatMoney(b.amount).replace(/đ/g, '').trim();
     document.getElementById('budgetRepeat').checked = !!b.isRepeating;
 
     document.getElementById('budgetTitle').innerText = 'Sửa ngân sách';
@@ -2460,7 +2460,7 @@ function editBudgetFromDetail() {
 }
 
 function deleteBudget() {
-    if (confirm('Bạn có chắc chắn mu�n xóa ngân sách này?')) {
+    if (confirm('Bạn có chắc chắn muốn xóa ngân sách này?')) {
         const id = document.getElementById('editBudgetId').value;
         budgets = budgets.filter(x => x.id !== id);
         syncData();
@@ -2478,11 +2478,11 @@ function openBudgetWalletPicker() {
     let listHtml = '';
     
     const allCheck = currentWalletId === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">�xR�</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">T�"ng c�"ng</div>${allCheck}</div>`;
+    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">ðŸŒ</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = currentWalletId === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-        listHtml += `<div onclick="selectBudgetWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'�x�'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
+        listHtml += `<div onclick="selectBudgetWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'ðŸ’³'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
     });
     
     const overlay = document.createElement('div');
@@ -2491,8 +2491,8 @@ function openBudgetWalletPicker() {
     overlay.innerHTML = `
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
-                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn ví</h3>
-                <button onclick="closeBudgetWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">�S"</button>
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n ví</h3>
+                <button onclick="closeBudgetWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button>
             </div>
             <div style="flex:1; overflow-y:auto;">${listHtml}</div>
         </div>`;
@@ -2508,10 +2508,10 @@ function closeBudgetWalletPicker() {
 function selectBudgetWallet(id) {
     document.getElementById('budgetWalletId').value = id;
     if (id === 'all') {
-        document.getElementById('budgetWalletName').innerText = 'T�"ng c�"ng';
+        document.getElementById('budgetWalletName').innerText = 'Tổng cộng';
     } else {
         const w = wallets.find(x => x.id === id);
-        document.getElementById('budgetWalletName').innerText = w ? w.name : 'T�"ng c�"ng';
+        document.getElementById('budgetWalletName').innerText = w ? w.name : 'Tổng cộng';
     }
     closeBudgetWalletPicker();
 }
@@ -2525,11 +2525,11 @@ function openBudgetGlobalWalletPicker() {
     
     let listHtml = '';
     const allCheck = budgetGlobalWalletFilter === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">�xR�</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">T�"ng c�"ng</div>${allCheck}</div>`;
+    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">ðŸŒ</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = budgetGlobalWalletFilter === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-        listHtml += `<div onclick="selectBudgetGlobalWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'�x�'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
+        listHtml += `<div onclick="selectBudgetGlobalWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'ðŸ’³'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
     });
     
     const overlay = document.createElement('div');
@@ -2538,8 +2538,8 @@ function openBudgetGlobalWalletPicker() {
     overlay.innerHTML = `
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
-                <h3 style="font-size:16px; font-weight:700; margin:0;">Lọc theo ví</h3>
-                <button onclick="closeBudgetGlobalWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">�S"</button>
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Lá»c theo ví</h3>
+                <button onclick="closeBudgetGlobalWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button>
             </div>
             <div style="flex:1; overflow-y:auto;">${listHtml}</div>
         </div>`;
@@ -2555,11 +2555,11 @@ function closeBudgetGlobalWalletPicker() {
 function selectBudgetGlobalWallet(id) {
     budgetGlobalWalletFilter = id;
     if (id === 'all') {
-        document.getElementById('budgetGlobalWalletLabel').innerText = 'T�"ng';
+        document.getElementById('budgetGlobalWalletLabel').innerText = 'Tổng';
         document.getElementById('budgetGlobalWalletIcon').className = 'fas fa-globe';
     } else {
         const w = wallets.find(x => x.id === id);
-        document.getElementById('budgetGlobalWalletLabel').innerText = w ? w.name : 'T�"ng';
+        document.getElementById('budgetGlobalWalletLabel').innerText = w ? w.name : 'Tổng';
         document.getElementById('budgetGlobalWalletIcon').className = 'fas fa-wallet';
     }
     closeBudgetGlobalWalletPicker();
@@ -2585,7 +2585,7 @@ function openBudgetPeriodPicker() {
     const overlay = document.createElement('div');
     overlay.id = 'budgetPeriodOverlay';
     overlay.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;';
-    overlay.innerHTML = '<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);"><div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;"><h3 style="font-size:16px; font-weight:700; margin:0;">Chọn giai �oạn</h3><button onclick="closeBudgetPeriodPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">�S"</button></div><div style="flex:1; overflow-y:auto;">' + listHtml + '</div></div>';
+    overlay.innerHTML = '<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);"><div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;"><h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n giai đoạn</h3><button onclick="closeBudgetPeriodPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button></div><div style="flex:1; overflow-y:auto;">' + listHtml + '</div></div>';
     overlay.addEventListener('click', function(e) { if (e.target === overlay) closeBudgetPeriodPicker(); });
     document.body.appendChild(overlay);
 }
@@ -2656,7 +2656,7 @@ function checkBudgetsThreshold(txn) {
             
             let catName = 'Nhóm chi tiêu';
             if (b.categoryId === 'all') {
-                catName = 'T�"ng ngân sách';
+                catName = 'Tổng ngân sách';
             } else {
                 const cat = (userCategories.expense || []).find(c => c.id === b.categoryId);
                 if (cat) catName = cat.name;
@@ -2664,11 +2664,11 @@ function checkBudgetsThreshold(txn) {
 
             if (spent > b.amount) {
                 const overAmount = spent - b.amount;
-                showToast('B�O �NG: Ng�n s�ch [' + catName + '] � V��T ' + formatMoney(overAmount) + '!', 'error', 6000);
+                showToast('BÁO ĐỘNG: Ngân sách [' + catName + '] đã VƯỢT ' + formatMoney(overAmount) + '!', 'error', 6000);
             } else if (percent >= 100) {
-                showToast('C�nh b�o: Ng�n s�ch [' + catName + '] � h�t s�ch!', 'error', 5000);
+                showToast('Cảnh báo: Ngân sách [' + catName + '] đã hết sạch!', 'error', 5000);
             } else if (percent >= 90) {
-                showToast('S�p h�t: Ng�n s�ch [' + catName + '] � d�ng ' + Math.round(percent) + '%', 'warning', 4000);
+                showToast('Sắp hết: Ngân sách [' + catName + '] đã dùng ' + Math.round(percent) + '%', 'warning', 4000);
             }
         }
     });
