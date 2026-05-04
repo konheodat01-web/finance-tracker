@@ -7,7 +7,7 @@ let currentTab = 'expense';
 let editModeActive = false;
 let selectedWalletId = null;
 let chartInstance = null;
-let selectedIcon = 'ðŸ’°';
+let selectedIcon = '💰';
 let prevPage = 'accounts';
 let currentTxnWalletIndex = -1; // -1 = Tất cả
 let currentPeriodIndex = 3; 
@@ -56,15 +56,15 @@ let userCategories = {
         { id: 'cat5', name: 'Giải trí', icon: 'ðŸŽ®', color: '#f59e0b' }
     ],
     income: [
-        { id: 'cat6', name: 'Tiá»n lương', icon: 'ðŸ’¸', color: '#10b981' },
+        { id: 'cat6', name: 'Tiá»n lương', icon: '💸', color: '#10b981' },
         { id: 'cat7', name: 'Tiá»n thưởng', icon: 'ðŸŽ', color: '#3b82f6' },
-        { id: 'cat8', name: 'Thu nhập khác', icon: 'ðŸ’°', color: '#10b981' }
+        { id: 'cat8', name: 'Thu nhập khác', icon: '💰', color: '#10b981' }
     ],
     debt: [
-        { id: 'cat9', name: 'Cho vay', icon: 'ðŸ“¤', color: '#ef4444' },
-        { id: 'cat10', name: 'Äi vay', icon: 'ðŸ“¥', color: '#10b981' },
-        { id: 'cat11', name: 'Thu nợ', icon: 'ðŸ“¥', color: '#10b981' },
-        { id: 'cat12', name: 'Trả nợ', icon: 'ðŸ“¤', color: '#ef4444' }
+        { id: 'cat9', name: 'Cho vay', icon: '📅¤', color: '#ef4444' },
+        { id: 'cat10', name: 'Äi vay', icon: '📅¥', color: '#10b981' },
+        { id: 'cat11', name: 'Thu nợ', icon: '📅¥', color: '#10b981' },
+        { id: 'cat12', name: 'Trả nợ', icon: '📅¤', color: '#ef4444' }
     ]
 };
 let receivingInfos = [];
@@ -158,13 +158,13 @@ function loadData() {
 
 // === ICON LIBRARY ===
 const ICONS = [
-    'ðŸ’°','ðŸ’³','ðŸ¦','ðŸ’µ','ðŸ’¸','ðŸ’´',
-    'ðŸ·','ðŸŽ¯','âœˆï¸','ðŸš—','ðŸš¢','ðŸš‚',
+    '💰','💳','ðŸ¦','💵','💸','ðŸ’´',
+    'ðŸ·','ðŸŽ¯','✈️','ðŸš—','ðŸš¢','ðŸš‚',
     'ðŸ ','ðŸª','ðŸ¥','ðŸ«','ðŸ—ï¸','ðŸ¨',
     'ðŸ”','â˜•','ðŸ•','ðŸº','ðŸ¥—','ðŸ±',
     'âš½','ðŸŽ¾','ðŸŠ','ðŸ†','ðŸŽ®','ðŸŽµ',
-    'ðŸ’»','ðŸ“±','ðŸ“º','ðŸ“–','âŒ¨ï¸','ðŸ–¼ï¸',
-    'ðŸ’Š','ðŸ’‰','ðŸ§ ','â¤ï¸','ðŸ’¡','ðŸ”‘',
+    'ðŸ’»','📅±','📅º','📅–','âŒ¨ï¸','ðŸ–¼ï¸',
+    'ðŸ’Š','ðŸ’‰','ðŸ§ ','â¤ï¸','ðŸ’¡','🔍‘',
     'ðŸŽ','ðŸŽ€','ðŸŽ„','ðŸš€','ðŸŒŸ','â­'
 ];
 
@@ -413,7 +413,7 @@ function renderTxnList(period) {
 
     if (filtered.length === 0) {
         listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px;">
-            <div style="font-size:40px; margin-bottom:12px;">ðŸ“‹</div>
+            <div style="font-size:40px; margin-bottom:12px;">📋</div>
             Chưa có giao dịch nào<br>trong kỳ này
         </div>`;
         return;
@@ -448,7 +448,7 @@ function renderTxnList(period) {
             const amtStr = new Intl.NumberFormat('vi-VN').format(t.amount);
             return `
             <div onclick="openEditTransaction('${t.id}')" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-top:1px solid #f3f4f6; cursor:pointer;">
-                <div style="width:38px;height:38px;border-radius:50%;background:${t.categoryColor||'#9ca3af'};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${t.categoryIcon||'ðŸ’¸'}</div>
+                <div style="width:38px;height:38px;border-radius:50%;background:${t.categoryColor||'#9ca3af'};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${t.categoryIcon||'💸'}</div>
                 <div style="flex:1; min-width:0;">
                     <div style="font-size:14px;font-weight:600;color:#1f2937;">${t.category||'Khác'}</div>
                     ${t.note ? `<div style="font-size:12px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.note}</div>` : ''}
@@ -507,7 +507,7 @@ function renderSelectWalletList() {
         const isSelected = currentTxnWalletIndex === idx;
         html += `
             <div style="display:flex; align-items:center; padding:16px; cursor:pointer; border-bottom:${idx === wallets.length - 1 ? 'none' : '1px solid #f3f4f6'}; background:${isSelected ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(${idx})">
-                <div style="width:40px; height:40px; border-radius:50%; background:${w.bgClass || '#3b82f6'}; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:white;">${w.emoji || 'ðŸ’°'}</div>
+                <div style="width:40px; height:40px; border-radius:50%; background:${w.bgClass || '#3b82f6'}; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:white;">${w.emoji || '💰'}</div>
                 <div style="flex:1;">
                     <div style="font-size:15px; font-weight:600; color:#000;">${w.name}</div>
                     <div style="font-size:13px; color:#6b7280;">${new Intl.NumberFormat('vi-VN').format(w.balance)} ${w.currency || 'VND'}</div>
@@ -650,14 +650,14 @@ function updateSelectedWalletDisplay() {
     const currEl = document.getElementById('txnCurrencyLabel');
     
     if (w) {
-        if(iconEl) iconEl.innerText = w.emoji || 'ðŸ’°';
+        if(iconEl) iconEl.innerText = w.emoji || '💰';
         if(nameEl) {
             nameEl.innerText = w.name;
             nameEl.style.color = '#000';
         }
         if(currEl) currEl.innerText = w.currency || 'VND';
     } else {
-        if(iconEl) iconEl.innerText = 'ðŸ’°';
+        if(iconEl) iconEl.innerText = '💰';
         if(nameEl) {
             nameEl.innerText = 'Chá»n ví';
             nameEl.style.color = '#9ca3af';
@@ -697,7 +697,7 @@ function openTxnWalletPicker() {
     
     list.innerHTML = wallets.map(w => `
         <div onclick="selectTxnWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${w.id === txnSelectedWalletId ? '#f0fdf4' : 'transparent'};">
-            <div style="font-size:24px;">${w.emoji||'ðŸ’°'}</div>
+            <div style="font-size:24px;">${w.emoji||'💰'}</div>
             <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
             ${w.id === txnSelectedWalletId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
         </div>
@@ -906,7 +906,7 @@ function deleteTransaction() {
 // === ADD WALLET PAGE ===
 function openAddWallet() {
     prevPage = document.querySelector('.page.active')?.id.replace('page-','') || 'accounts';
-    selectedIcon = 'ðŸ’°';
+    selectedIcon = '💰';
     document.getElementById('addWalletPageTitle').innerText = 'Thêm Ví';
     document.getElementById('editWalletId').value = '';
     document.getElementById('walletName').value = '';
@@ -923,7 +923,7 @@ function openEditWallet(id) {
     const w = wallets.find(x => x.id === id);
     if (!w) return;
     prevPage = 'accounts';
-    selectedIcon = w.emoji || 'ðŸ’°';
+    selectedIcon = w.emoji || '💰';
     document.getElementById('addWalletPageTitle').innerText = 'Sửa Ví';
     document.getElementById('editWalletId').value = w.id;
     document.getElementById('walletName').value = w.name;
@@ -1601,7 +1601,7 @@ function renderSePayMappings() {
     let html = '';
     sepayConfig.mappings.forEach((m, index) => {
         const wallet = wallets.find(w => w.id === m.walletId);
-        const wName = wallet ? `${wallet.emoji || 'ðŸ’°'} ${wallet.name}` : 'Chưa chá»n Ví';
+        const wName = wallet ? `${wallet.emoji || '💰'} ${wallet.name}` : 'Chưa chá»n Ví';
         
         let cName = 'Chưa chá»n Nhóm';
         let cIcon = 'â“';
@@ -1833,7 +1833,7 @@ async function runSePaySync(silent = false) {
             let type = isIncome ? 'income' : 'expense';
             let finalCatId = null;
             let finalCatName = isIncome ? 'Nạp quỹ' : 'Chưa phân loại';
-            let finalCatIcon = isIncome ? 'ðŸ’°' : 'ðŸ’¸';
+            let finalCatIcon = isIncome ? '💰' : '💸';
             let finalCatColor = '#9ca3af';
 
             if (isIncome) {
@@ -1848,7 +1848,7 @@ async function runSePaySync(silent = false) {
                     finalCatColor = otherIncomeCat.color;
                 } else {
                     finalCatName = 'Thu nhập khác';
-                    finalCatIcon = 'ðŸ’µ';
+                    finalCatIcon = '💵';
                     finalCatColor = '#10b981';
                 }
             } else {
@@ -1974,7 +1974,7 @@ function renderReceivingInfoList() {
     
     if (filteredInfos.length === 0) {
         listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px; width:100%;">
-            <div style="font-size:40px; margin-bottom:12px;">ðŸ“‡</div>
+            <div style="font-size:40px; margin-bottom:12px;">📅‡</div>
             Chưa có thông tin nhận tiá»n nào
         </div>`;
         dotsEl.innerHTML = '';
@@ -2262,7 +2262,7 @@ function renderBudgetsPage() {
         if (userCategories && userCategories.expense) {
             userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
         }
-        const icon = catObj ? catObj.icon : 'ðŸ’°';
+        const icon = catObj ? catObj.icon : '💰';
         const name = catObj ? catObj.name : 'Tổng cộng';
         const color = catObj ? catObj.color : '#10b981';
         const remainColor = remain < 0 ? '#ef4444' : '#6b7280';
@@ -2384,7 +2384,7 @@ function openBudgetDetail(id) {
     if (userCategories && userCategories.expense) {
         userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
     }
-    const icon = catObj ? catObj.icon : 'ðŸ’°';
+    const icon = catObj ? catObj.icon : '💰';
     const name = catObj ? catObj.name : 'Tổng cộng';
     const color = catObj ? catObj.color : '#10b981';
 
@@ -2439,7 +2439,7 @@ function editBudgetFromDetail() {
     if (userCategories && userCategories.expense) {
         userCategories.expense.forEach(c => { if(c.id === b.categoryId) catObj = c; });
     }
-    const icon = catObj ? catObj.icon : 'ðŸ’°';
+    const icon = catObj ? catObj.icon : '💰';
     const name = catObj ? catObj.name : 'Tổng cộng';
     const color = catObj ? catObj.color : '#10b981';
 
@@ -2482,7 +2482,7 @@ function openBudgetWalletPicker() {
     
     wallets.forEach(w => {
         const check = currentWalletId === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-        listHtml += `<div onclick="selectBudgetWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'ðŸ’³'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
+        listHtml += `<div onclick="selectBudgetWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'💳'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
     });
     
     const overlay = document.createElement('div');
@@ -2529,7 +2529,7 @@ function openBudgetGlobalWalletPicker() {
     
     wallets.forEach(w => {
         const check = budgetGlobalWalletFilter === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-        listHtml += `<div onclick="selectBudgetGlobalWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'ðŸ’³'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
+        listHtml += `<div onclick="selectBudgetGlobalWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === w.id ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">${w.emoji||'💳'}</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>${check}</div>`;
     });
     
     const overlay = document.createElement('div');
