@@ -222,9 +222,7 @@ function updateBalanceDisplays() {
     const total = getTotalBalance();
     const formatted = formatCurrency(total, currency);
     // Strip trailing ' đ' for main display if VND since we show 'đ' separately
-    document.getElementById('mainTotalBalance').innerText = currency === 'VND'
-        ? new Intl.NumberFormat('vi-VN').format(total)
-        : formatted;
+    document.getElementById('mainTotalBalance').innerText = !isBalanceVisible ? '***' : (currency === 'VND' ? new Intl.NumberFormat('vi-VN').format(total) : formatted);
     document.getElementById('accountsTotalBalance').innerText = formatted;
 }
 
