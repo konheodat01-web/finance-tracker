@@ -2273,7 +2273,7 @@ function renderBudgetsPage() {
                     <div style="height: 100%; background: ${barColor}; width: ${percent}%; transition: width 0.3s;"></div>
                 </div>
                 <div style="display:flex; justify-content:space-between; margin-top: 4px;">
-                    <div style="font-size: 11px; color: #9ca3af;">Äã chi ${formatMoney(spent)}</div>
+                    <div style="font-size: 11px; color: #9ca3af;">Đã tiêu ${formatMoney(spent)}</div>
                     <div style="font-size: 11px; color: #9ca3af;">${Math.round(percent)}%</div>
                 </div>
             </div>
