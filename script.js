@@ -1519,7 +1519,7 @@ async function sendTelegramNotification(txn, wallet) {
     const chatId = '-5124834913';
     if (!botToken || !chatId) return;
 
-    const isIncome = txn.type === 'income' || (txn.type === 'debt' && (txn.category === 'Äi vay' || txn.category === 'Thu nợ'));
+    const isIncome = txn.type === 'income';
     const sign = isIncome ? '+' : '-';
     
     let totalBalance = 0;
@@ -1528,383 +1528,29 @@ async function sendTelegramNotification(txn, wallet) {
     }
     
     const formatter = new Intl.NumberFormat('vi-VN');
-    const amountStr = formatter.format(txn.amount) + ' đ';
-    const walletBalanceStr = wallet ? formatter.format(wallet.balance) + ' đ' : '0 đ';
-    const totalBalanceStr = formatter.format(totalBalance) + ' đ';
-    const walletName = wallet ? wallet.name : 'Chưa rõ ví';
+    const amountStr = formatter.format(txn.amount) + ' d';
+    const walletBalanceStr = wallet ? formatter.format(wallet.balance) + ' d' : '0 d';
+    const totalBalanceStr = formatter.format(totalBalance) + ' d';
+    const walletName = wallet ? wallet.name : 'Chua ro vi';
+    const txId = txn.id || '';
     
-    const message = `BIáº¾N Äá»˜NG Sá» DÆ¯ "${walletName}"
-${sign} ${amountStr}
-Ná»˜I DUNG: "${txn.note || txn.category}"
-Sá» DÆ¯ VÃ: "${walletBalanceStr}"
-Tá»”NG Sá» DÆ¯: "${totalBalanceStr}"`;
-
+    var msg = 'BIEN DONG SO DU "' + walletName + '"\n';
+    msg += sign + ' ' + amountStr + '\n';
+    msg += 'NOI DUNG: "' + (txn.note || txn.category || '') + '"\n';
+    msg += 'SO DU VI: "' + walletBalanceStr + '"\n';
+    msg += 'TONG SO DU: "' + totalBalanceStr + '"';
+    if (txId) msg += '\n#id_' + txId;
+    
     try {
-        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        await fetch('https://api.telegram.org/bot' + botToken + '/sendMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: message
-            })
+            body: JSON.stringify({ chat_id: chatId, text: msg })
         });
     } catch(err) {
         console.error('Failed to send Telegram notif:', err);
     }
 }
-
-// === SEPAY SYNC LOGIC ===
-function openSePaySync() {
-    if (!sepayConfig) {
-        sepayConfig = { apiToken: '', proxyUrl: '', mappings: [], lastSyncIds: [] };
-    }
-    document.getElementById('sepayApiToken').value = sepayConfig.apiToken || '';
-    document.getElementById('sepayProxyUrl').value = sepayConfig.proxyUrl || '';
-    document.getElementById('sepaySyncLog').style.display = 'none';
-    renderSePayMappings();
-    switchPage('sepay');
-}
-
-function saveSePayConfig() {
-    sepayConfig.apiToken = document.getElementById('sepayApiToken').value.trim();
-    sepayConfig.proxyUrl = document.getElementById('sepayProxyUrl').value.trim();
-    syncData();
-}
-
-function toggleSePayConfig() {
-    const sec = document.getElementById('sepayConfigSection');
-    if (sec.style.display === 'none') {
-        sec.style.display = 'block';
-    } else {
-        sec.style.display = 'none';
-    }
-}
-
-function renderSePayMappings() {
-    const list = document.getElementById('sepayMappingList');
-    if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
-        list.innerHTML = '<div style="text-align:center; padding:20px; color:#9ca3af; font-size:13px;">Chưa có liên kết ngân hàng nào.</div>';
-        return;
-    }
-    
-    let html = '';
-    sepayConfig.mappings.forEach((m, index) => {
-        const wallet = wallets.find(w => w.id === m.walletId);
-        const wName = wallet ? `${wallet.emoji || '💰'} ${wallet.name}` : 'Chưa chá»n Ví';
-        
-        let cName = 'Chưa chá»n Nhóm';
-        let cIcon = 'â“';
-        let cColor = '#9ca3af';
-        if (m.categoryId) {
-            const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
-            const cat = allCats.find(c => c.id === m.categoryId);
-            if (cat) {
-                cName = cat.name;
-                cIcon = cat.icon;
-                cColor = cat.color;
-            }
-        }
-
-        html += `
-            <div class="card" style="padding:16px; margin-bottom:12px; position:relative;">
-                <button onclick="removeSePayMapping(${index})" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer;"><i class="fas fa-trash"></i></button>
-                <div style="margin-bottom:12px;">
-                    <div style="font-size:11px; color:#9ca3af; text-transform:uppercase; font-weight:600; margin-bottom:4px;">Số tài khoản</div>
-                    <input type="text" placeholder="Nhập số tài khoản..." value="${m.bankAcc}" onchange="updateSePayMapping(${index}, 'bankAcc', this.value)" style="width:calc(100% - 30px); border:none; outline:none; border-bottom:1px solid #e5e7eb; padding:4px 0; font-size:15px; font-weight:600; color:#1f2937;">
-                </div>
-                
-                <div style="display:flex; gap:12px;">
-                    <div style="flex:1; background:#f9fafb; padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="openSePayWalletPicker(${index})">
-                        <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">Nhập vào Ví</div>
-                        <div style="font-size:14px; font-weight:500; color:#1f2937;">${wName}</div>
-                    </div>
-                    <div style="flex:1; background:#f9fafb; padding:8px 12px; border-radius:8px; cursor:pointer;" onclick="openSePayCategoryPicker(${index})">
-                        <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">Nhóm chi tiêu</div>
-                        <div style="font-size:14px; font-weight:500; color:${cColor};"><span style="margin-right:4px;">${cIcon}</span> ${cName}</div>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    list.innerHTML = html;
-}
-
-function addSePayMapping() {
-    if (!sepayConfig.mappings) sepayConfig.mappings = [];
-    sepayConfig.mappings.push({ bankAcc: '', walletId: '', categoryId: '' });
-    renderSePayMappings();
-    syncData();
-}
-
-function removeSePayMapping(index) {
-    if(confirm('Xóa liên kết này?')) {
-        sepayConfig.mappings.splice(index, 1);
-        renderSePayMappings();
-        syncData();
-    }
-}
-
-function updateSePayMapping(index, field, value) {
-    sepayConfig.mappings[index][field] = value.trim();
-    if (field === 'categoryId') {
-        retroUpdateSepayTxns(index);
-    }
-    // Also retro-update walletId for auto-synced txns when wallet mapping changes
-    if (field === 'walletId') {
-        const map = sepayConfig.mappings[index];
-        transactions.forEach(t => {
-            if (t.sepayBankAcc && t.sepayBankAcc === map.bankAcc && !t.manuallyEdited) {
-                t.walletId = value.trim();
-            }
-        });
-        renderAll();
-    }
-    syncData();
-}
-
-function retroUpdateSepayTxns(mappingIndex) {
-    const map = sepayConfig.mappings[mappingIndex];
-    if (!map || !map.bankAcc) return;
-    
-    const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
-    const cat = allCats.find(c => c.id === map.categoryId);
-    
-    let updatedCount = 0;
-    transactions.forEach(t => {
-        if (t.sepayBankAcc && t.sepayBankAcc === map.bankAcc) {
-            // Respect manual edits - never overwrite user's manual changes
-            if (t.manuallyEdited) return;
-            // Income transactions are auto-mapped to "Thu nhập khác", do not overwrite them with expense mapping
-            if (t.type === 'income') return;
-            if (cat) {
-                t.categoryId = cat.id;
-                t.category = cat.name;
-                t.categoryIcon = cat.icon;
-                t.categoryColor = cat.color;
-                // Re-determine type from category
-                const expCat = (userCategories.expense||[]).find(c => c.id === cat.id);
-                const incCat = (userCategories.income||[]).find(c => c.id === cat.id);
-                if (expCat) t.type = 'expense';
-                else if (incCat) t.type = 'income';
-            }
-            updatedCount++;
-        }
-    });
-    if (updatedCount > 0) {
-        renderAll();
-    }
-}
-
-let activeSePayMappingIndex = -1;
-
-function openSePayWalletPicker(index) {
-    activeSePayMappingIndex = index;
-    const list = document.getElementById('txnWalletPickerList');
-    if(!list) return;
-    
-    let html = '';
-    wallets.forEach(w => {
-        html += `
-            <div onclick="selectSePayWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer;">
-                <div style="width:36px; height:36px; border-radius:50%; background:#f3f4f6; display:flex; align-items:center; justify-content:center; font-size:18px;">${w.icon}</div>
-                <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
-            </div>
-        `;
-    });
-    list.innerHTML = html;
-    document.getElementById('txnWalletPickerOverlay').style.display = 'flex';
-}
-
-function selectSePayWallet(id) {
-    if (activeSePayMappingIndex !== -1) {
-        sepayConfig.mappings[activeSePayMappingIndex].walletId = id;
-        renderSePayMappings();
-        syncData();
-    }
-    closeTxnWalletPicker();
-}
-
-function openSePayCategoryPicker(index) {
-    activeSePayMappingIndex = index;
-    const list = document.getElementById('txnCategoryPickerList');
-    if(!list) return;
-    
-    const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[])];
-    const currentMapping = sepayConfig.mappings[index];
-    const selectedId = currentMapping ? currentMapping.categoryId : null;
-    
-    list.innerHTML = generateCategoryListHTML(allCats, selectedId, 'selectSePayCategory');
-    document.getElementById('txnCategoryPickerOverlay').style.display = 'flex';
-}
-
-function selectSePayCategory(id) {
-    if (activeSePayMappingIndex !== -1) {
-        sepayConfig.mappings[activeSePayMappingIndex].categoryId = id;
-        renderSePayMappings();
-        syncData();
-    }
-    closeTxnCategoryPicker();
-}
-
-async function runSePaySync(silent = false) {
-    const btn = document.getElementById('btnRunSePaySync');
-    const logBox = document.getElementById('sepaySyncLog');
-    const apiToken = sepayConfig.apiToken;
-    
-    if (!apiToken) {
-        if (!silent) alert('Vui lòng nhập API Token SePay trước!');
-        return;
-    }
-    if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
-        if (!silent) alert('Vui lòng thêm ít nhất 1 liên kết ngân hàng!');
-        return;
-    }
-
-    try {
-        if (!silent) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Äang tải dữ liệu...';
-            btn.disabled = true;
-            logBox.style.display = 'block';
-            logBox.innerHTML = 'Äang kết nối SePay qua Proxy...<br>';
-        }
-        
-        let url = 'https://my.sepay.vn/api/transactions/list?limit=50';
-        let options = {
-            headers: {
-                'Authorization': 'Bearer ' + apiToken,
-                'Content-Type': 'application/json'
-            }
-        };
-
-        // If proxy is available, use it to bypass CORS. 
-        // We MUST NOT send custom headers to avoid triggering an OPTIONS preflight request.
-        if (sepayConfig.proxyUrl) {
-            url = `${sepayConfig.proxyUrl}?token=${encodeURIComponent(apiToken)}&limit=50`;
-            options = {}; // No custom headers
-        }
-        
-        const res = await fetch(url, options);
-        
-        if (!res.ok) throw new Error('Lỗi kết nối API SePay. Vui lòng kiểm tra lại API Token.');
-        
-        const json = await res.json();
-        console.log('SePay raw response:', json);
-        logBox.innerHTML += `Phản hồi: status=${json.status}, error="${json.error || 'none'}"<br>`;
-        
-        if (json.status !== 200 && json.status !== '200') throw new Error(json.messages || json.error || 'Lỗi lấy dữ liệu từ SePay');
-        
-        const records = json.transactions || [];
-        logBox.innerHTML += `Tìm thấy ${records.length} giao dịch gần đây.<br>`;
-        
-        if (!sepayConfig.lastSyncIds) sepayConfig.lastSyncIds = [];
-        let newCount = 0;
-        
-        // SePay returns newest first, we process oldest first for balance integrity
-        records.reverse().forEach(tx => {
-            const txIdStr = String(tx.id);
-            if (sepayConfig.lastSyncIds.includes(txIdStr)) return;
-            
-            console.log('Processing tx:', tx.id, 'account:', tx.account_number, 'mappings:', sepayConfig.mappings.map(m => m.bankAcc));
-            logBox.innerHTML += `TX ${tx.id}: tài khoản="${tx.account_number}"<br>`;
-            
-            const map = sepayConfig.mappings.find(m => m.bankAcc && m.bankAcc.trim() === String(tx.account_number).trim());
-            if (!map) return;
-            
-            const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
-            const cat = allCats.find(c => c.id === map.categoryId);
-            
-            const amountIn = parseFloat(tx.amount_in || 0);
-            const amountOut = parseFloat(tx.amount_out || 0);
-            const isIncome = amountIn > 0;
-            const amount = isIncome ? amountIn : amountOut;
-            
-            // Determine type: if category is mapped, use its type. Otherwise infer from transaction.
-            let type = isIncome ? 'income' : 'expense';
-            let finalCatId = null;
-            let finalCatName = isIncome ? 'Nạp quỹ' : 'Chưa phân loại';
-            let finalCatIcon = isIncome ? '💰' : '💸';
-            let finalCatColor = '#9ca3af';
-
-            if (isIncome) {
-                // If Income, ignore mapped category and force to "Thu nhập khác"
-                type = 'income';
-                const incomeCats = userCategories.income || [];
-                const otherIncomeCat = incomeCats.find(c => c.name.toLowerCase() === 'thu nhập khác');
-                if (otherIncomeCat) {
-                    finalCatId = otherIncomeCat.id;
-                    finalCatName = otherIncomeCat.name;
-                    finalCatIcon = otherIncomeCat.icon;
-                    finalCatColor = otherIncomeCat.color;
-                } else {
-                    finalCatName = 'Thu nhập khác';
-                    finalCatIcon = '💵';
-                    finalCatColor = '#10b981';
-                }
-            } else {
-                // If Expense, use mapped category
-                if (cat) {
-                    finalCatId = cat.id;
-                    finalCatName = cat.name;
-                    finalCatIcon = cat.icon;
-                    finalCatColor = cat.color;
-                    
-                    const expCat = (userCategories.expense||[]).find(c => c.id === cat.id);
-                    const incCat = (userCategories.income||[]).find(c => c.id === cat.id);
-                    if (expCat) type = 'expense';
-                    else if (incCat) type = 'income';
-                }
-            }
-            
-            const newTxn = {
-                id: 'sepay_' + tx.id,
-                walletId: map.walletId || null,
-                categoryId: finalCatId,
-                sepayBankAcc: map.bankAcc || null,
-                manuallyEdited: false, // Auto-synced, can be overwritten by mapping changes
-                type: type,
-                amount: amount,
-                category: finalCatName,
-                categoryIcon: finalCatIcon,
-                categoryColor: finalCatColor,
-                note: tx.transaction_content || 'SePay Sync',
-                date: (tx.transaction_date || '').split(' ')[0]
-            };
-            
-            transactions.push(newTxn);
-            sepayConfig.lastSyncIds.push(txIdStr);
-            
-            const w = wallets.find(w => w.id === map.walletId);
-            if (w) {
-                if (type === 'income') w.balance += amount;
-                else w.balance -= amount;
-            }
-            
-            sendTelegramNotification(newTxn, w);
-            newCount++;
-        });
-        
-        if (sepayConfig.lastSyncIds.length > 200) {
-            sepayConfig.lastSyncIds = sepayConfig.lastSyncIds.slice(sepayConfig.lastSyncIds.length - 200);
-        }
-        
-        syncData();
-        renderAll();
-        
-        if (!silent) {
-            logBox.innerHTML += `<strong style="color:#10b981;">Hoàn tất! Äã đồng bộ ${newCount} giao dịch mới.</strong>`;
-        }
-        
-    } catch (e) {
-        if (!silent) logBox.innerHTML += `<strong style="color:#ef4444;">Lỗi: ${e.message}</strong>`;
-    } finally {
-        if (!silent) {
-            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Äồng bộ ngay';
-            btn.disabled = false;
-        }
-    }
-}
-
-
 
 function formatWalletBalance(input) {
     let val = input.value.replace(/[^0-9]/g, '');
@@ -2467,7 +2113,7 @@ function openBudgetWalletPicker() {
     let listHtml = '';
     
     const allCheck = currentWalletId === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">ðŸŒ</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
+    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">🌍</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = currentWalletId === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
@@ -2514,7 +2160,7 @@ function openBudgetGlobalWalletPicker() {
     
     let listHtml = '';
     const allCheck = budgetGlobalWalletFilter === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">ðŸŒ</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
+    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">🌍</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = budgetGlobalWalletFilter === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
