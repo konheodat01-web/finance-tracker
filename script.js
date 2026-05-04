@@ -7,7 +7,7 @@ let currentTab = 'expense';
 let editModeActive = false;
 let selectedWalletId = null;
 let chartInstance = null;
-let selectedIcon = '💰';
+let selectedIcon = '📁';
 let prevPage = 'accounts';
 let currentTxnWalletIndex = -1; // -1 = Tất cả
 let currentPeriodIndex = 3; 
@@ -347,7 +347,7 @@ function renderTransactionsPage() {
     const w = allWallets[Math.min(idx, allWallets.length-1)];
     const walletEl = document.getElementById('txnWalletIcon');
     const nameEl = document.getElementById('txnWalletName');
-    if (walletEl) walletEl.innerText = w.emoji || 'ðŸŒ';
+    if (walletEl) walletEl.innerText = w.emoji || '👛';
     if (nameEl) nameEl.innerText = w.name;
 
     // Balance display
@@ -496,7 +496,7 @@ function renderSelectWalletList() {
         const isSelected = currentTxnWalletIndex === idx;
         html += `
             <div style="display:flex; align-items:center; padding:16px; cursor:pointer; border-bottom:${idx === wallets.length - 1 ? 'none' : '1px solid #f3f4f6'}; background:${isSelected ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(${idx})">
-                <div style="width:40px; height:40px; border-radius:50%; background:${w.bgClass || '#3b82f6'}; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:white;">${w.emoji || '💰'}</div>
+                <div style="width:40px; height:40px; border-radius:50%; background:${w.bgClass || '#3b82f6'}; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px; color:white;">${w.emoji || '👛'}</div>
                 <div style="flex:1;">
                     <div style="font-size:15px; font-weight:600; color:#000;">${w.name}</div>
                     <div style="font-size:13px; color:#6b7280;">${new Intl.NumberFormat('vi-VN').format(w.balance)} ${w.currency || 'VND'}</div>
@@ -639,7 +639,7 @@ function updateSelectedWalletDisplay() {
     const currEl = document.getElementById('txnCurrencyLabel');
     
     if (w) {
-        if(iconEl) iconEl.innerText = w.emoji || '💰';
+        if(iconEl) iconEl.innerText = w.emoji || '👛';
         if(nameEl) {
             nameEl.innerText = w.name;
             nameEl.style.color = '#000';
@@ -895,7 +895,7 @@ function deleteTransaction() {
 // === ADD WALLET PAGE ===
 function openAddWallet() {
     prevPage = document.querySelector('.page.active')?.id.replace('page-','') || 'accounts';
-    selectedIcon = '💰';
+    selectedIcon = '📁';
     document.getElementById('addWalletPageTitle').innerText = 'Thêm Ví';
     document.getElementById('editWalletId').value = '';
     document.getElementById('walletName').value = '';
@@ -912,7 +912,7 @@ function openEditWallet(id) {
     const w = wallets.find(x => x.id === id);
     if (!w) return;
     prevPage = 'accounts';
-    selectedIcon = w.emoji || '💰';
+    selectedIcon = w.emoji || '👛';
     document.getElementById('addWalletPageTitle').innerText = 'Sửa Ví';
     document.getElementById('editWalletId').value = w.id;
     document.getElementById('walletName').value = w.name;
@@ -1330,7 +1330,7 @@ function openAddCategoryPage() {
     document.getElementById('editCatId').value = '';
     document.getElementById('catNameInput').value = '';
     
-    selectedIcon = 'â¤ï¸';
+    selectedIcon = '📁';
     const iconBtn = document.getElementById('catIconPreview');
     if(iconBtn) {
         iconBtn.innerText = selectedIcon;
