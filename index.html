@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Finance">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="style.css?v=v1.1.1">
+    <link rel="stylesheet" href="style.css?v=v1.1.2">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -65,16 +65,16 @@
 
     <div class="app-container">
 
-        <!-- ===================== PAGE: TỔNG QUAN ===================== -->
+        <!-- ===================== PAGE: Tá»”NG QUAN ===================== -->
         <div id="page-home" class="page active">
             <header class="header">
                 <div class="header-top">
                     <div class="balance-section">
                         <div class="balance-wrapper">
-                            <span id="mainTotalBalance">0</span> <span class="currency">đ</span>
+                            <span id="mainTotalBalance">0</span> <span class="currency">Ä‘</span>
                             <i class="fas fa-eye" id="toggleBalanceBtn" onclick="toggleBalance()"></i>
                         </div>
-                        <div class="balance-label">Tổng số dư <i class="fas fa-question-circle" style="color: #cbd5e1; font-size: 12px;"></i></div>
+                        <div class="balance-label">Tá»•ng sá»‘ dÆ° <i class="fas fa-question-circle" style="color: #cbd5e1; font-size: 12px;"></i></div>
                     </div>
                     <div class="header-actions">
                         <button class="btn-link" onclick="location.reload()" style="color:#6b7280; font-size:18px;"><i class="fas fa-sync-alt"></i></button>
@@ -86,163 +86,163 @@
                 <!-- Wallets Card -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Ví của tôi</h3>
-                        <a href="#" class="card-link" onclick="switchPage('accounts'); return false;">Xem tất cả</a>
+                        <h3 class="card-title">VÃ­ cá»§a tÃ´i</h3>
+                        <a href="#" class="card-link" onclick="switchPage('accounts'); return false;">Xem táº¥t cáº£</a>
                     </div>
                     <div class="wallet-list" id="walletListHome"></div>
                 </div>
                 <!-- Report Card -->
                 <div class="report-section-header">
-                    <h3 class="section-title">Báo cáo tháng này</h3>
-                    <a href="#" class="card-link">Xem báo cáo</a>
+                    <h3 class="section-title">BÃ¡o cÃ¡o thÃ¡ng nÃ y</h3>
+                    <a href="#" class="card-link">Xem bÃ¡o cÃ¡o</a>
                 </div>
                 <div class="card report-card">
                     <div class="report-tabs">
                         <div class="tab active" onclick="switchTab('expense')">
-                            <div class="tab-label">Tổng đã chi</div>
+                            <div class="tab-label">Tá»•ng Ä‘Ã£ chi</div>
                             <div class="tab-value expense">0</div>
                         </div>
                         <div class="tab" onclick="switchTab('income')">
-                            <div class="tab-label">Tổng thu</div>
+                            <div class="tab-label">Tá»•ng thu</div>
                             <div class="tab-value income">0</div>
                         </div>
                     </div>
                     <div class="chart-info">
                         <div class="chart-date">02/05/2026: <strong class="expense-text">0</strong></div>
-                        <div class="chart-avg">Trung bình 3 tháng trước: <strong>0</strong></div>
+                        <div class="chart-avg">Trung bÃ¬nh 3 thÃ¡ng trÆ°á»›c: <strong>0</strong></div>
                     </div>
                     <div class="chart-container">
                         <canvas id="reportChart"></canvas>
                     </div>
                     <div class="chart-legend">
-                        <div class="legend-item"><span class="dot red"></span> Tháng này</div>
-                        <div class="legend-item"><span class="dot gray"></span> Trung bình 3 tháng trước <i class="fas fa-question-circle" style="color:#cbd5e1;"></i></div>
+                        <div class="legend-item"><span class="dot red"></span> ThÃ¡ng nÃ y</div>
+                        <div class="legend-item"><span class="dot gray"></span> Trung bÃ¬nh 3 thÃ¡ng trÆ°á»›c <i class="fas fa-question-circle" style="color:#cbd5e1;"></i></div>
                     </div>
                 </div>
             </main>
         </div>
 
-        <!-- ===================== PAGE: TÀI KHOẢN (Chọn Ví) ===================== -->
+        <!-- ===================== PAGE: TÃ€I KHOáº¢N (Chá»n VÃ­) ===================== -->
         <div id="page-accounts" class="page">
             <header class="header header-modal-style">
                 <div class="header-top">
-                    <button class="btn-link" onclick="switchPage('home')">Đóng</button>
-                    <h2 class="page-title">Chọn Ví</h2>
+                    <button class="btn-link" onclick="switchPage('home')">ÄÃ³ng</button>
+                    <h2 class="page-title">Chá»n VÃ­</h2>
                     <div style="display:flex; gap:14px; align-items:center;">
-                        <button class="btn-link" style="font-size:18px; color:#6b7280;" onclick="switchPage('settings')" title="Cài đặt"><i class="fas fa-cog"></i></button>
+                        <button class="btn-link" style="font-size:18px; color:#6b7280;" onclick="switchPage('settings')" title="CÃ i Ä‘áº·t"><i class="fas fa-cog"></i></button>
                     </div>
                 </div>
             </header>
             <main class="content">
-                <!-- Tổng cộng -->
+                <!-- Tá»•ng cá»™ng -->
                 <div class="card wallet-total-card">
                     <div class="wallet-item-full">
                         <div class="wallet-icon icon-globe"><i class="fas fa-globe"></i></div>
                         <div>
-                            <div class="wallet-name-big">Tổng cộng</div>
-                            <div class="wallet-balance-sub" id="accountsTotalBalance">0 đ</div>
+                            <div class="wallet-name-big">Tá»•ng cá»™ng</div>
+                            <div class="wallet-balance-sub" id="accountsTotalBalance">0 Ä‘</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Danh sách ví -->
-                <div class="section-label">TÍNH VÀO TỔNG</div>
+                <!-- Danh sÃ¡ch vÃ­ -->
+                <div class="section-label">TÃNH VÃ€O Tá»”NG</div>
                 <div class="card wallet-list-card" id="walletListAccounts"></div>
 
                 <!-- Actions -->
                 <div class="card wallet-actions-card">
                     <button class="wallet-action-row" onclick="openAddWallet()">
                         <span class="action-icon green"><i class="fas fa-plus"></i></span>
-                        <span class="action-text green">Thêm ví</span>
+                        <span class="action-text green">ThÃªm vÃ­</span>
                     </button>
                     <div class="divider-thin"></div>
                     <button class="wallet-action-row" onclick="openReceivingInfoPage()">
                         <span class="action-icon green"><i class="fas fa-qrcode"></i></span>
-                        <span class="action-text green">Thông tin nhận tiền</span>
+                        <span class="action-text green">ThÃ´ng tin nháº­n tiá»n</span>
                     </button>
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Version v1.1.1</div>
+                <div class="version-tag">Version v1.1.2</div>
             </main>
         </div>
 
         <div id="toastContainer" class="toast-container"></div>
 
-        <!-- ===================== PAGE: CÀI ĐẶT ===================== -->
+        <!-- ===================== PAGE: CÃ€I Äáº¶T ===================== -->
         <div id="page-settings" class="page page-light">
             <header class="header header-modal-style">
                 <div class="header-top">
                     <button class="btn-link" onclick="switchPage('accounts')">
-                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay láº¡i
                     </button>
-                    <h2 class="page-title">Cài Đặt</h2>
+                    <h2 class="page-title">CÃ i Äáº·t</h2>
                     <span style="width:70px;"></span>
                 </div>
             </header>
             <main class="content">
-                <div class="section-label" style="margin-top:8px;">HIỂN THỊ</div>
+                <div class="section-label" style="margin-top:8px;">HIá»‚N THá»Š</div>
                 <div class="card" style="padding:0; overflow:hidden; margin-bottom:12px;">
 
-                    <!-- Định dạng thời gian -->
+                    <!-- Äá»‹nh dáº¡ng thá»i gian -->
                     <div onclick="openSettingPicker('dateFormat')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
-                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Định dạng thời gian</span>
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Äá»‹nh dáº¡ng thá»i gian</span>
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span id="val-dateFormat" style="font-size:14px; font-weight:500; color:#22c55e;">DD/MM/YYYY</span>
                             <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
 
-                    <!-- Đơn vị tiền cho ví Tổng -->
+                    <!-- ÄÆ¡n vá»‹ tiá»n cho vÃ­ Tá»•ng -->
                     <div onclick="openSettingPicker('totalCurrency')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
-                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đơn vị tiền cho ví Tổng</span>
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">ÄÆ¡n vá»‹ tiá»n cho vÃ­ Tá»•ng</span>
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span id="val-totalCurrency" style="font-size:14px; font-weight:500; color:#22c55e;">VND</span>
                             <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
 
-                    <!-- Chọn ngày đầu tuần -->
+                    <!-- Chá»n ngÃ y Ä‘áº§u tuáº§n -->
                     <div onclick="openSettingPicker('firstDayOfWeek')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
-                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Chọn ngày đầu tuần</span>
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Chá»n ngÃ y Ä‘áº§u tuáº§n</span>
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <span id="val-firstDayOfWeek" style="font-size:14px; font-weight:500; color:#22c55e;">Thứ Hai</span>
+                            <span id="val-firstDayOfWeek" style="font-size:14px; font-weight:500; color:#22c55e;">Thá»© Hai</span>
                             <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
 
-                    <!-- Đặt ngày đầu tiên của tháng -->
+                    <!-- Äáº·t ngÃ y Ä‘áº§u tiÃªn cá»§a thÃ¡ng -->
                     <div onclick="openSettingPicker('firstDayOfMonth')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
-                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đặt ngày đầu tiên của tháng</span>
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Äáº·t ngÃ y Ä‘áº§u tiÃªn cá»§a thÃ¡ng</span>
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span id="val-firstDayOfMonth" style="font-size:14px; font-weight:500; color:#22c55e;">1</span>
                             <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
 
-                    <!-- Chọn tháng đầu tiên của năm -->
+                    <!-- Chá»n thÃ¡ng Ä‘áº§u tiÃªn cá»§a nÄƒm -->
                     <div onclick="openSettingPicker('firstMonthOfYear')" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer;">
-                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Chọn tháng đầu tiên của năm</span>
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Chá»n thÃ¡ng Ä‘áº§u tiÃªn cá»§a nÄƒm</span>
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <span id="val-firstMonthOfYear" style="font-size:14px; font-weight:500; color:#22c55e;">Tháng Một</span>
+                            <span id="val-firstMonthOfYear" style="font-size:14px; font-weight:500; color:#22c55e;">ThÃ¡ng Má»™t</span>
                             <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
 
                 </div>
 
-                <div class="section-label" style="margin-top:8px;">DỮ LIỆU</div>
+                <div class="section-label" style="margin-top:8px;">Dá»® LIá»†U</div>
                 <div class="card" style="padding:0; overflow:hidden; margin-bottom:12px;">
-                    <!-- Quản lý nhóm -->
+                    <!-- Quáº£n lÃ½ nhÃ³m -->
                     <div onclick="openManageCategories()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer; border-bottom:1px solid #f3f4f6;">
-                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Quản lý nhóm chi tiêu</span>
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Quáº£n lÃ½ nhÃ³m chi tiÃªu</span>
                         <div style="display:flex; align-items:center; gap:8px;">
                             <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
                     </div>
-                    <!-- Đồng bộ SePay -->
+                    <!-- Äá»“ng bá»™ SePay -->
                     <div onclick="openSePaySync()" style="display:flex; align-items:center; justify-content:space-between; padding:15px 16px; cursor:pointer;">
-                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Đồng bộ ngân hàng (SePay)</span>
+                        <span style="font-size:15px; font-weight:500; color:#1f2937;">Äá»“ng bá»™ ngÃ¢n hÃ ng (SePay)</span>
                         <div style="display:flex; align-items:center; gap:8px;">
                             <i class="fas fa-chevron-right" style="font-size:12px; color:#cbd5e1;"></i>
                         </div>
@@ -255,15 +255,15 @@
         <div id="page-receiving-info" class="page page-light">
             <header class="header header-modal-style">
                 <div class="header-top">
-                    <button class="btn-link" onclick="switchPage('accounts')">Đóng</button>
-                    <h2 class="page-title">Thông tin nhận tiền</h2>
+                    <button class="btn-link" onclick="switchPage('accounts')">ÄÃ³ng</button>
+                    <h2 class="page-title">ThÃ´ng tin nháº­n tiá»n</h2>
                     <div>
                         <button class="btn-link" onclick="toggleReceivingSearch()" style="color:#6b7280; margin-right:8px;"><i class="fas fa-search"></i></button>
-                        <button class="btn-link" onclick="openAddReceivingInfo()" style="color:#10b981; font-weight:600;"><i class="fas fa-plus"></i> Thêm</button>
+                        <button class="btn-link" onclick="openAddReceivingInfo()" style="color:#10b981; font-weight:600;"><i class="fas fa-plus"></i> ThÃªm</button>
                     </div>
                 </div>
                 <div id="receivingSearchContainer" style="display:none; padding: 0 16px 12px 16px;">
-                    <input type="text" id="receivingSearchInput" placeholder="Tìm theo tên, NH, STK hoặc tag..." style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #e5e7eb; outline:none; font-family:'Inter', sans-serif; font-size:14px; background:#f9fafb;" oninput="renderReceivingInfoList()">
+                    <input type="text" id="receivingSearchInput" placeholder="TÃ¬m theo tÃªn, NH, STK hoáº·c tag..." style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #e5e7eb; outline:none; font-family:'Inter', sans-serif; font-size:14px; background:#f9fafb;" oninput="renderReceivingInfoList()">
                 </div>
             </header>
             <main class="content" style="padding-top:16px; padding-left:0; padding-right:0;">
@@ -286,9 +286,9 @@
         <div id="page-add-receiving" class="page page-light">
             <header class="header header-modal-style">
                 <div class="header-top">
-                    <button class="btn-link" onclick="switchPage('receiving-info')">Hủy</button>
-                    <h2 class="page-title" id="addReceivingTitle">Thêm thông tin</h2>
-                    <button class="btn-link" onclick="saveReceivingInfo()" style="color:#10b981; font-weight:600;">Lưu</button>
+                    <button class="btn-link" onclick="switchPage('receiving-info')">Há»§y</button>
+                    <h2 class="page-title" id="addReceivingTitle">ThÃªm thÃ´ng tin</h2>
+                    <button class="btn-link" onclick="saveReceivingInfo()" style="color:#10b981; font-weight:600;">LÆ°u</button>
                 </div>
             </header>
             <main class="content" style="padding-top:16px;">
@@ -296,95 +296,95 @@
                 <div class="card aw-card">
                     <div class="aw-field-row">
                         <div style="flex:1;">
-                            <div class="aw-field-label">Ngân hàng / Ví</div>
-                            <input type="text" id="recvBank" class="aw-balance-input" style="font-size:16px; width:100%;" placeholder="Ví dụ: VietinBank">
+                            <div class="aw-field-label">NgÃ¢n hÃ ng / VÃ­</div>
+                            <input type="text" id="recvBank" class="aw-balance-input" style="font-size:16px; width:100%;" placeholder="VÃ­ dá»¥: VietinBank">
                         </div>
                     </div>
                     <div class="aw-field-row">
                         <div style="flex:1;">
-                            <div class="aw-field-label">Số tài khoản</div>
-                            <input type="text" id="recvNumber" class="aw-balance-input" style="font-size:16px; font-family:monospace; width:100%;" placeholder="Nhập số tài khoản">
+                            <div class="aw-field-label">Sá»‘ tÃ i khoáº£n</div>
+                            <input type="text" id="recvNumber" class="aw-balance-input" style="font-size:16px; font-family:monospace; width:100%;" placeholder="Nháº­p sá»‘ tÃ i khoáº£n">
                         </div>
                     </div>
                     <div class="aw-field-row">
                         <div style="flex:1;">
-                            <div class="aw-field-label">Tên chủ tài khoản</div>
-                            <input type="text" id="recvName" class="aw-balance-input" style="font-size:16px; text-transform:uppercase; width:100%;" placeholder="Tên in hoa không dấu">
+                            <div class="aw-field-label">TÃªn chá»§ tÃ i khoáº£n</div>
+                            <input type="text" id="recvName" class="aw-balance-input" style="font-size:16px; text-transform:uppercase; width:100%;" placeholder="TÃªn in hoa khÃ´ng dáº¥u">
                         </div>
                     </div>
                     <div class="aw-field-row">
                         <div style="flex:1;">
-                            <div class="aw-field-label">Tags (Phân cách bằng dấu phẩy)</div>
-                            <input type="text" id="recvTags" class="aw-balance-input" style="font-size:14px; width:100%; color:#6b7280;" placeholder="Ví dụ: Cá nhân, Công ty, Crypto...">
+                            <div class="aw-field-label">Tags (PhÃ¢n cÃ¡ch báº±ng dáº¥u pháº©y)</div>
+                            <input type="text" id="recvTags" class="aw-balance-input" style="font-size:14px; width:100%; color:#6b7280;" placeholder="VÃ­ dá»¥: CÃ¡ nhÃ¢n, CÃ´ng ty, Crypto...">
                         </div>
                     </div>
                     <div class="aw-field-row" style="border-bottom:none;">
                         <div style="flex:1;">
-                            <div class="aw-field-label">Link ảnh QR (Gyazo, Imgur...)</div>
-                            <input type="text" id="recvImageLink" class="aw-balance-input" style="font-size:14px; color:#3b82f6; width:100%;" placeholder="Dán link ảnh vào đây" oninput="previewReceivingImage(this.value)">
+                            <div class="aw-field-label">Link áº£nh QR (Gyazo, Imgur...)</div>
+                            <input type="text" id="recvImageLink" class="aw-balance-input" style="font-size:14px; color:#3b82f6; width:100%;" placeholder="DÃ¡n link áº£nh vÃ o Ä‘Ã¢y" oninput="previewReceivingImage(this.value)">
                         </div>
                     </div>
                 </div>
                 <div id="recvImagePreviewContainer" style="margin-top:16px; text-align:center; display:none;">
                     <img id="recvImagePreview" style="max-width:100%; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1);" src="">
                 </div>
-                <button id="deleteReceivingRow" class="btn-link" style="color:#ef4444; width:100%; text-align:center; margin-top:24px; padding:12px; background:white; border-radius:12px; display:none;" onclick="deleteReceivingInfo()">Xóa thông tin này</button>
+                <button id="deleteReceivingRow" class="btn-link" style="color:#ef4444; width:100%; text-align:center; margin-top:24px; padding:12px; background:white; border-radius:12px; display:none;" onclick="deleteReceivingInfo()">XÃ³a thÃ´ng tin nÃ y</button>
             </main>
         </div>
 
-        <!-- ===================== PAGE: THÊM / SỬA VÍ ===================== -->
+        <!-- ===================== PAGE: THÃŠM / Sá»¬A VÃ ===================== -->
         <div id="page-add-wallet" class="page page-light">
             <!-- Header -->
             <header class="header header-modal-style">
                 <div class="header-top">
-                    <button class="btn-link" id="btnCancelWallet" onclick="closeAddWalletPage()">Huỷ</button>
-                    <h2 class="page-title" id="addWalletPageTitle">Thêm Ví</h2>
-                    <button class="btn-link btn-link-primary" onclick="saveWallet()">Lưu</button>
+                    <button class="btn-link" id="btnCancelWallet" onclick="closeAddWalletPage()">Huá»·</button>
+                    <h2 class="page-title" id="addWalletPageTitle">ThÃªm VÃ­</h2>
+                    <button class="btn-link btn-link-primary" onclick="saveWallet()">LÆ°u</button>
                 </div>
             </header>
             <main class="content">
                 <input type="hidden" id="editWalletId">
 
-                <!-- Tên + Icon -->
+                <!-- TÃªn + Icon -->
                 <div class="card aw-card">
                     <div class="aw-name-row">
-                        <button class="aw-icon-btn" id="walletIconPreview" onclick="openIconPicker()">💰 <i class="fas fa-chevron-up" style="font-size:9px; color:#aaa;"></i></button>
-                        <input type="text" id="walletName" class="aw-name-input" placeholder="Tên">
+                        <button class="aw-icon-btn" id="walletIconPreview" onclick="openIconPicker()">ðŸ’° <i class="fas fa-chevron-up" style="font-size:9px; color:#aaa;"></i></button>
+                        <input type="text" id="walletName" class="aw-name-input" placeholder="TÃªn">
                     </div>
                 </div>
 
-                <!-- Tiền tệ + Số dư -->
+                <!-- Tiá»n tá»‡ + Sá»‘ dÆ° -->
                 <div class="card aw-card">
                     <div class="aw-field-row" style="border-bottom: 1px solid var(--border-color);">
-                        <span class="aw-field-icon">💲</span>
+                        <span class="aw-field-icon">ðŸ’²</span>
                         <div style="flex:1;">
-                            <div class="aw-field-label" style="margin-bottom:0;">Đơn vị tiền tệ</div>
+                            <div class="aw-field-label" style="margin-bottom:0;">ÄÆ¡n vá»‹ tiá»n tá»‡</div>
                             <select id="walletCurrency" style="width:100%; border:none; outline:none; background:transparent; font-size:15px; font-weight:600; color:var(--text-primary); cursor:pointer; font-family:'Inter', sans-serif;">
-                                <option value="VND">Việt Nam Đồng (VND)</option>
-                                <option value="USD">Đô la Mỹ (USD)</option>
+                                <option value="VND">Viá»‡t Nam Äá»“ng (VND)</option>
+                                <option value="USD">ÄÃ´ la Má»¹ (USD)</option>
                             </select>
                         </div>
                         <i class="fas fa-chevron-right aw-field-arrow"></i>
                     </div>
                     <div class="aw-field-row">
                         <div style="flex: 1;">
-                            <div class="aw-field-label">Số tiền hiện có</div>
+                            <div class="aw-field-label">Sá»‘ tiá»n hiá»‡n cÃ³</div>
                             <input type="text" id="walletBalance" class="aw-balance-input" placeholder="0" oninput="formatWalletBalance(this)">
                         </div>
                     </div>
                 </div>
 
-                <!-- Liên kết dịch vụ -->
+                <!-- LiÃªn káº¿t dá»‹ch vá»¥ -->
                 <div class="card aw-card aw-link-card">
-                    <button class="aw-link-btn">Liên kết dịch vụ</button>
+                    <button class="aw-link-btn">LiÃªn káº¿t dá»‹ch vá»¥</button>
                 </div>
-                <p class="aw-hint">Kết nối tới các dịch vụ ngay trong app.</p>
+                <p class="aw-hint">Káº¿t ná»‘i tá»›i cÃ¡c dá»‹ch vá»¥ ngay trong app.</p>
 
-                <!-- Toggle Không tính vào tổng -->
+                <!-- Toggle KhÃ´ng tÃ­nh vÃ o tá»•ng -->
                 <div class="card aw-card">
                     <!-- Exclude Toggle -->
                     <div class="aw-toggle-row">
-                        <span class="aw-toggle-label">Không tính vào báo cáo</span>
+                        <span class="aw-toggle-label">KhÃ´ng tÃ­nh vÃ o bÃ¡o cÃ¡o</span>
                         <label class="aw-switch">
                             <input type="checkbox" id="walletExclude">
                             <span class="aw-slider"></span>
@@ -393,30 +393,30 @@
 
                     <!-- Default Toggle -->
                     <div class="aw-toggle-row">
-                        <span class="aw-toggle-label">Chọn làm ví mặc định</span>
+                        <span class="aw-toggle-label">Chá»n lÃ m vÃ­ máº·c Ä‘á»‹nh</span>
                         <label class="aw-switch">
                             <input type="checkbox" id="walletDefault" onchange="handleDefaultWalletChange(this)">
                             <span class="aw-slider"></span>
                         </label>
                     </div>
                 </div>
-                <p class="aw-hint">Bỏ qua ví này và số dư khỏi "Tổng".</p>
+                <p class="aw-hint">Bá» qua vÃ­ nÃ y vÃ  sá»‘ dÆ° khá»i "Tá»•ng".</p>
 
-                <!-- Nút xóa (khi sửa) -->
+                <!-- NÃºt xÃ³a (khi sá»­a) -->
                 <div id="deleteWalletRow" style="display:none; margin-top:10px;">
-                    <button onclick="deleteWallet()" class="aw-delete-btn">🗑 Xóa ví này</button>
+                    <button onclick="deleteWallet()" class="aw-delete-btn">ðŸ—‘ XÃ³a vÃ­ nÃ y</button>
                 </div>
             </main>
         </div>
 
-        <!-- ===================== PAGE: QUẢN LÝ NHÓM ===================== -->
+        <!-- ===================== PAGE: QUáº¢N LÃ NHÃ“M ===================== -->
         <div id="page-categories" class="page page-light">
             <header class="header header-modal-style">
                 <div class="header-top" style="align-items: center;">
                     <button class="btn-link" onclick="switchPage('settings')">
-                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay láº¡i
                     </button>
-                    <h2 class="page-title">Nhóm</h2>
+                    <h2 class="page-title">NhÃ³m</h2>
                     <div style="display:flex; gap:14px; align-items:center;">
                         <button class="btn-link" style="font-size:18px; color:#1f2937;"><i class="fas fa-globe"></i></button>
                         <button class="btn-link" style="font-size:18px; color:#1f2937;"><i class="fas fa-search"></i></button>
@@ -424,16 +424,16 @@
                 </div>
             </header>
             <main class="content">
-                <!-- Tabs: Khoản chi | Khoản thu | Vay/Nợ -->
+                <!-- Tabs: Khoáº£n chi | Khoáº£n thu | Vay/Ná»£ -->
                 <div style="display:flex; background:#f3f4f6; margin-bottom:16px; border-radius:8px; padding:2px;">
-                    <button id="catManageExpenseBtn" onclick="setCatManageType('expense')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
-                    <button id="catManageIncomeBtn" onclick="setCatManageType('income')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
-                    <button id="catManageDebtBtn" onclick="setCatManageType('debt')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Vay/Nợ</button>
+                    <button id="catManageExpenseBtn" onclick="setCatManageType('expense')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoáº£n chi</button>
+                    <button id="catManageIncomeBtn" onclick="setCatManageType('income')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoáº£n thu</button>
+                    <button id="catManageDebtBtn" onclick="setCatManageType('debt')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Vay/Ná»£</button>
                 </div>
 
                 <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:8px; background:white; cursor:pointer;" onclick="openAddCategoryPage()">
                     <div style="padding:14px; text-align:center; color:#10b981; font-weight:600; font-size:15px;">
-                        <i class="fas fa-plus-circle" style="margin-right:6px;"></i> Nhóm mới
+                        <i class="fas fa-plus-circle" style="margin-right:6px;"></i> NhÃ³m má»›i
                     </div>
                 </div>
 
@@ -442,14 +442,14 @@
             </main>
         </div>
 
-        <!-- ===================== PAGE: THÊM / SỬA NHÓM ===================== -->
+        <!-- ===================== PAGE: THÃŠM / Sá»¬A NHÃ“M ===================== -->
         <div id="page-add-category" class="page page-light">
             <header class="header header-modal-style">
                 <div class="header-top">
                     <button class="btn-link" onclick="switchPage('categories')">
-                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Nhóm
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>NhÃ³m
                     </button>
-                    <h2 class="page-title" id="addCatPageTitle">Nhóm mới</h2>
+                    <h2 class="page-title" id="addCatPageTitle">NhÃ³m má»›i</h2>
                     <span style="width:70px;"></span>
                 </div>
             </header>
@@ -457,22 +457,22 @@
                 <input type="hidden" id="editCatId">
                 <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:12px; background:white;">
                     <div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
-                        <button id="catIconPreview" onclick="openIconPickerForCat()" style="width:50px; height:50px; border-radius:50%; background:#e5e7eb; border:none; font-size:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-right:12px;">📁</button>
-                        <input type="text" id="catNameInput" placeholder="Tên nhóm" oninput="checkCatValid()" style="flex:1; border:none; outline:none; font-size:18px; color:#1f2937; background:transparent; font-weight:500;">
+                        <button id="catIconPreview" onclick="openIconPickerForCat()" style="width:50px; height:50px; border-radius:50%; background:#e5e7eb; border:none; font-size:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-right:12px;">ðŸ“</button>
+                        <input type="text" id="catNameInput" placeholder="TÃªn nhÃ³m" oninput="checkCatValid()" style="flex:1; border:none; outline:none; font-size:18px; color:#1f2937; background:transparent; font-weight:500;">
                     </div>
                     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border-bottom:1px solid #f3f4f6;">
                         <div style="font-size:20px; color:#1f2937;">+/-</div>
                         <div style="display:flex; background:#f3f4f6; border-radius:8px; padding:2px;">
-                            <button id="addCatIncomeBtn" onclick="setAddCatType('income')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
-                            <button id="addCatExpenseBtn" onclick="setAddCatType('expense')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
+                            <button id="addCatIncomeBtn" onclick="setAddCatType('income')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoáº£n thu</button>
+                            <button id="addCatExpenseBtn" onclick="setAddCatType('expense')" style="padding:6px 12px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoáº£n chi</button>
                         </div>
                     </div>
                     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; cursor:pointer;" onclick="openParentCatPicker()">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div style="font-size:18px; color:#1f2937;"><i class="fas fa-box-open"></i></div>
                             <div>
-                                <div style="font-size:12px; color:#9ca3af;">Nhóm cha</div>
-                                <div style="font-size:15px; color:#1f2937; font-weight:500;" id="parentCatNameDisplay">Không có</div>
+                                <div style="font-size:12px; color:#9ca3af;">NhÃ³m cha</div>
+                                <div style="font-size:15px; color:#1f2937; font-weight:500;" id="parentCatNameDisplay">KhÃ´ng cÃ³</div>
                             </div>
                         </div>
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
@@ -480,21 +480,21 @@
                 </div>
 
                 <div id="deleteCatRow" style="display:none; margin-top:10px;">
-                    <button onclick="deleteCategory()" class="aw-delete-btn">🗑 Xóa nhóm này</button>
+                    <button onclick="deleteCategory()" class="aw-delete-btn">ðŸ—‘ XÃ³a nhÃ³m nÃ y</button>
                 </div>
             </main>
             <div style="padding:16px; background:white; border-top:1px solid #f3f4f6; padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px)); z-index:10; position:relative;">
-                <button onclick="saveCategory()" style="width:100%; background:#d1d5db; color:white; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s;" id="saveCatBtn" disabled>Lưu</button>
+                <button onclick="saveCategory()" style="width:100%; background:#d1d5db; color:white; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s;" id="saveCatBtn" disabled>LÆ°u</button>
             </div>
         </div>
 
-        <!-- ===================== PAGE: CHỌN VÍ (SỔ GIAO DỊCH) ===================== -->
+        <!-- ===================== PAGE: CHá»ŒN VÃ (Sá»” GIAO Dá»ŠCH) ===================== -->
         <div id="page-select-wallet" class="page" style="background:#f4f5f7; flex-direction:column; height:100vh; z-index:3000;">
             <div style="background:white; flex-shrink:0; border-bottom:1px solid #f3f4f6;">
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px;">
-                    <button onclick="switchPage('transactions')" style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;">Đóng</button>
-                    <h2 style="font-size:16px; font-weight:600; margin:0; color:#000;">Chọn Ví</h2>
-                    <button style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;">Sửa</button>
+                    <button onclick="switchPage('transactions')" style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;">ÄÃ³ng</button>
+                    <h2 style="font-size:16px; font-weight:600; margin:0; color:#000;">Chá»n VÃ­</h2>
+                    <button style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;">Sá»­a</button>
                 </div>
             </div>
             <main class="content" style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:10px 15px 20px 15px; background:var(--bg-main);" id="selectWalletList">
@@ -504,19 +504,19 @@
                         <div style="width:28px; height:28px; border-radius:50%; background:#10b981; display:flex; align-items:center; justify-content:center; color:white; margin-right:12px;">
                             <i class="fas fa-plus" style="font-size:14px;"></i>
                         </div>
-                        <span style="font-size:15px; color:#10b981; font-weight:500;">Thêm ví</span>
+                        <span style="font-size:15px; color:#10b981; font-weight:500;">ThÃªm vÃ­</span>
                     </div>
                     <div style="display:flex; align-items:center; padding:14px 16px; cursor:pointer;">
                         <div style="width:28px; height:28px; border-radius:50%; background:#10b981; display:flex; align-items:center; justify-content:center; color:white; margin-right:12px;">
                             <i class="fas fa-link" style="font-size:12px;"></i>
                         </div>
-                        <span style="font-size:15px; color:#10b981; font-weight:500;">Liên kết dịch vụ</span>
+                        <span style="font-size:15px; color:#10b981; font-weight:500;">LiÃªn káº¿t dá»‹ch vá»¥</span>
                     </div>
                 </div>
             </main>
         </div>
 
-        <!-- ===================== PAGE: SỔ GIAO DỊCH ===================== -->
+        <!-- ===================== PAGE: Sá»” GIAO Dá»ŠCH ===================== -->
         <div id="page-transactions" class="page">
             <div style="background:white; flex-shrink:0; border-bottom:1px solid #f3f4f6;">
                 <!-- Top bar -->
@@ -524,8 +524,8 @@
                     <button style="background:none;border:none;cursor:pointer;font-size:18px;color:#9ca3af;width:36px;"><i class="fas fa-question-circle"></i></button>
                     <!-- Wallet switcher -->
                     <div style="display:flex; align-items:center; gap:6px; cursor:pointer;" onclick="openSelectWalletPage()">
-                        <span id="txnWalletIcon" style="font-size:20px;">💰</span>
-                        <span id="txnWalletName" style="font-size:13px;font-weight:600;color:#1f2937;">Tất cả</span>
+                        <span id="txnWalletIcon" style="font-size:20px;">ðŸ’°</span>
+                        <span id="txnWalletName" style="font-size:13px;font-weight:600;color:#1f2937;">Táº¥t cáº£</span>
                         <i class="fas fa-chevron-down" style="font-size:10px;color:#9ca3af;"></i>
                     </div>
                     <div style="display:flex; gap:14px;">
@@ -535,8 +535,8 @@
                 </div>
                 <!-- Balance -->
                 <div style="text-align:center; padding:0 16px 10px;">
-                    <div style="font-size:11px; color:#9ca3af; margin-bottom:2px;">Số dư</div>
-                    <div id="txnBalance" style="font-size:22px; font-weight:700; color:#1f2937;">0 đ</div>
+                    <div style="font-size:11px; color:#9ca3af; margin-bottom:2px;">Sá»‘ dÆ°</div>
+                    <div id="txnBalance" style="font-size:22px; font-weight:700; color:#1f2937;">0 Ä‘</div>
                 </div>
                 <!-- Period tabs -->
                 <div id="periodTabs" style="display:flex; overflow-x:auto; scrollbar-width:none; border-top:1px solid #f3f4f6;"></div>
@@ -547,13 +547,13 @@
             </main>
         </div>
 
-        <!-- ===================== PAGE: THÊM GIAO DỊCH ===================== -->
+        <!-- ===================== PAGE: THÃŠM GIAO Dá»ŠCH ===================== -->
         <div id="page-add-transaction" class="page" style="background:#f4f5f7; flex-direction:column; height:100vh; z-index:2000;">
             <!-- Header (White) -->
             <div style="background:white; flex-shrink:0; border-radius: 0 0 16px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); position:relative; z-index:10;">
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px;">
-                    <button onclick="closeAddTransaction()" style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;padding:0;">Huỷ</button>
-                    <h2 style="font-size:16px; font-weight:600; margin:0; color:#000;">Thêm Giao Dịch</h2>
+                    <button onclick="closeAddTransaction()" style="background:none;border:none;color:#1f2937;font-size:15px;cursor:pointer;padding:0;">Huá»·</button>
+                    <h2 style="font-size:16px; font-weight:600; margin:0; color:#000;">ThÃªm Giao Dá»‹ch</h2>
                     <span style="width:30px;"></span> <!-- Spacer for centering -->
                 </div>
             </div>
@@ -563,18 +563,18 @@
                 <input type="hidden" id="editTxnId">
 
                 <div class="card" style="padding:0; overflow:hidden; margin-bottom:16px; border-radius:8px; background:white; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                    <!-- Tabs: Khoản chi | Khoản thu | Vay/Nợ -->
+                    <!-- Tabs: Khoáº£n chi | Khoáº£n thu | Vay/Ná»£ -->
                     <div style="display:flex; background:#f3f4f6; margin:16px 16px 10px; border-radius:8px; padding:2px;">
-                        <button id="typeExpenseBtn" onclick="setTxnType('expense')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoản chi</button>
-                        <button id="typeIncomeBtn" onclick="setTxnType('income')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoản thu</button>
-                        <button id="typeDebtBtn" onclick="setTxnType('debt')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Vay/Nợ</button>
+                        <button id="typeExpenseBtn" onclick="setTxnType('expense')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:white; color:#000; box-shadow:0 1px 2px rgba(0,0,0,0.1);">Khoáº£n chi</button>
+                        <button id="typeIncomeBtn" onclick="setTxnType('income')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Khoáº£n thu</button>
+                        <button id="typeDebtBtn" onclick="setTxnType('debt')" style="flex:1; padding:8px 0; border:none; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; background:transparent; color:#6b7280;">Vay/Ná»£</button>
                     </div>
 
                     <!-- Wallet -->
                     <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #f3f4f6; cursor:pointer;" onclick="openTxnWalletPicker()">
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <div id="selectedWalletIconTxn" style="font-size:18px;">💰</div>
-                            <div id="selectedWalletNameTxn" style="font-size:14px; color:#000;">Chọn ví</div>
+                            <div id="selectedWalletIconTxn" style="font-size:18px;">ðŸ’°</div>
+                            <div id="selectedWalletNameTxn" style="font-size:14px; color:#000;">Chá»n vÃ­</div>
                         </div>
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
                     </div>
@@ -583,7 +583,7 @@
                     <div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
                         <div style="border:1px solid #e5e7eb; border-radius:6px; padding:4px 8px; font-size:12px; color:#6b7280; font-weight:600; margin-right:12px;" id="txnCurrencyLabel">VND</div>
                         <div style="flex:1;">
-                            <div style="font-size:11px; color:#9ca3af; margin-bottom:2px;">Số tiền</div>
+                            <div style="font-size:11px; color:#9ca3af; margin-bottom:2px;">Sá»‘ tiá»n</div>
                             <input type="text" id="txnAmount" placeholder="0" oninput="formatTxnAmount(this)" style="width:100%; border:none; outline:none; font-size:28px; font-weight:500; color:#000; background:transparent; padding:0;">
                         </div>
                     </div>
@@ -592,7 +592,7 @@
                     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; border-bottom:1px solid #f3f4f6; cursor:pointer;" onclick="openTxnCategoryPicker()">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div id="selectedCatIconTxn" style="width:32px; height:32px; border-radius:50%; background:#d1d5db; display:flex; align-items:center; justify-content:center; font-size:16px; color:white;"></div>
-                            <div id="selectedCatNameTxn" style="font-size:15px; color:#9ca3af;">Chọn nhóm</div>
+                            <div id="selectedCatNameTxn" style="font-size:15px; color:#9ca3af;">Chá»n nhÃ³m</div>
                         </div>
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px;"></i>
                     </div>
@@ -600,7 +600,7 @@
                     <!-- Note -->
                     <div style="display:flex; align-items:center; padding:16px; border-bottom:1px solid #f3f4f6;">
                         <i class="fas fa-align-left" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
-                        <input type="text" id="txnNote" placeholder="Ghi chúú" style="flex:1; border:none; outline:none; font-size:14px; color:#000; background:transparent; padding:0;">
+                        <input type="text" id="txnNote" placeholder="Ghi chÃºÃº" style="flex:1; border:none; outline:none; font-size:14px; color:#000; background:transparent; padding:0;">
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:12px; opacity:0;"></i>
                     </div>
 
@@ -609,7 +609,7 @@
                         <i class="far fa-calendar-alt" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
                         <div style="flex:1; display:flex; align-items:center; justify-content:space-between; background:#f4f5f7; border-radius:6px; padding:6px 10px; cursor:pointer;" onclick="document.getElementById('txnDate').showPicker()">
                             <button onclick="event.stopPropagation(); changeTxnDate(-1)" style="width:24px; height:24px; border-radius:50%; border:none; background:white; color:#10b981; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05); padding:0;"><i class="fas fa-chevron-left" style="font-size:10px;"></i></button>
-                            <div id="txnDateDisplay" style="font-size:13px; color:#10b981; font-weight:500;">Hôm nay</div>
+                            <div id="txnDateDisplay" style="font-size:13px; color:#10b981; font-weight:500;">HÃ´m nay</div>
                             <button onclick="event.stopPropagation(); changeTxnDate(1)" style="width:24px; height:24px; border-radius:50%; border:none; background:white; color:#10b981; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.05); padding:0;"><i class="fas fa-chevron-right" style="font-size:10px;"></i></button>
                             <input type="date" id="txnDate" style="position:absolute; visibility:hidden; width:0; height:0;" onchange="updateTxnDateDisplay()">
                         </div>
@@ -619,7 +619,7 @@
                     <div style="display:flex; align-items:center; justify-content:space-between; padding:16px;">
                         <div style="display:flex; align-items:center;">
                             <i class="fas fa-eye-slash" style="color:#1f2937; font-size:16px; width:32px; text-align:center; margin-right:12px;"></i>
-                            <span style="font-size:14px; color:#1f2937;">Không tính vào báo cáo</span>
+                            <span style="font-size:14px; color:#1f2937;">KhÃ´ng tÃ­nh vÃ o bÃ¡o cÃ¡o</span>
                         </div>
                         <label class="aw-switch">
                             <input type="checkbox" id="txnExclude">
@@ -628,18 +628,18 @@
                     </div>
                 </div>
 
-                <!-- Thêm chi tiết button -->
-                <button style="width:100%; background:white; border:none; border-radius:8px; padding:14px; color:#10b981; font-size:14px; font-weight:500; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.05);">Thêm chi tiết</button>
+                <!-- ThÃªm chi tiáº¿t button -->
+                <button style="width:100%; background:white; border:none; border-radius:8px; padding:14px; color:#10b981; font-size:14px; font-weight:500; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.05);">ThÃªm chi tiáº¿t</button>
 
                 <!-- Delete button (when editing) -->
                 <div id="deleteTxnRow" style="display:none; margin-top:16px;">
-                    <button onclick="deleteTransaction()" style="background:white; color:#ef4444; border:none; width:100%; padding:14px; border-radius:8px; font-size:14px; font-weight:500; box-shadow:0 1px 3px rgba(0,0,0,0.05); cursor:pointer;">Xóa giao dịch này</button>
+                    <button onclick="deleteTransaction()" style="background:white; color:#ef4444; border:none; width:100%; padding:14px; border-radius:8px; font-size:14px; font-weight:500; box-shadow:0 1px 3px rgba(0,0,0,0.05); cursor:pointer;">XÃ³a giao dá»‹ch nÃ y</button>
                 </div>
             </main>
 
             <!-- Bottom Save Button -->
             <div style="padding:16px; background:white; border-top:1px solid #f3f4f6; padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px));">
-                <button onclick="saveTransaction()" style="width:100%; background:#d1d5db; color:white; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s;" id="saveTxnBtn" disabled>Lưu</button>
+                <button onclick="saveTransaction()" style="width:100%; background:#d1d5db; color:white; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s;" id="saveTxnBtn" disabled>LÆ°u</button>
             </div>
         </div>
 
@@ -648,10 +648,10 @@
             <header class="header header-modal-style">
                 <div class="header-top" style="align-items: center;">
                     <button class="btn-link" onclick="switchPage('settings')">
-                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>Cài đặt
+                        <i class="fas fa-chevron-left" style="margin-right:4px;"></i>CÃ i Ä‘áº·t
                     </button>
-                    <h2 class="page-title">Đồng bộ SePay</h2>
-                    <button class="btn-link" onclick="toggleSePayConfig()" id="btnToggleConfig" style="font-size:13px; color:#6b7280;">Cấu hình</button>
+                    <h2 class="page-title">Äá»“ng bá»™ SePay</h2>
+                    <button class="btn-link" onclick="toggleSePayConfig()" id="btnToggleConfig" style="font-size:13px; color:#6b7280;">Cáº¥u hÃ¬nh</button>
                 </div>
             </header>
 
@@ -659,7 +659,7 @@
             <div id="sepayConfigSection" style="display:none; padding:12px 16px; background:white; border-bottom:1px solid #f3f4f6;">
                 <div style="margin-bottom:10px;">
                     <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">API Token</div>
-                    <input type="text" id="sepayApiToken" placeholder="Nhập API Token..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:10px; font-size:13px; outline:none; box-sizing:border-box;" onchange="saveSePayConfig()">
+                    <input type="text" id="sepayApiToken" placeholder="Nháº­p API Token..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:10px; font-size:13px; outline:none; box-sizing:border-box;" onchange="saveSePayConfig()">
                 </div>
                 <div>
                     <div style="font-size:11px; color:#9ca3af; margin-bottom:4px;">Proxy URL (Google Apps Script)</div>
@@ -669,8 +669,8 @@
 
             <main class="content" style="padding-bottom:80px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <h3 style="font-size:13px; color:#6b7280; font-weight:600; text-transform:uppercase; margin:0;">Liên kết Ngân hàng</h3>
-                    <button onclick="addSePayMapping()" style="background:none; border:none; color:#10b981; font-weight:600; font-size:13px; cursor:pointer;"><i class="fas fa-plus"></i> Thêm</button>
+                    <h3 style="font-size:13px; color:#6b7280; font-weight:600; text-transform:uppercase; margin:0;">LiÃªn káº¿t NgÃ¢n hÃ ng</h3>
+                    <button onclick="addSePayMapping()" style="background:none; border:none; color:#10b981; font-weight:600; font-size:13px; cursor:pointer;"><i class="fas fa-plus"></i> ThÃªm</button>
                 </div>
                 
                 <div id="sepayMappingList">
@@ -684,25 +684,25 @@
             <!-- Sticky sync button -->
             <div style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; padding:12px 16px; background:white; border-top:1px solid #f3f4f6; box-sizing:border-box; z-index:100;">
                 <button onclick="runSePaySync()" id="btnRunSePaySync" style="width:100%; background:#10b981; color:white; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(16,185,129,0.3); display:flex; justify-content:center; align-items:center; gap:8px;">
-                    <i class="fas fa-sync-alt"></i> Đồng bộ ngay
+                    <i class="fas fa-sync-alt"></i> Äá»“ng bá»™ ngay
                 </button>
             </div>
         </div>
 
 
-        <!-- ===================== PAGE: NGÂN SÁCH ===================== -->
+        <!-- ===================== PAGE: NGÃ‚N SÃCH ===================== -->
         <div id="page-budgets" class="page page-light">
             <header class="header">
                 <div class="header-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <h2 class="page-title" style="margin: 0; text-align: left;">Ngân sách Đang áp dụng</h2>
+                    <h2 class="page-title" style="margin: 0; text-align: left;">NgÃ¢n sÃ¡ch Äang Ã¡p dá»¥ng</h2>
                     <div onclick="openBudgetGlobalWalletPicker()" style="display:flex; align-items:center; gap:6px; cursor:pointer; padding:6px 10px; border:1px solid #e5e7eb; border-radius:20px;">
                         <i id="budgetGlobalWalletIcon" class="fas fa-globe" style="color:#10b981; font-size:16px;"></i>
-                        <span id="budgetGlobalWalletLabel" style="font-size:13px; color:#374151; font-weight:500;">Tổng</span>
+                        <span id="budgetGlobalWalletLabel" style="font-size:13px; color:#374151; font-weight:500;">Tá»•ng</span>
                         <i class="fas fa-chevron-down" style="font-size:9px; color:#9ca3af;"></i>
                     </div>
                 </div>
                 <div class="date-navigator" style="justify-content: flex-start; padding-left: 16px; border-bottom: 1px solid #f3f4f6;">
-                    <div style="font-weight: 600; padding-bottom: 8px; border-bottom: 2px solid #10b981; color:#10b981;">Tháng này</div>
+                    <div style="font-weight: 600; padding-bottom: 8px; border-bottom: 2px solid #10b981; color:#10b981;">ThÃ¡ng nÃ y</div>
                 </div>
             </header>
             <main class="content">
@@ -712,7 +712,7 @@
                         <div style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #f3f4f6; position: absolute; top: 0; left: 0; box-sizing: border-box;"></div>
                         <div id="budgetGlobalProgress" style="width: 220px; height: 220px; border-radius: 50%; border: 12px solid #10b981; position: absolute; top: 0; left: 0; box-sizing: border-box; border-bottom-color: transparent; border-right-color: transparent; transform: rotate(-135deg); transition: transform 0.5s;"></div>
                         <div style="position: absolute; bottom: 0; width: 100%; text-align: center;">
-                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">Số tiền bạn có thể chi</div>
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 4px;">Sá»‘ tiá»n báº¡n cÃ³ thá»ƒ chi</div>
                             <div id="budgetGlobalAvailable" style="font-size: 28px; font-weight: 700; color: #10b981;">0</div>
                         </div>
                     </div>
@@ -720,21 +720,21 @@
                     <div style="display: flex; justify-content: space-between; text-align: center; margin-bottom: 20px;">
                         <div style="flex: 1;">
                             <div id="budgetGlobalTotal" style="font-weight: 600; font-size: 15px; color:#1f2937;">0</div>
-                            <div style="font-size: 12px; color: #9ca3af;">Tổng ngân sách</div>
+                            <div style="font-size: 12px; color: #9ca3af;">Tá»•ng ngÃ¢n sÃ¡ch</div>
                         </div>
                         <div style="width: 1px; background: #e5e7eb;"></div>
                         <div style="flex: 1;">
                             <div id="budgetGlobalSpent" style="font-weight: 600; font-size: 15px; color:#1f2937;">0</div>
-                            <div style="font-size: 12px; color: #9ca3af;">Tổng đã chi</div>
+                            <div style="font-size: 12px; color: #9ca3af;">Tá»•ng Ä‘Ã£ chi</div>
                         </div>
                         <div style="width: 1px; background: #e5e7eb;"></div>
                         <div style="flex: 1;">
-                            <div id="budgetGlobalDays" style="font-weight: 600; font-size: 15px; color:#1f2937;">0 ngày</div>
-                            <div style="font-size: 12px; color: #9ca3af;">Đến cuối tháng</div>
+                            <div id="budgetGlobalDays" style="font-weight: 600; font-size: 15px; color:#1f2937;">0 ngÃ y</div>
+                            <div style="font-size: 12px; color: #9ca3af;">Äáº¿n cuá»‘i thÃ¡ng</div>
                         </div>
                     </div>
                     
-                    <button onclick="openAddBudget()" style="background: #10b981; color: white; border: none; border-radius: 20px; padding: 10px 24px; font-weight: 600; font-size: 15px; cursor: pointer;">Tạo Ngân sách</button>
+                    <button onclick="openAddBudget()" style="background: #10b981; color: white; border: none; border-radius: 20px; padding: 10px 24px; font-weight: 600; font-size: 15px; cursor: pointer;">Táº¡o NgÃ¢n sÃ¡ch</button>
                 </div>
 
                 <div id="budgetList" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 80px;">
@@ -747,8 +747,8 @@
         <div id="page-add-budget" class="page page-light">
             <header class="header header-modal-style">
                 <div class="header-top" style="justify-content: center; position: relative;">
-                    <button class="btn-link" onclick="switchPage('budgets')" style="position: absolute; left: 16px; color: #4b5563;">Huỷ</button>
-                    <h2 class="page-title" id="budgetTitle">Thêm ngân sách</h2>
+                    <button class="btn-link" onclick="switchPage('budgets')" style="position: absolute; left: 16px; color: #4b5563;">Huá»·</button>
+                    <h2 class="page-title" id="budgetTitle">ThÃªm ngÃ¢n sÃ¡ch</h2>
                 </div>
             </header>
             <main class="content">
@@ -756,19 +756,19 @@
                     <input type="hidden" id="editBudgetId">
                     <input type="hidden" id="budgetCatId">
                     
-                    <!-- Chọn nhóm -->
+                    <!-- Chá»n nhÃ³m -->
                     <div class="aw-field-row" onclick="openBudgetCategoryPicker()" style="cursor: pointer;">
                         <div style="display:flex; align-items:center; gap:12px; flex:1;">
                             <div id="budgetCategoryIcon" style="width:32px; height:32px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; color:#9ca3af; font-size:16px;"><i class="fas fa-question"></i></div>
-                            <div id="budgetCategoryName" style="font-size:16px; color:#9ca3af;">Chọn nhóm</div>
+                            <div id="budgetCategoryName" style="font-size:16px; color:#9ca3af;">Chá»n nhÃ³m</div>
                         </div>
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
                     </div>
                     
-                    <!-- Số tiền -->
+                    <!-- Sá»‘ tiá»n -->
                     <div class="aw-field-row" style="align-items: flex-end;">
                         <div style="flex:1;">
-                            <div class="aw-field-label">Số tiền</div>
+                            <div class="aw-field-label">Sá»‘ tiá»n</div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <div style="padding: 4px 8px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 12px; color: #6b7280; font-weight: 600;">VND</div>
                                 <input type="text" id="budgetAmount" class="aw-balance-input" style="font-size:24px; font-weight:600; width:100%; border:none; outline:none;" placeholder="0" inputmode="numeric" oninput="formatCurrencyInput(this)">
@@ -776,22 +776,22 @@
                         </div>
                     </div>
                     
-                    <!-- Thời gian -->
+                    <!-- Thá»i gian -->
                     <div class="aw-field-row" style="cursor: pointer;" onclick="openBudgetPeriodPicker()">
                         <div style="display:flex; align-items:center; gap:12px; flex:1;">
                             <i class="far fa-calendar-alt" style="color:#4b5563; font-size:18px;"></i>
-                            <div id="budgetPeriodStr" style="font-size:15px; color:#1f2937;">Tháng này</div>
+                            <div id="budgetPeriodStr" style="font-size:15px; color:#1f2937;">ThÃ¡ng nÃ y</div>
                             <input type="hidden" id="budgetPeriodStart">
                             <input type="hidden" id="budgetPeriodEnd">
                         </div>
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
                     </div>
                     
-                    <!-- Chọn ví -->
+                    <!-- Chá»n vÃ­ -->
                     <div class="aw-field-row" style="border-bottom: none; cursor: pointer;" onclick="openBudgetWalletPicker()">
                         <div style="display:flex; align-items:center; gap:12px; flex:1;">
                             <i class="fas fa-globe" style="color:#10b981; font-size:18px;"></i>
-                            <div id="budgetWalletName" style="font-size:15px; color:#1f2937;">Tổng cộng</div>
+                            <div id="budgetWalletName" style="font-size:15px; color:#1f2937;">Tá»•ng cá»™ng</div>
                             <input type="hidden" id="budgetWalletId" value="all">
                         </div>
                         <i class="fas fa-chevron-right" style="color:#cbd5e1; font-size:14px;"></i>
@@ -800,8 +800,8 @@
                 
                 <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <div style="font-size: 15px; font-weight: 500; margin-bottom: 4px;">Lặp lại ngân sách này</div>
-                        <div style="font-size: 13px; color: #6b7280;">Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.</div>
+                        <div style="font-size: 15px; font-weight: 500; margin-bottom: 4px;">Láº·p láº¡i ngÃ¢n sÃ¡ch nÃ y</div>
+                        <div style="font-size: 13px; color: #6b7280;">NgÃ¢n sÃ¡ch Ä‘Æ°á»£c tá»± Ä‘á»™ng láº·p láº¡i á»Ÿ ká»³ háº¡n tiáº¿p theo.</div>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" id="budgetRepeat" checked>
@@ -810,11 +810,11 @@
                 </div>
                 
                 <button id="btnDeleteBudget" onclick="deleteBudget()" style="width:100%; margin-top:20px; padding:15px; background:none; border:1px solid #ef4444; border-radius:12px; color:#ef4444; font-weight:600; font-size:15px; cursor:pointer; display:none;">
-                    Xóa Ngân Sách
+                    XÃ³a NgÃ¢n SÃ¡ch
                 </button>
             </main>
             <div style="position:fixed; bottom:0; width:100%; max-width:480px; padding:16px; background:white; z-index:100; border-top:1px solid #f3f4f6;">
-                <button onclick="saveBudget()" style="width:100%; background:#10b981; color:white; border:none; border-radius:24px; padding:14px; font-size:16px; font-weight:600; cursor:pointer;">Lưu</button>
+                <button onclick="saveBudget()" style="width:100%; background:#10b981; color:white; border:none; border-radius:24px; padding:14px; font-size:16px; font-weight:600; cursor:pointer;">LÆ°u</button>
             </div>
         </div>
 
@@ -822,8 +822,8 @@
         <div id="page-budget-detail" class="page page-light">
             <header class="header header-modal-style">
                 <div class="header-top" style="justify-content: space-between;">
-                    <button class="btn-link" onclick="switchPage('budgets')"><i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay lại</button>
-                    <button class="btn-link" onclick="editBudgetFromDetail()">Sửa</button>
+                    <button class="btn-link" onclick="switchPage('budgets')"><i class="fas fa-chevron-left" style="margin-right:4px;"></i>Quay láº¡i</button>
+                    <button class="btn-link" onclick="editBudgetFromDetail()">Sá»­a</button>
                 </div>
             </header>
             <main class="content">
@@ -836,8 +836,8 @@
                     <div id="detailBudgetAmount" style="font-size: 24px; font-weight: 700; margin-bottom: 12px; color:#1f2937;"></div>
                     
                     <div style="display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-bottom: 8px;">
-                        <div>Đã chi <br><div id="detailBudgetSpent" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
-                        <div style="text-align: right;">Còn lại <br><div id="detailBudgetRemain" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
+                        <div>ÄÃ£ chi <br><div id="detailBudgetSpent" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
+                        <div style="text-align: right;">CÃ²n láº¡i <br><div id="detailBudgetRemain" style="font-weight:600; color:#1f2937; font-size:15px; margin-top:2px;">0</div></div>
                     </div>
                     
                     <div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-bottom: 8px; position:relative;">
@@ -845,7 +845,7 @@
                         <div id="detailBudgetTodayMarker" style="position:absolute; top:0; bottom:0; width:2px; background:#9ca3af; z-index:2;"></div>
                     </div>
                     <div style="font-size: 11px; color: #9ca3af; position:relative; height: 16px;">
-                        <div id="detailBudgetTodayText" style="position:absolute; display:inline-block; background:#f3f4f6; padding:2px 6px; border-radius:4px; top:0; transform:translateX(-50%);">Hôm nay</div>
+                        <div id="detailBudgetTodayText" style="position:absolute; display:inline-block; background:#f3f4f6; padding:2px 6px; border-radius:4px; top:0; transform:translateX(-50%);">HÃ´m nay</div>
                     </div>
                     
                     <div style="margin-top: 24px;">
@@ -858,26 +858,26 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
                             <i class="fas fa-globe" style="font-size: 20px; color: #10b981; width: 24px; text-align: center;"></i>
-                            <div style="font-size: 15px; color: #1f2937;">Tổng cộng</div>
+                            <div style="font-size: 15px; color: #1f2937;">Tá»•ng cá»™ng</div>
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 12px;">
                             <i class="fas fa-redo-alt" style="font-size: 20px; color: #4b5563; width: 24px; text-align: center;"></i>
-                            <div style="font-size: 15px; color: #1f2937;" id="detailBudgetRepeatText">Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.</div>
+                            <div style="font-size: 15px; color: #1f2937;" id="detailBudgetRepeatText">NgÃ¢n sÃ¡ch Ä‘Æ°á»£c tá»± Ä‘á»™ng láº·p láº¡i á»Ÿ ká»³ háº¡n tiáº¿p theo.</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
-                        <div style="color: #6b7280; font-size: 14px;">Nên chi hàng ngày</div>
+                        <div style="color: #6b7280; font-size: 14px;">NÃªn chi hÃ ng ngÃ y</div>
                         <div id="detailBudgetRecDaily" style="font-weight: 500; font-size: 15px; color:#1f2937;"></div>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f3f4f6;">
-                        <div style="color: #6b7280; font-size: 14px;">Dự kiến chi tiêu</div>
+                        <div style="color: #6b7280; font-size: 14px;">Dá»± kiáº¿n chi tiÃªu</div>
                         <div id="detailBudgetProjected" style="font-weight: 500; font-size: 15px; color:#1f2937;">0</div>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 12px 0;">
-                        <div style="color: #6b7280; font-size: 14px;">Thực tế chi tiêu hàng ngày</div>
+                        <div style="color: #6b7280; font-size: 14px;">Thá»±c táº¿ chi tiÃªu hÃ ng ngÃ y</div>
                         <div id="detailBudgetActualDaily" style="font-weight: 500; font-size: 15px; color:#1f2937;">0</div>
                     </div>
                 </div>
@@ -889,11 +889,11 @@
         <nav class="bottom-nav">
             <a href="#" class="nav-item active" id="nav-home" onclick="switchPage('home'); return false;">
                 <i class="fas fa-home"></i>
-                <span>Tổng quan</span>
+                <span>Tá»•ng quan</span>
             </a>
             <a href="#" class="nav-item" id="nav-transactions" onclick="switchPage('transactions'); return false;">
                 <i class="fas fa-wallet"></i>
-                <span>Sổ giao dịch</span>
+                <span>Sá»• giao dá»‹ch</span>
             </a>
             <div class="nav-fab-wrapper">
                 <button class="fab-btn" onclick="openAddTransaction()">
@@ -902,11 +902,11 @@
             </div>
             <a href="#" class="nav-item" id="nav-budgets" onclick="switchPage('budgets'); return false;">
                 <i class="fas fa-book"></i>
-                <span>Ngân sách</span>
+                <span>NgÃ¢n sÃ¡ch</span>
             </a>
             <a href="#" class="nav-item" id="nav-accounts" onclick="switchPage('accounts'); return false;">
                 <i class="far fa-user"></i>
-                <span>Tài khoản</span>
+                <span>TÃ i khoáº£n</span>
             </a>
         </nav>
     </div> <!-- End .app-container -->
@@ -940,8 +940,8 @@
     <div id="iconPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:3000; justify-content:center; align-items:center;">
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
-                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn biểu tượng</h3>
-                <button onclick="closeIconPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n biá»ƒu tÆ°á»£ng</h3>
+                <button onclick="closeIconPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button>
             </div>
             <div style="flex:1; overflow-y:auto; padding:16px;">
                 <div id="iconGrid" style="display:grid; grid-template-columns: repeat(6, 1fr); gap:10px; text-align:center;"></div>
@@ -954,7 +954,7 @@
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
                 <h3 id="settingPickerTitle" style="font-size:16px; font-weight:700; margin:0;"></h3>
-                <button onclick="closeSettingPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+                <button onclick="closeSettingPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button>
             </div>
             <div style="flex:1; overflow-y:auto;">
                 <div id="settingPickerList" style="padding:8px 0;"></div>
@@ -966,8 +966,8 @@
     <div id="txnWalletPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
-                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn ví</h3>
-                <button onclick="closeTxnWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n vÃ­</h3>
+                <button onclick="closeTxnWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button>
             </div>
             <div style="flex:1; overflow-y:auto;">
                 <div id="txnWalletPickerList" style="padding:8px 0;"></div>
@@ -979,8 +979,8 @@
     <div id="txnCategoryPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
-                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn nhóm</h3>
-                <button onclick="closeTxnCategoryPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n nhÃ³m</h3>
+                <button onclick="closeTxnCategoryPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button>
             </div>
             <div style="flex:1; overflow-y:auto; padding:0;">
                 <div id="txnCategoryPickerList" style="padding:8px 0;"></div>
@@ -992,8 +992,8 @@
     <div id="parentCatPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;">
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
-                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn nhóm cha</h3>
-                <button onclick="closeParentCatPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n nhÃ³m cha</h3>
+                <button onclick="closeParentCatPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button>
             </div>
             <div style="flex:1; overflow-y:auto;">
                 <div id="parentCatPickerList" style="padding:8px 0;"></div>
@@ -1001,6 +1001,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=v1.1.1"></script>
+    <script src="script.js?v=v1.1.2"></script>
 </body>
 </html>
