@@ -821,7 +821,7 @@ function checkTxnValid() {
     }
 }
 
-function saveTransaction() {
+async function saveTransaction() {
     const id = document.getElementById('editTxnId').value;
     const amountStr = document.getElementById('txnAmount').value.replace(/\./g, '').replace(/,/g, '');
     const amount = parseFloat(amountStr) || 0;
@@ -832,7 +832,7 @@ function saveTransaction() {
     
     if (!amount || !date || !walletId || !selectedCategory) return;
 
-    const isIncome = currentTxnType === 'income' || (currentTxnType === 'debt' && (selectedCategory.name === 'Äi vay' || selectedCategory.name === 'Thu nợ'));
+    const isIncome = currentTxnType === 'income' || (currentTxnType === 'debt' && (selectedCategory.name === 'Đi vay' || selectedCategory.name === 'Thu nợ'));
 
     const oldTxn = id ? transactions.find(t => t.id === id) : null;
 
@@ -847,11 +847,11 @@ function saveTransaction() {
     };
 
     if (id) {
-        const oldTxn = transactions.find(t => t.id === id);
-        if (oldTxn) {
-            const oldIsIncome = oldTxn.type === 'income' || (oldTxn.type === 'debt' && (oldTxn.category === 'Äi vay' || oldTxn.category === 'Thu nợ'));
-            const w = wallets.find(x => x.id === oldTxn.walletId);
-            if (w) w.balance += oldIsIncome ? -oldTxn.amount : oldTxn.amount;
+        const existingTxn = transactions.find(t => t.id === id);
+        if (existingTxn) {
+            const oldIsIncome = existingTxn.type === 'income' || (existingTxn.type === 'debt' && (existingTxn.category === 'Đi vay' || existingTxn.category === 'Thu nợ'));
+            const w = wallets.find(x => x.id === existingTxn.walletId);
+            if (w) w.balance += oldIsIncome ? -existingTxn.amount : existingTxn.amount;
         }
         transactions = transactions.filter(t => t.id !== id);
     }
@@ -865,7 +865,7 @@ function saveTransaction() {
     
     // Only notify if it's a new transaction
     if (!id) {
-        sendTelegramNotification(txn, targetWallet);
+        await sendTelegramNotification(txn, targetWallet);
     }
     
     syncData();
@@ -878,11 +878,11 @@ function saveTransaction() {
 function deleteTransaction() {
     const id = document.getElementById('editTxnId').value;
     if (!id || !confirm('Xóa giao dịch này?')) return;
-    const t = transactions.find(x => x.id === id);
-    if (t) {
-        const isIncome = t.type === 'income' || (t.type === 'debt' && (t.category === 'Äi vay' || t.category === 'Thu nợ'));
-        const w = wallets.find(x => x.id === t.walletId);
-        if (w) w.balance += isIncome ? -t.amount : t.amount;
+    const txnToDelete = transactions.find(x => x.id === id);
+    if (txnToDelete) {
+        const isIncome = txnToDelete.type === 'income' || (txnToDelete.type === 'debt' && (txnToDelete.category === 'Đi vay' || txnToDelete.category === 'Thu nợ'));
+        const w = wallets.find(x => x.id === txnToDelete.walletId);
+        if (w) w.balance += isIncome ? -txnToDelete.amount : txnToDelete.amount;
     }
     transactions = transactions.filter(x => x.id !== id);
     syncData();
@@ -1542,13 +1542,287 @@ async function sendTelegramNotification(txn, wallet) {
     if (txId) msg += '\n#id_' + txId;
     
     try {
-        await fetch('https://api.telegram.org/bot' + botToken + '/sendMessage', {
+        const res = await fetch('https://api.telegram.org/bot' + botToken + '/sendMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ chat_id: chatId, text: msg })
         });
+        if (!res.ok) {
+            const errBody = await res.json().catch(() => ({}));
+            console.error('Telegram API error:', res.status, errBody.description || '');
+        }
     } catch(err) {
         console.error('Failed to send Telegram notif:', err);
+    }
+}
+
+// === SEPAY SYNC ===
+function openSePaySync() {
+    if (!sepayConfig) {
+        sepayConfig = { apiToken: '', proxyUrl: '', mappings: [], lastSyncIds: [] };
+    }
+    document.getElementById('sepayApiToken').value = sepayConfig.apiToken || '';
+    document.getElementById('sepayProxyUrl').value = sepayConfig.proxyUrl || '';
+    renderSePayMappings();
+    const logEl = document.getElementById('sepaySyncLog');
+    if (logEl) logEl.style.display = 'none';
+    switchPage('sepay');
+}
+
+function saveSePayConfig() {
+    sepayConfig.apiToken = document.getElementById('sepayApiToken').value.trim();
+    sepayConfig.proxyUrl = document.getElementById('sepayProxyUrl').value.trim();
+    syncData();
+}
+
+function toggleSePayConfig() {
+    const section = document.getElementById('sepayConfigSection');
+    const btn = document.getElementById('btnToggleConfig');
+    if (!section) return;
+    const isHidden = section.style.display === 'none';
+    section.style.display = isHidden ? 'block' : 'none';
+    if (btn) btn.innerText = isHidden ? 'Ẩn cấu hình' : 'Cấu hình';
+}
+
+function renderSePayMappings() {
+    const list = document.getElementById('sepayMappingList');
+    if (!list) return;
+    if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
+        list.innerHTML = '<div style="padding:12px; color:#9ca3af; font-size:13px; text-align:center;">Chưa có mapping nào. Bấm Thêm để tạo.</div>';
+        return;
+    }
+    list.innerHTML = sepayConfig.mappings.map((m, i) => {
+        const wallet = wallets.find(w => w.id === m.walletId);
+        const walletName = wallet ? (wallet.emoji + ' ' + wallet.name) : 'Chọn ví';
+        const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+        const cat = allCats.find(c => c.id === m.categoryId);
+        const catName = cat ? (cat.icon + ' ' + cat.name) : 'Chọn nhóm';
+        return `
+        <div style="background:white; border-radius:12px; margin-bottom:10px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:13px; font-weight:600; color:#1f2937;">Mapping #${i+1}</div>
+                <button onclick="removeSePayMapping(${i})" style="background:none; border:none; color:#ef4444; font-size:13px; cursor:pointer;"><i class="fas fa-trash"></i></button>
+            </div>
+            <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Từ khóa nội dung</div>
+            <input type="text" value="${m.keyword||''}" onchange="updateSePayMapping(${i},'keyword',this.value)" placeholder="VD: CHUYEN KHOAN, NHAN TIEN..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; outline:none; box-sizing:border-box; margin-bottom:8px;">
+            <div style="display:flex; gap:8px;">
+                <div style="flex:1;">
+                    <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Ví nhận</div>
+                    <div onclick="openSePayWalletPicker(${i})" style="border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; cursor:pointer; background:white;">${walletName}</div>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Nhóm</div>
+                    <div onclick="openSePayCategoryPicker(${i})" style="border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; cursor:pointer; background:white;">${catName}</div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function addSePayMapping() {
+    if (!sepayConfig.mappings) sepayConfig.mappings = [];
+    sepayConfig.mappings.push({ keyword: '', walletId: null, categoryId: null });
+    syncData();
+    renderSePayMappings();
+}
+
+function removeSePayMapping(index) {
+    if (!confirm('Xóa mapping này?')) return;
+    sepayConfig.mappings.splice(index, 1);
+    syncData();
+    renderSePayMappings();
+}
+
+function updateSePayMapping(index, field, value) {
+    if (!sepayConfig.mappings[index]) return;
+    sepayConfig.mappings[index][field] = value;
+    syncData();
+}
+
+function retroUpdateSepayTxns(mappingIndex) {
+    const mapping = sepayConfig.mappings[mappingIndex];
+    if (!mapping || !mapping.keyword || !mapping.walletId || !mapping.categoryId) return;
+    const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+    const cat = allCats.find(c => c.id === mapping.categoryId);
+    if (!cat) return;
+    let updated = 0;
+    transactions.forEach(t => {
+        if (t.sepayBankAcc && !t.manuallyEdited) {
+            const content = (t.note || '').toUpperCase();
+            if (content.includes(mapping.keyword.toUpperCase())) {
+                t.walletId = mapping.walletId;
+                t.categoryId = mapping.categoryId;
+                t.category = cat.name;
+                t.categoryIcon = cat.icon;
+                t.categoryColor = cat.color;
+                updated++;
+            }
+        }
+    });
+    if (updated > 0) {
+        syncData();
+        renderAll();
+        showToast(`Đã cập nhật ${updated} giao dịch!`, 'success');
+    }
+}
+
+let _sepayPickerIndex = -1;
+
+function openSePayWalletPicker(index) {
+    _sepayPickerIndex = index;
+    const overlay = document.getElementById('txnWalletPickerOverlay');
+    const list = document.getElementById('txnWalletPickerList');
+    if (!overlay || !list) return;
+    const currentId = sepayConfig.mappings[index]?.walletId;
+    list.innerHTML = wallets.map(w => `
+        <div onclick="selectSePayWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${w.id === currentId ? '#f0fdf4' : 'transparent'};">
+            <div style="font-size:24px;">${w.emoji||'💰'}</div>
+            <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
+            ${w.id === currentId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
+        </div>
+    `).join('');
+    overlay.style.display = 'flex';
+}
+
+function selectSePayWallet(id) {
+    if (_sepayPickerIndex >= 0 && sepayConfig.mappings[_sepayPickerIndex]) {
+        sepayConfig.mappings[_sepayPickerIndex].walletId = id;
+        syncData();
+        renderSePayMappings();
+    }
+    document.getElementById('txnWalletPickerOverlay').style.display = 'none';
+    _sepayPickerIndex = -1;
+}
+
+function openSePayCategoryPicker(index) {
+    _sepayPickerIndex = index;
+    const overlay = document.getElementById('txnCategoryPickerOverlay');
+    const list = document.getElementById('txnCategoryPickerList');
+    if (!overlay || !list) return;
+    const currentId = sepayConfig.mappings[index]?.categoryId;
+    const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+    list.innerHTML = generateCategoryListHTML(allCats, currentId, 'selectSePayCategory');
+    overlay.style.display = 'flex';
+}
+
+function selectSePayCategory(id) {
+    if (_sepayPickerIndex >= 0 && sepayConfig.mappings[_sepayPickerIndex]) {
+        sepayConfig.mappings[_sepayPickerIndex].categoryId = id;
+        syncData();
+        renderSePayMappings();
+        retroUpdateSepayTxns(_sepayPickerIndex);
+    }
+    document.getElementById('txnCategoryPickerOverlay').style.display = 'none';
+    _sepayPickerIndex = -1;
+}
+
+async function runSePaySync(silent = false) {
+    const btn = document.getElementById('btnRunSePaySync');
+    const logEl = document.getElementById('sepaySyncLog');
+    const apiToken = (sepayConfig.apiToken || '').trim();
+    const proxyUrl = (sepayConfig.proxyUrl || '').trim();
+
+    if (!apiToken || !proxyUrl) {
+        if (logEl) { logEl.style.display = 'block'; logEl.innerText = 'Vui lòng nhập API Token và Proxy URL.'; }
+        return;
+    }
+
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang đồng bộ...'; }
+    if (logEl && !silent) { logEl.style.display = 'block'; logEl.innerText = 'Đang kết nối SePay...'; }
+
+    try {
+        const lastIds = sepayConfig.lastSyncIds || [];
+        const url = proxyUrl + '?token=' + encodeURIComponent(apiToken);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        const records = data.data || data.transactions || data || [];
+        if (!Array.isArray(records)) throw new Error('Dữ liệu không hợp lệ từ proxy');
+
+        let added = 0;
+        const newIds = [];
+
+        records.forEach(rec => {
+            const recId = String(rec.id || rec.transaction_id || '');
+            if (!recId || lastIds.includes(recId)) return;
+            newIds.push(recId);
+
+            const amount = Math.abs(parseFloat(rec.amount || rec.transferAmount || 0));
+            if (!amount) return;
+
+            const content = (rec.content || rec.description || rec.transactionContent || '').toUpperCase();
+            const bankAcc = rec.bankAccountNumber || rec.bankAccount || rec.accountNumber || '';
+            const dateRaw = rec.transactionDate || rec.created_at || rec.date || new Date().toISOString();
+            const date = dateRaw.split('T')[0] || getTodayStr();
+            const isIn = (parseFloat(rec.amount || rec.transferAmount || 0)) > 0;
+
+            // Find matching mapping
+            let matchedMapping = null;
+            if (sepayConfig.mappings) {
+                matchedMapping = sepayConfig.mappings.find(m =>
+                    m.keyword && content.includes(m.keyword.toUpperCase()) && m.walletId && m.categoryId
+                );
+            }
+
+            const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+            let cat, walletId;
+
+            if (matchedMapping) {
+                cat = allCats.find(c => c.id === matchedMapping.categoryId);
+                walletId = matchedMapping.walletId;
+            }
+
+            if (!cat) {
+                const defaultCatName = isIn ? 'Thu nhập khác' : 'Chi khác';
+                cat = allCats.find(c => c.name === defaultCatName) || allCats[0];
+            }
+            if (!walletId) {
+                const defaultWallet = wallets.find(w => w.isDefault) || wallets[0];
+                walletId = defaultWallet ? defaultWallet.id : null;
+            }
+            if (!walletId || !cat) return;
+
+            const txnId = 'sepay_' + recId;
+            if (transactions.find(t => t.id === txnId)) return;
+
+            const txn = {
+                id: txnId,
+                walletId,
+                type: isIn ? 'income' : 'expense',
+                amount,
+                category: cat.name,
+                categoryIcon: cat.icon,
+                categoryColor: cat.color,
+                categoryId: cat.id,
+                note: rec.content || rec.description || '',
+                date,
+                excluded: false,
+                sepayBankAcc: bankAcc,
+                manuallyEdited: false
+            };
+
+            const wallet = wallets.find(w => w.id === walletId);
+            if (wallet) wallet.balance += isIn ? amount : -amount;
+            transactions.push(txn);
+            added++;
+        });
+
+        sepayConfig.lastSyncIds = [...lastIds, ...newIds].slice(-200);
+        syncData();
+        if (added > 0) renderAll();
+
+        const msg = added > 0 ? `Đồng bộ xong: +${added} giao dịch mới.` : 'Không có giao dịch mới.';
+        if (logEl && !silent) logEl.innerText = msg;
+        if (!silent) showToast(msg, added > 0 ? 'success' : 'info');
+
+    } catch (err) {
+        const errMsg = 'Lỗi: ' + (err.message || 'Không kết nối được');
+        if (logEl && !silent) logEl.innerText = errMsg;
+        if (!silent) showToast(errMsg, 'error');
+        console.error('SePay sync error:', err);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync"></i> Đồng bộ ngay'; }
     }
 }
 
