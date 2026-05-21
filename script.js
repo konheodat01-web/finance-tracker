@@ -903,6 +903,10 @@ async function saveTransaction() {
 function deleteTransaction() {
     const id = document.getElementById('editTxnId').value;
     if (!id || !confirm('Xóa giao dịch này?')) return;
+    
+    // Đóng popup và chuyển trang ngay lập tức, trước khi xử lý để tránh user bấm nhầm nút Lưu
+    switchPage('transactions');
+    
     const txnToDelete = transactions.find(x => x.id === id);
     if (txnToDelete) {
         const isIncome = txnToDelete.type === 'income' || (txnToDelete.type === 'debt' && (txnToDelete.category === 'Đi vay' || txnToDelete.category === 'Thu nợ'));
@@ -911,11 +915,10 @@ function deleteTransaction() {
     }
     transactions = transactions.filter(x => x.id !== id);
     syncData();
-    renderAll();
-    checkBudgetsThreshold(txn);
-    showToast('Đã lưu giao dịch!', 'success');
-    switchPage('transactions');
+    renderAll(true);
+    showToast('Đã xóa giao dịch!', 'success');
 }
+
 
 // === ADD WALLET PAGE ===
 function openAddWallet() {
@@ -2758,7 +2761,7 @@ function openBudgetPeriodPicker() {
     const overlay = document.createElement('div');
     overlay.id = 'budgetPeriodOverlay';
     overlay.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;';
-    overlay.innerHTML = '<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);"><div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;"><h3 style="font-size:16px; font-weight:700; margin:0;">Chọn giai đoạn</h3><button onclick="closeBudgetPeriodPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button></div><div style="flex:1; overflow-y:auto;">' + listHtml + '</div></div>';
+    overlay.innerHTML = '<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);"><div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;"><h3 style="font-size:16px; font-weight:700; margin:0;">Chọn giai đoạn</h3><button onclick="closeBudgetPeriodPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;"><i class="fas fa-times"></i></button></div><div style="flex:1; overflow-y:auto;">' + listHtml + '</div></div>';
     overlay.addEventListener('click', function(e) { if (e.target === overlay) closeBudgetPeriodPicker(); });
     document.body.appendChild(overlay);
 }
