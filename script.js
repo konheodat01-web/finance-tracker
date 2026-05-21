@@ -1658,6 +1658,16 @@ function addSePayMapping() {
     renderSePayMappings();
 }
 
+function openSePayGuide() {
+    const el = document.getElementById('sepayGuideOverlay');
+    if (el) el.style.display = 'flex';
+}
+
+function closeSePayGuide() {
+    const el = document.getElementById('sepayGuideOverlay');
+    if (el) el.style.display = 'none';
+}
+
 function removeSePayMapping(index) {
     if (!confirm('Xóa mapping này?')) return;
     sepayConfig.mappings.splice(index, 1);
