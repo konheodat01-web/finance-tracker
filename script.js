@@ -76,11 +76,11 @@ const SETTING_OPTIONS = {
                   'DD-MM-YYYY', 'MM-DD-YYYY', 'D MMM YYYY']
     },
     totalCurrency: {
-        title: 'Äơn vị tiá»n cho ví Tổng',
+        title: 'Äơn vị tiền cho ví Tổng',
         options: ['VND', 'USD']
     },
     firstDayOfWeek: {
-        title: 'Chá»n ngày đầu tuần',
+        title: 'Chọn ngày đầu tuần',
         options: ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật']
     },
     firstDayOfMonth: {
@@ -88,7 +88,7 @@ const SETTING_OPTIONS = {
         options: Array.from({length: 28}, (_, i) => i + 1)
     },
     firstMonthOfYear: {
-        title: 'Chá»n tháng đầu tiên của năm',
+        title: 'Chọn tháng đầu tiên của năm',
         options: ['Tháng Một','Tháng Hai','Tháng Ba','Tháng Tư','Tháng Năm',
                   'Tháng Sáu','Tháng Bảy','Tháng Tám','Tháng Chín',
                   'Tháng Mưá»i','Tháng Mưá»i Một','Tháng Mưá»i Hai']
@@ -648,7 +648,7 @@ function updateSelectedWalletDisplay() {
     } else {
         if(iconEl) iconEl.innerText = '💰';
         if(nameEl) {
-            nameEl.innerText = 'Chá»n ví';
+            nameEl.innerText = 'Chọn ví';
             nameEl.style.color = '#9ca3af';
         }
         if(currEl) currEl.innerText = settings.totalCurrency || 'VND';
@@ -674,7 +674,7 @@ function updateSelectedCategoryDisplay() {
             iconEl.style.background = '#e5e7eb';
         }
         if(nameEl) {
-            nameEl.innerText = 'Chá»n nhóm';
+            nameEl.innerText = 'Chọn nhóm';
             nameEl.style.color = '#9ca3af';
         }
     }
@@ -2100,7 +2100,7 @@ function renderReceivingInfoList() {
     if (filteredInfos.length === 0) {
         listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px; width:100%;">
             <div style="font-size:40px; margin-bottom:12px;">📅‡</div>
-            Chưa có thông tin nhận tiá»n nào
+            Chưa có thông tin nhận tiền nào
         </div>`;
         dotsEl.innerHTML = '';
         return;
@@ -2299,7 +2299,7 @@ function saveReceivingInfo() {
 }
 
 function deleteReceivingInfo() {
-    const confirmDelete = confirm('Bạn có chắc chắn muốn xóa thông tin nhận tiá»n này?');
+    const confirmDelete = confirm('Bạn có chắc chắn muốn xóa thông tin nhận tiền này?');
     if (!confirmDelete) return;
     
     const idxStr = document.getElementById('editReceivingId').value;
@@ -2441,7 +2441,7 @@ function openAddBudget() {
     document.getElementById('editBudgetId').value = '';
     document.getElementById('budgetAmount').value = '';
     document.getElementById('budgetCatId').value = '';
-    document.getElementById('budgetCategoryName').innerText = 'Chá»n nhóm';
+    document.getElementById('budgetCategoryName').innerText = 'Chọn nhóm';
     document.getElementById('budgetCategoryIcon').innerHTML = '<i class="fas fa-question"></i>';
     document.getElementById('budgetCategoryIcon').style.background = '#e5e7eb';
     document.getElementById('budgetCategoryIcon').style.color = '#9ca3af';
@@ -2470,8 +2470,8 @@ function saveBudget() {
     const isRepeat = document.getElementById('budgetRepeat').checked;
     const walletId = document.getElementById('budgetWalletId') ? document.getElementById('budgetWalletId').value : 'all';
 
-    if (!catId) return alert('Vui lòng chá»n nhóm chi tiêu!');
-    if (!amount || amount <= 0) return alert('Vui lòng nhập số tiá»n hợp lệ!');
+    if (!catId) return alert('Vui lòng chọn nhóm chi tiêu!');
+    if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền hợp lệ!');
 
     if (id) {
         const b = budgets.find(x => x.id === id);
@@ -2616,7 +2616,7 @@ function openBudgetWalletPicker() {
     overlay.innerHTML = `
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
-                <h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n ví</h3>
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn ví</h3>
                 <button onclick="closeBudgetWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button>
             </div>
             <div style="flex:1; overflow-y:auto;">${listHtml}</div>
@@ -2710,7 +2710,7 @@ function openBudgetPeriodPicker() {
     const overlay = document.createElement('div');
     overlay.id = 'budgetPeriodOverlay';
     overlay.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;';
-    overlay.innerHTML = '<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);"><div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;"><h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n giai đoạn</h3><button onclick="closeBudgetPeriodPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button></div><div style="flex:1; overflow-y:auto;">' + listHtml + '</div></div>';
+    overlay.innerHTML = '<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);"><div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;"><h3 style="font-size:16px; font-weight:700; margin:0;">Chọn giai đoạn</h3><button onclick="closeBudgetPeriodPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button></div><div style="flex:1; overflow-y:auto;">' + listHtml + '</div></div>';
     overlay.addEventListener('click', function(e) { if (e.target === overlay) closeBudgetPeriodPicker(); });
     document.body.appendChild(overlay);
 }
