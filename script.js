@@ -1587,24 +1587,54 @@ function toggleSePayConfig() {
 function renderSePayMappings() {
     const list = document.getElementById('sepayMappingList');
     if (!list) return;
+    
+    let html = '';
+    html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <button onclick="fetchSePayBankAccounts()" style="background:#f3f4f6; border:none; padding:8px 12px; border-radius:8px; font-size:13px; font-weight:500; color:#4b5563; cursor:pointer;"><i class="fas fa-cloud-download-alt"></i> Tải DS Tài khoản</button>
+        <button onclick="addSePayMapping()" style="background:#10b981; border:none; padding:8px 12px; border-radius:8px; font-size:13px; font-weight:500; color:white; cursor:pointer;"><i class="fas fa-plus"></i> Thêm Mapping</button>
+    </div>`;
+
     if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
-        list.innerHTML = '<div style="padding:12px; color:#9ca3af; font-size:13px; text-align:center;">Chưa có mapping nào. Bấm Thêm để tạo.</div>';
+        list.innerHTML = html + '<div style="padding:12px; color:#9ca3af; font-size:13px; text-align:center;">Chưa có mapping nào.</div>';
         return;
     }
-    list.innerHTML = sepayConfig.mappings.map((m, i) => {
+    
+    html += sepayConfig.mappings.map((m, i) => {
         const wallet = wallets.find(w => w.id === m.walletId);
         const walletName = wallet ? (wallet.emoji + ' ' + wallet.name) : 'Chọn ví';
         const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
         const cat = allCats.find(c => c.id === m.categoryId);
         const catName = cat ? (cat.icon + ' ' + cat.name) : 'Chọn nhóm';
+        
+        let bankInputHtml = '';
+        if (sepayConfig.bankAccounts && sepayConfig.bankAccounts.length > 0) {
+            const options = sepayConfig.bankAccounts.map(acc => {
+                const accNo = acc.account_number || acc.bank_account || acc.id;
+                const bankName = acc.bank_name || 'Ngân hàng';
+                const isSelected = m.bankAcc === accNo;
+                return `<option value="${accNo}" ${isSelected ? 'selected' : ''}>${bankName} - ${accNo}</option>`;
+            }).join('');
+            
+            const hasCustomVal = m.bankAcc && !sepayConfig.bankAccounts.find(a => (a.account_number || a.bank_account || a.id) === m.bankAcc);
+            const customOption = hasCustomVal ? `<option value="${m.bankAcc}" selected>${m.bankAcc}</option>` : '';
+            
+            bankInputHtml = `<select onchange="updateSePayMapping(${i},'bankAcc',this.value)" style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; outline:none; box-sizing:border-box; margin-bottom:8px; background:white;">
+                <option value="">-- Chọn số tài khoản --</option>
+                ${options}
+                ${customOption}
+            </select>`;
+        } else {
+            bankInputHtml = `<input type="text" value="${m.bankAcc||''}" onchange="updateSePayMapping(${i},'bankAcc',this.value)" placeholder="VD: 0123456789" style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; outline:none; box-sizing:border-box; margin-bottom:8px;">`;
+        }
+        
         return `
         <div style="background:white; border-radius:12px; margin-bottom:10px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <div style="font-size:13px; font-weight:600; color:#1f2937;">Mapping #${i+1}</div>
                 <button onclick="removeSePayMapping(${i})" style="background:none; border:none; color:#ef4444; font-size:13px; cursor:pointer;"><i class="fas fa-trash"></i></button>
             </div>
-            <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Từ khóa nội dung</div>
-            <input type="text" value="${m.keyword||''}" onchange="updateSePayMapping(${i},'keyword',this.value)" placeholder="VD: CHUYEN KHOAN, NHAN TIEN..." style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; outline:none; box-sizing:border-box; margin-bottom:8px;">
+            <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Số tài khoản nhận</div>
+            ${bankInputHtml}
             <div style="display:flex; gap:8px;">
                 <div style="flex:1;">
                     <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Ví nhận</div>
@@ -1617,11 +1647,13 @@ function renderSePayMappings() {
             </div>
         </div>`;
     }).join('');
+    
+    list.innerHTML = html;
 }
 
 function addSePayMapping() {
     if (!sepayConfig.mappings) sepayConfig.mappings = [];
-    sepayConfig.mappings.push({ keyword: '', walletId: null, categoryId: null });
+    sepayConfig.mappings.push({ bankAcc: '', walletId: null, categoryId: null });
     syncData();
     renderSePayMappings();
 }
@@ -1641,15 +1673,15 @@ function updateSePayMapping(index, field, value) {
 
 function retroUpdateSepayTxns(mappingIndex) {
     const mapping = sepayConfig.mappings[mappingIndex];
-    if (!mapping || !mapping.keyword || !mapping.walletId || !mapping.categoryId) return;
+    if (!mapping || !mapping.bankAcc || !mapping.walletId || !mapping.categoryId) return;
     const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
     const cat = allCats.find(c => c.id === mapping.categoryId);
     if (!cat) return;
     let updated = 0;
     transactions.forEach(t => {
         if (t.sepayBankAcc && !t.manuallyEdited) {
-            const content = (t.note || '').toUpperCase();
-            if (content.includes(mapping.keyword.toUpperCase())) {
+            const bankAcc = String(t.sepayBankAcc).trim();
+            if (bankAcc === String(mapping.bankAcc).trim()) {
                 t.walletId = mapping.walletId;
                 t.categoryId = mapping.categoryId;
                 t.category = cat.name;
@@ -1663,6 +1695,37 @@ function retroUpdateSepayTxns(mappingIndex) {
         syncData();
         renderAll();
         showToast(`Đã cập nhật ${updated} giao dịch!`, 'success');
+    }
+}
+
+async function fetchSePayBankAccounts() {
+    const apiToken = (sepayConfig.apiToken || '').trim();
+    const proxyUrl = (sepayConfig.proxyUrl || '').trim();
+    
+    if (!apiToken || !proxyUrl) {
+        showToast('Vui lòng nhập API Token và Proxy URL', 'error');
+        return;
+    }
+    
+    showToast('Đang tải danh sách tài khoản...', 'info');
+    try {
+        const url = proxyUrl + '?token=' + encodeURIComponent(apiToken) + '&action=bank-accounts';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        
+        const accounts = data.bank_accounts || data.accounts || data.data || data.items || [];
+        if (Array.isArray(accounts) && accounts.length > 0) {
+            sepayConfig.bankAccounts = accounts;
+            syncData();
+            renderSePayMappings();
+            showToast(`Đã tải ${accounts.length} tài khoản`, 'success');
+        } else {
+            showToast('Không tìm thấy tài khoản nào', 'info');
+        }
+    } catch (err) {
+        console.error('Lỗi tải danh sách tài khoản:', err);
+        showToast('Lỗi tải tài khoản: ' + err.message, 'error');
     }
 }
 
@@ -1761,7 +1824,7 @@ async function runSePaySync(silent = false) {
             let matchedMapping = null;
             if (sepayConfig.mappings) {
                 matchedMapping = sepayConfig.mappings.find(m =>
-                    m.keyword && content.includes(m.keyword.toUpperCase()) && m.walletId && m.categoryId
+                    m.bankAcc && String(m.bankAcc).trim() === String(bankAcc).trim() && m.walletId && m.categoryId
                 );
             }
 
