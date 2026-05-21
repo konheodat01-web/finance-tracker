@@ -1716,10 +1716,27 @@ async function fetchSePayBankAccounts() {
         console.log("SePay Bank Accounts raw response:", data);
         
         let accounts = [];
-        if (Array.isArray(data)) {
+        
+        if (data.bank_accounts && Array.isArray(data.bank_accounts)) {
+            accounts = data.bank_accounts;
+        } else if (data.transactions && Array.isArray(data.transactions)) {
+            // Fallback: extract unique bank accounts from recent transactions
+            const uniqueAccs = {};
+            data.transactions.forEach(t => {
+                const accNo = t.account_number || t.bankAccountNumber || t.bankAccount;
+                const bankName = t.bank_brand_name || t.bankName || 'Ngân hàng';
+                if (accNo && !uniqueAccs[accNo]) {
+                    uniqueAccs[accNo] = {
+                        account_number: accNo,
+                        bank_name: bankName
+                    };
+                }
+            });
+            accounts = Object.values(uniqueAccs);
+        } else if (Array.isArray(data)) {
             accounts = data;
         } else {
-            accounts = data.bank_accounts || data.accounts || data.data || data.items || [];
+            accounts = data.accounts || data.data || data.items || [];
         }
         
         if (Array.isArray(accounts) && accounts.length > 0) {
@@ -1727,9 +1744,10 @@ async function fetchSePayBankAccounts() {
             syncData();
             renderSePayMappings();
             showToast(`Đã tải ${accounts.length} tài khoản`, 'success');
+            // Remove the alert for success cases
         } else {
             showToast('Không tìm thấy tài khoản nào', 'info');
-            alert("Lỗi tải tài khoản. Dữ liệu trả về từ SePay:\n" + JSON.stringify(data, null, 2));
+            alert("Không tìm thấy tài khoản. Dữ liệu trả về:\n" + JSON.stringify(data).substring(0, 500));
         }
     } catch (err) {
         console.error('Lỗi tải danh sách tài khoản:', err);
