@@ -1573,12 +1573,21 @@ async function sendTelegramNotification(txn, wallet) {
         else if (txn.category) categoryLabel = txn.category;
     }
 
-    var msg = 'BIEN DONG SO DU\n';
-    msg += 'Vi: "' + walletName + '"  |  Nhom: "' + categoryLabel + '"\n';
-    msg += sign + ' ' + amountStr + '\n';
-    msg += 'NOI DUNG: "' + (txn.note || '') + '"\n';
-    msg += 'SO DU VI: "' + walletBalanceStr + '"\n';
-    msg += 'TONG SO DU: "' + totalBalanceStr + '"';
+    // Icon phan loai giao dich
+    const txIcon = isIncome ? '💰' : '💸';
+    const arrowIcon = isIncome ? '⬆️' : '⬇️';
+    const signIcon = isIncome ? '➕' : '➖';
+
+    var msg = (isIncome ? '🟢' : '🔴') + ' BIEN DONG SO DU ' + (isIncome ? '(THU)' : '(CHI)') + '\n';
+    msg += '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n';
+    msg += '💳 Vi:   ' + walletName + '\n';
+    msg += '🏷️ Nhom: ' + categoryLabel + '\n';
+    msg += '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n';
+    msg += signIcon + '  ' + (isIncome ? '+' : '-') + amountStr + '\n';
+    msg += '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n';
+    msg += '📝 ND:   ' + (txn.note || txn.category || 'Khong ro') + '\n';
+    msg += '💰 SDu:  ' + walletBalanceStr + '\n';
+    msg += '🏦 Tong: ' + totalBalanceStr;
     if (txId) msg += '\n#id_' + txId;
     
     try {
