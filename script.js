@@ -1771,9 +1771,7 @@ function saveAdjustedBalance() {
     w.balance = newBalance;
     
     syncData();
-    renderTransactions();
-    renderWallets();
-    updateTotalBalance();
+    renderAll();
     closeAdjustBalanceOverlay();
 }
 
