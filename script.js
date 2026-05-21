@@ -1591,7 +1591,7 @@ function renderSePayMappings() {
     let html = '';
     html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <button onclick="fetchSePayBankAccounts()" style="background:#f3f4f6; border:none; padding:8px 12px; border-radius:8px; font-size:13px; font-weight:500; color:#4b5563; cursor:pointer;"><i class="fas fa-cloud-download-alt"></i> Tải DS Tài khoản</button>
-        <button onclick="addSePayMapping()" style="background:#10b981; border:none; padding:8px 12px; border-radius:8px; font-size:13px; font-weight:500; color:white; cursor:pointer;"><i class="fas fa-plus"></i> Thêm Mapping</button>
+        <button onclick="openSePayGuide()" style="background:#3b82f6; border:none; padding:8px 12px; border-radius:8px; font-size:13px; font-weight:500; color:white; cursor:pointer;"><i class="fas fa-book-open"></i> Hướng dẫn</button>
     </div>`;
 
     if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
