@@ -480,7 +480,7 @@ function renderSelectWalletList() {
     let html = `
         <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
             <div style="display:flex; align-items:center; padding:16px; cursor:pointer; background:${currentTxnWalletIndex === -1 ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(-1)">
-                <div style="width:44px; height:44px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; font-size:24px; margin-right:12px;">ðŸŒ</div>
+                <div style="width:44px; height:44px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; margin-right:12px;"><i class="fas fa-layer-group" style="color:#6b7280; font-size:20px;"></i></div>
                 <div style="flex:1;">
                     <div style="font-size:16px; font-weight:700; color:#000;">Tổng cộng</div>
                     <div style="font-size:13px; color:#6b7280;">${new Intl.NumberFormat('vi-VN').format(totalBalance)} ${currency}</div>
@@ -488,7 +488,7 @@ function renderSelectWalletList() {
                 ${currentTxnWalletIndex === -1 ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
             </div>
         </div>
-        <div style="font-size:11px; color:#9ca3af; font-weight:600; margin-bottom:8px; padding-left:4px; letter-spacing:0.5px; text-transform:uppercase;">TÃNH VÃ€O Tá»”NG</div>
+        <div style="font-size:11px; color:#9ca3af; font-weight:600; margin-bottom:8px; padding-left:4px; letter-spacing:0.5px; text-transform:uppercase;">TÍNH VÀO TỔNG</div>
         <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
     `;
 
@@ -2603,7 +2603,7 @@ function openBudgetWalletPicker() {
     let listHtml = '';
     
     const allCheck = currentWalletId === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">🌍</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
+    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:20px; display:flex; align-items:center; justify-content:center; width:22px; color:#9ca3af;"><i class="fas fa-layer-group"></i></div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = currentWalletId === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
@@ -2650,7 +2650,7 @@ function openBudgetGlobalWalletPicker() {
     
     let listHtml = '';
     const allCheck = budgetGlobalWalletFilter === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">🌍</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
+    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:20px; display:flex; align-items:center; justify-content:center; width:22px; color:#9ca3af;"><i class="fas fa-layer-group"></i></div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = budgetGlobalWalletFilter === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
