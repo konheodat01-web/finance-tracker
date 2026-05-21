@@ -1028,7 +1028,7 @@
                 <button onclick="saveAdjustedBalance()" style="background:none; border:none; font-size:15px; color:#3b82f6; font-weight:600; cursor:pointer; padding:8px;">Lưu</button>
             </div>
             
-            <div style="padding:16px; overflow-y:auto; flex:1; background:#f9fafb;">
+            <div style="padding:16px; overflow-y:auto; flex:1; background:#f9fafb; padding-bottom:calc(16px + env(safe-area-inset-bottom));">
                 <!-- Chọn ví -->
                 <div id="adjustBalanceWalletSelector" style="background:white; border-radius:12px; display:flex; justify-content:space-between; align-items:center; padding:16px; margin-bottom:12px; cursor:pointer;" onclick="openAdjustBalanceWalletPicker()">
                     <div style="display:flex; align-items:center; gap:12px;">
@@ -1050,9 +1050,9 @@
                 <!-- Không tính báo cáo -->
                 <div style="background:white; border-radius:12px; display:flex; justify-content:space-between; align-items:center; padding:16px;">
                     <div style="font-size:15px; font-weight:500; color:#1f2937;">Không tính vào báo cáo</div>
-                    <label class="switch">
+                    <label class="aw-switch">
                         <input type="checkbox" id="adjustBalanceExclude" checked>
-                        <span class="slider round"></span>
+                        <span class="aw-slider"></span>
                     </label>
                 </div>
             </div>
