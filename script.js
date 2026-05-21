@@ -1713,8 +1713,15 @@ async function fetchSePayBankAccounts() {
         const res = await fetch(url);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
+        console.log("SePay Bank Accounts raw response:", data);
         
-        const accounts = data.bank_accounts || data.accounts || data.data || data.items || [];
+        let accounts = [];
+        if (Array.isArray(data)) {
+            accounts = data;
+        } else {
+            accounts = data.bank_accounts || data.accounts || data.data || data.items || [];
+        }
+        
         if (Array.isArray(accounts) && accounts.length > 0) {
             sepayConfig.bankAccounts = accounts;
             syncData();
@@ -1722,6 +1729,7 @@ async function fetchSePayBankAccounts() {
             showToast(`Đã tải ${accounts.length} tài khoản`, 'success');
         } else {
             showToast('Không tìm thấy tài khoản nào', 'info');
+            alert("Lỗi tải tài khoản. Dữ liệu trả về từ SePay:\n" + JSON.stringify(data, null, 2));
         }
     } catch (err) {
         console.error('Lỗi tải danh sách tài khoản:', err);
