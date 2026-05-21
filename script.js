@@ -1,4 +1,4 @@
-// === STATE ===
+﻿// === STATE ===
 let wallets = [];
 let transactions = [];
 let budgets = [];
@@ -1562,9 +1562,21 @@ async function sendTelegramNotification(txn, wallet) {
     const walletName = wallet ? wallet.name : 'Chua ro vi';
     const txId = txn.id || '';
     
-    var msg = 'BIEN DONG SO DU "' + walletName + '"\n';
+    // Xac dinh nhom: uu tien nhom con, sau do nhom cha, sau do ten vi
+    let categoryLabel = walletName;
+    if (txn.categoryId || txn.category) {
+        const allCatsForNotif = [].concat(userCategories.expense || [], userCategories.income || [], userCategories.debt || []);
+        let matchedCat = allCatsForNotif.find(c => c.id === txn.categoryId && c.parentId);
+        if (!matchedCat) matchedCat = allCatsForNotif.find(c => c.id === txn.categoryId);
+        if (!matchedCat && txn.category) matchedCat = allCatsForNotif.find(c => c.name === txn.category);
+        if (matchedCat) categoryLabel = matchedCat.name;
+        else if (txn.category) categoryLabel = txn.category;
+    }
+
+    var msg = 'BIEN DONG SO DU\n';
+    msg += 'Vi: "' + walletName + '"  |  Nhom: "' + categoryLabel + '"\n';
     msg += sign + ' ' + amountStr + '\n';
-    msg += 'NOI DUNG: "' + (txn.note || txn.category || '') + '"\n';
+    msg += 'NOI DUNG: "' + (txn.note || '') + '"\n';
     msg += 'SO DU VI: "' + walletBalanceStr + '"\n';
     msg += 'TONG SO DU: "' + totalBalanceStr + '"';
     if (txId) msg += '\n#id_' + txId;
@@ -2564,20 +2576,21 @@ function openBudgetDetail(id) {
     const name = catObj ? catObj.name : 'Tổng cộng';
     const color = catObj ? catObj.color : '#10b981';
 
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-    const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const daysLeft = lastDayOfMonth - today.getDate();
-    const daysPassed = today.getDate();
+    // Dung ky nguoi dung (firstDayOfMonth) thay vi calendar month cung
+    const _prs = getPeriods();
+    const _now = new Date();
+    const currentPeriod = _prs.find(p => _now >= p.start && _now <= new Date(p.end.getTime() + 86399999)) || _prs[3];
+    const periodStart = currentPeriod.start;
+    const periodEnd = currentPeriod.end;
+    const totalDays = Math.max(1, Math.round((periodEnd.getTime() - periodStart.getTime()) / 86400000) + 1);
+    const daysPassed = Math.max(1, Math.round((_now.getTime() - periodStart.getTime()) / 86400000) + 1);
+    const daysLeft = Math.max(0, Math.round((periodEnd.getTime() - _now.getTime()) / 86400000));
 
     const spent = getBudgetSpent(b);
-
     const remain = b.amount - spent;
     let percent = (spent / b.amount) * 100;
     if (percent > 100) percent = 100;
-    
-    let timePercent = (daysPassed / lastDayOfMonth) * 100;
+    let timePercent = Math.min(100, (daysPassed / totalDays) * 100);
 
     document.getElementById('detailBudgetIcon').innerHTML = icon;
     document.getElementById('detailBudgetIcon').style.background = color;
@@ -2591,14 +2604,13 @@ function openBudgetDetail(id) {
     document.getElementById('detailBudgetTodayMarker').style.left = timePercent + '%';
     document.getElementById('detailBudgetTodayText').style.left = timePercent + '%';
 
-    const monthStr = (currentMonth + 1).toString().padStart(2, '0');
-    document.getElementById('detailBudgetDateRange').innerText = `01/${monthStr} - ${lastDayOfMonth}/${monthStr}`;
+    document.getElementById('detailBudgetDateRange').innerText = formatDate(periodStart) + ' - ' + formatDate(periodEnd);
     document.getElementById('detailBudgetDaysLeft').innerText = `Còn ${daysLeft} ngày`;
     document.getElementById('detailBudgetRepeatText').innerText = b.isRepeating ? 'Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.' : 'Ngân sách không lặp lại.';
 
     const recDaily = remain > 0 && daysLeft > 0 ? remain / daysLeft : 0;
     const actualDaily = daysPassed > 0 ? spent / daysPassed : 0;
-    const projected = actualDaily * lastDayOfMonth;
+    const projected = actualDaily * totalDays;
 
     document.getElementById('detailBudgetRecDaily').innerText = formatMoney(Math.round(recDaily));
     document.getElementById('detailBudgetActualDaily').innerText = formatMoney(Math.round(actualDaily));
