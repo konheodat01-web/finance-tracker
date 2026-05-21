@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Finance">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="style.css?v=v1.1.7">
+    <link rel="stylesheet" href="style.css?v=v1.1.8">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -163,7 +163,7 @@
                 </div>
 
                 <!-- Version Info -->
-                <div class="version-tag">Version v1.1.7</div>
+                <div class="version-tag">Version v1.1.8</div>
             </main>
         </div>
 
@@ -530,7 +530,7 @@
                     </div>
                     <div style="display:flex; gap:14px;">
                         <button style="background:none;border:none;cursor:pointer;font-size:18px;color:#1f2937;"><i class="fas fa-search"></i></button>
-                        <button style="background:none;border:none;cursor:pointer;font-size:18px;color:#1f2937;"><i class="fas fa-ellipsis-h"></i></button>
+                        <button onclick="openAdjustBalanceOverlay()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#1f2937;"><i class="fas fa-ellipsis-h"></i></button>
                     </div>
                 </div>
                 <!-- Balance -->
@@ -1019,6 +1019,57 @@
         </div>
     </div>
 
-    <script src="script.js?v=v1.1.7"></script>
+    <!-- ===================== ADJUST BALANCE OVERLAY ===================== -->
+    <div id="adjustBalanceOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:3000; justify-content:center; align-items:flex-end;">
+        <div style="background:white; width:100%; max-width:480px; border-radius:24px 24px 0 0; display:flex; flex-direction:column; max-height:85vh;">
+            <div style="padding:16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f3f4f6;">
+                <button onclick="closeAdjustBalanceOverlay()" style="background:none; border:none; font-size:15px; color:#6b7280; font-weight:500; cursor:pointer; padding:8px;">Hủy</button>
+                <div style="font-size:16px; font-weight:600; color:#1f2937;">Điều Chỉnh Số Dư</div>
+                <button onclick="saveAdjustedBalance()" style="background:none; border:none; font-size:15px; color:#3b82f6; font-weight:600; cursor:pointer; padding:8px;">Lưu</button>
+            </div>
+            
+            <div style="padding:16px; overflow-y:auto; flex:1; background:#f9fafb;">
+                <!-- Chọn ví -->
+                <div id="adjustBalanceWalletSelector" style="background:white; border-radius:12px; display:flex; justify-content:space-between; align-items:center; padding:16px; margin-bottom:12px; cursor:pointer;" onclick="openAdjustBalanceWalletPicker()">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div id="adjustBalanceWalletIcon" style="width:32px; height:32px; background:#f3f4f6; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:16px;">👛</div>
+                        <div id="adjustBalanceWalletName" style="font-size:15px; font-weight:500; color:#1f2937;">Chọn Ví</div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color:#9ca3af; font-size:14px;"></i>
+                </div>
+
+                <!-- Số dư thực tế -->
+                <div style="background:white; border-radius:12px; padding:16px; margin-bottom:12px;">
+                    <div style="font-size:13px; color:#6b7280; margin-bottom:8px;">Số dư thực tế</div>
+                    <div style="display:flex; align-items:center;">
+                        <input type="text" id="adjustBalanceAmount" inputmode="numeric" oninput="formatCurrencyInput(this)" style="width:100%; border:none; outline:none; font-size:24px; font-weight:600; color:#1f2937; padding:0;" placeholder="0">
+                        <span id="adjustBalanceCurrency" style="font-size:20px; font-weight:500; color:#6b7280; margin-left:8px;">đ</span>
+                    </div>
+                </div>
+
+                <!-- Không tính báo cáo -->
+                <div style="background:white; border-radius:12px; display:flex; justify-content:space-between; align-items:center; padding:16px;">
+                    <div style="font-size:15px; font-weight:500; color:#1f2937;">Không tính vào báo cáo</div>
+                    <label class="switch">
+                        <input type="checkbox" id="adjustBalanceExclude" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== ADJUST BALANCE WALLET PICKER ===================== -->
+    <div id="adjustBalanceWalletPickerOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:flex-end;">
+        <div style="background:white; width:100%; max-width:480px; border-radius:24px 24px 0 0; display:flex; flex-direction:column; max-height:85vh;">
+            <div style="padding:16px; text-align:center; border-bottom:1px solid #f3f4f6; position:relative;">
+                <div style="font-size:16px; font-weight:600; color:#1f2937;">Chọn Ví</div>
+                <button onclick="document.getElementById('adjustBalanceWalletPickerOverlay').style.display='none'" style="position:absolute; right:16px; top:16px; background:none; border:none; font-size:18px; color:#6b7280; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="adjustBalanceWalletList" style="overflow-y:auto; flex:1; padding-bottom:env(safe-area-inset-bottom);"></div>
+        </div>
+    </div>
+
+    <script src="script.js?v=v1.1.8"></script>
 </body>
 </html>

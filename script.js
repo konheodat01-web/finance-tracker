@@ -1658,6 +1658,125 @@ function addSePayMapping() {
     renderSePayMappings();
 }
 
+// --- ADJUST BALANCE LOGIC ---
+let adjustBalanceSelectedWalletId = null;
+
+function openAdjustBalanceOverlay() {
+    if (wallets.length === 0) {
+        alert('Vui lòng tạo ví trước.');
+        return;
+    }
+    
+    // Auto select current wallet if we are in a specific wallet view
+    if (currentTxnWalletIndex > 0) {
+        const w = wallets[currentTxnWalletIndex - 1];
+        if (w) selectAdjustBalanceWallet(w.id);
+        document.getElementById('adjustBalanceWalletSelector').style.display = 'none';
+    } else {
+        // If viewing all wallets, auto select default or first
+        const defaultW = wallets.find(w => w.isDefault) || wallets[0];
+        selectAdjustBalanceWallet(defaultW.id);
+        document.getElementById('adjustBalanceWalletSelector').style.display = 'flex';
+    }
+    
+    document.getElementById('adjustBalanceExclude').checked = true;
+    document.getElementById('adjustBalanceOverlay').style.display = 'flex';
+}
+
+function closeAdjustBalanceOverlay() {
+    document.getElementById('adjustBalanceOverlay').style.display = 'none';
+}
+
+function openAdjustBalanceWalletPicker() {
+    const list = document.getElementById('adjustBalanceWalletList');
+    list.innerHTML = wallets.map(w => `
+        <div onclick="selectAdjustBalanceWallet('${w.id}')" style="padding:16px; border-bottom:1px solid #f3f4f6; display:flex; align-items:center; gap:12px; cursor:pointer;">
+            <div style="font-size:24px;">${w.emoji}</div>
+            <div style="flex:1;">
+                <div style="font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
+                <div style="font-size:13px; color:#6b7280;">${formatMoney(w.balance)} đ</div>
+            </div>
+            ${w.id === adjustBalanceSelectedWalletId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
+        </div>
+    `).join('');
+    document.getElementById('adjustBalanceWalletPickerOverlay').style.display = 'flex';
+}
+
+function selectAdjustBalanceWallet(id) {
+    const w = wallets.find(x => x.id === id);
+    if (!w) return;
+    adjustBalanceSelectedWalletId = id;
+    document.getElementById('adjustBalanceWalletIcon').innerText = w.emoji;
+    document.getElementById('adjustBalanceWalletName').innerText = w.name;
+    document.getElementById('adjustBalanceCurrency').innerText = w.currency || 'VND';
+    document.getElementById('adjustBalanceAmount').value = new Intl.NumberFormat('vi-VN').format(w.balance);
+    document.getElementById('adjustBalanceWalletPickerOverlay').style.display = 'none';
+}
+
+function saveAdjustedBalance() {
+    if (!adjustBalanceSelectedWalletId) {
+        alert('Vui lòng chọn ví.');
+        return;
+    }
+    const w = wallets.find(x => x.id === adjustBalanceSelectedWalletId);
+    if (!w) return;
+
+    const valStr = document.getElementById('adjustBalanceAmount').value.replace(/\./g, '');
+    const newBalance = parseFloat(valStr);
+    if (isNaN(newBalance)) {
+        alert('Số dư không hợp lệ.');
+        return;
+    }
+
+    const diff = newBalance - w.balance;
+    if (diff === 0) {
+        closeAdjustBalanceOverlay();
+        return;
+    }
+
+    const isIncome = diff > 0;
+    const amount = Math.abs(diff);
+    const excluded = document.getElementById('adjustBalanceExclude').checked;
+    
+    // Find category
+    let allCats = [].concat(userCategories.expense || [], userCategories.income || [], userCategories.debt || []);
+    let cat = null;
+    if (isIncome) {
+        cat = allCats.find(c => c.name.toLowerCase() === 'khoản thu khác' || c.name.toLowerCase() === 'thu nhập khác') || (userCategories.income && userCategories.income[0]);
+    } else {
+        cat = allCats.find(c => c.name.toLowerCase() === 'chi phí khác' || c.name.toLowerCase() === 'chi khác') || (userCategories.expense && userCategories.expense[0]);
+    }
+
+    const type = isIncome ? 'income' : 'expense';
+    const finalCatName = cat ? cat.name : (isIncome ? 'Thu nhập khác' : 'Chi phí khác');
+    const finalCatIcon = cat ? cat.icon : (isIncome ? '💵' : '💸');
+    const finalCatColor = cat ? cat.color : (isIncome ? '#10b981' : '#f59e0b');
+
+    const newTxn = {
+        id: 'adj_' + Date.now(),
+        walletId: w.id,
+        categoryId: cat ? cat.id : null,
+        manuallyEdited: true,
+        type: type,
+        amount: amount,
+        category: finalCatName,
+        categoryIcon: finalCatIcon,
+        categoryColor: finalCatColor,
+        note: 'Điều chỉnh số dư',
+        date: new Date().toISOString().split('T')[0],
+        excluded: excluded
+    };
+
+    transactions.push(newTxn);
+    w.balance = newBalance;
+    
+    syncData();
+    renderTransactions();
+    renderWallets();
+    updateTotalBalance();
+    closeAdjustBalanceOverlay();
+}
+
 function openSePayGuide() {
     const el = document.getElementById('sepayGuideOverlay');
     if (el) el.style.display = 'flex';
