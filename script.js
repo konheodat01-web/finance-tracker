@@ -118,7 +118,14 @@ const STORAGE_KEY = 'finance_flow_data';
 function syncData() {
     const data = { wallets, isBalanceVisible, settings, transactions, userCategories, sepayConfig, receivingInfos, budgets };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    if (database) database.ref('user_data').set(data);
+    if (database) {
+        // Đánh dấu đang sync để tránh race condition: on('value') fire ngay sau khi set()
+        window._isSyncing = true;
+        database.ref('user_data').set(data).then(() => {
+            // Cho phép 500ms để Firebase listener ổn định trước khi nhận lại
+            setTimeout(() => { window._isSyncing = false; }, 500);
+        }).catch(() => { window._isSyncing = false; });
+    }
 }
 
 function loadData() {
@@ -142,6 +149,8 @@ function loadData() {
     if (database) {
         // Dùng on('value') để lắng nghe real-time (giao dịch SePay sẽ hiện ngay không cần F5)
         database.ref('user_data').on('value', s => {
+            // Bỏ qua nếu đang trong quá trình ghi (tránh race condition)
+            if (window._isSyncing) return;
             const data = s.val();
             if (data) {
                 const prevTxnCount = transactions.length;
@@ -163,6 +172,7 @@ function loadData() {
         });
     }
 }
+
 
 // === ICON LIBRARY ===
 const ICONS = ['💰', '💳', '📋', '💴', '💵', '💲', '💸', '🔍', '📅', '📊', '✈️', '✨', '🛍️', '🍕', '🏠', '💊', '🎓', '🎮', '❤️', '🏢', '🚗', '🚲', '🥦', '🎁', '🎞️', '🎨', '⚽', '🏖️', '💻', '🔥', '💡', '🔌', '👔', '👗', '🍼', '🐶'];
@@ -435,7 +445,14 @@ function renderTxnList(period) {
         const dayName = DAY_NAMES[d.getDay()];
         const monthName = MONTH_NAMES[d.getMonth()];
         const year = d.getFullYear();
-        const txns = groups[dateStr];
+        // Sắp xếp giao dịch trong cùng ngày: mới nhất lên trên
+        // Dùng id để sắp xếp ổn định (không thay đổi khi edit)
+        const txns = groups[dateStr].slice().sort((a, b) => {
+            // So sánh theo id (mới hơn = id lớn hơn)
+            if (a.id < b.id) return 1;
+            if (a.id > b.id) return -1;
+            return 0;
+        });
         const dayTotal = txns.reduce((s,t) => s + (t.type==='income' ? t.amount : -t.amount), 0);
         const totalColor = dayTotal >= 0 ? '#3b82f6' : '#ef4444';
         const totalStr = (dayTotal >= 0 ? '+' : '') + new Intl.NumberFormat('vi-VN').format(dayTotal);
@@ -2341,16 +2358,22 @@ function getBudgetCategoryIds(categoryId) {
 }
 
 function getBudgetSpent(b) {
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
+    // Sử dụng kỳ của người dùng (theo firstDayOfMonth) thay vì calendar month cứng
+    const periods = getPeriods();
+    const now = new Date();
+    // Tìm kỳ hiện tại
+    const currentPeriod = periods.find(p => now >= p.start && now <= new Date(p.end.getTime() + 86399999))
+                          || periods[3]; // fallback kỳ giữa
+    const sStr = getLocalDateStr(currentPeriod.start);
+    const eStr = getLocalDateStr(currentPeriod.end);
+
     const matchIds = getBudgetCategoryIds(b.categoryId);
     let spent = 0;
     transactions.forEach(t => {
         if (t.type !== 'expense') return;
         if (t.excluded) return;
-        const tDate = new Date(t.date);
-        if (tDate.getMonth() !== currentMonth || tDate.getFullYear() !== currentYear) return;
+        // So sánh theo chuỗi date (YYYY-MM-DD) để tránh lỗi timezone
+        if (t.date < sStr || t.date > eStr) return;
         let catMatch = false;
         if (b.categoryId === 'all') {
             catMatch = true;
@@ -2365,6 +2388,7 @@ function getBudgetSpent(b) {
     });
     return spent;
 }
+
 
 function renderBudgetsPage() {
     const today = new Date();
