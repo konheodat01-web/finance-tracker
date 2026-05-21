@@ -140,17 +140,25 @@ function loadData() {
     }
     
     if (database) {
-        database.ref('user_data').once('value').then(s => {
+        // Dùng on('value') để lắng nghe real-time (giao dịch SePay sẽ hiện ngay không cần F5)
+        database.ref('user_data').on('value', s => {
             const data = s.val();
             if (data) {
+                const prevTxnCount = transactions.length;
                 wallets = data.wallets || [];
                 transactions = data.transactions || [];
-        budgets = data.budgets || [];
+                budgets = data.budgets || [];
                 userCategories = data.userCategories || userCategories;
                 settings = data.settings || settings;
                 sepayConfig = data.sepayConfig || sepayConfig;
                 receivingInfos = data.receivingInfos || [];
-                renderAll();
+                renderAll(true);
+                // Nếu có giao dịch mới từ SePay, re-render budget page nếu đang xem
+                if (transactions.length !== prevTxnCount) {
+                    if (document.getElementById('page-budgets') && document.getElementById('page-budgets').classList.contains('active')) {
+                        renderBudgetsPage();
+                    }
+                }
             }
         });
     }
@@ -1721,7 +1729,12 @@ function saveAdjustedBalance() {
     const w = wallets.find(x => x.id === adjustBalanceSelectedWalletId);
     if (!w) return;
 
-    const valStr = document.getElementById('adjustBalanceAmount').value.replace(/\./g, '');
+    const valStr = document.getElementById('adjustBalanceAmount').value.replace(/\./g, '').trim();
+    // Cho phép điều chỉnh về 0đ: kiểm tra chuỗi rỗng trước, sau đó parse
+    if (valStr === '') {
+        alert('Vui lòng nhập số dư mới.');
+        return;
+    }
     const newBalance = parseFloat(valStr);
     if (isNaN(newBalance)) {
         alert('Số dư không hợp lệ.');
@@ -2358,6 +2371,7 @@ function renderBudgetsPage() {
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
     const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    // Tính đúng daysLeft (bao gồm cả hôm nay)
     const daysLeft = lastDayOfMonth - today.getDate();
 
     let totalBudget = 0;
@@ -2369,8 +2383,18 @@ function renderBudgetsPage() {
 
     const allBudgets = budgets || [];
     
+    // Lọc ngân sách theo tháng hiện tại:
+    // - Budget có isRepeating=true: luôn hiển thị (tự reset vì getBudgetSpent chỉ tính tháng hiện tại)
+    // - Budget có isRepeating=false: chỉ hiển thị nếu được tạo trong tháng/năm hiện tại
+    const monthFilteredBudgets = allBudgets.filter(b => {
+        if (b.isRepeating) return true; // Budget lặp: luôn hiển thị
+        if (!b.createdAt) return true;  // Không có createdAt: cứ hiển thị (tương thích dữ liệu cũ)
+        const created = new Date(b.createdAt);
+        return created.getMonth() === currentMonth && created.getFullYear() === currentYear;
+    });
+
     // Filter budgets by the global wallet filter on the dashboard
-    const filteredBudgets = allBudgets.filter(b => {
+    const filteredBudgets = monthFilteredBudgets.filter(b => {
         if (typeof budgetGlobalWalletFilter === 'undefined' || budgetGlobalWalletFilter === 'all') return true;
         return !b.walletId || b.walletId === 'all' || b.walletId === budgetGlobalWalletFilter;
     });
