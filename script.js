@@ -1,4 +1,4 @@
-﻿// === STATE ===
+// === STATE ===
 let wallets = [];
 let transactions = [];
 let budgets = [];
@@ -446,13 +446,10 @@ function renderTxnList(period) {
         const monthName = MONTH_NAMES[d.getMonth()];
         const year = d.getFullYear();
         // Sắp xếp giao dịch trong cùng ngày: mới nhất lên trên
-        // Dùng id để sắp xếp ổn định (không thay đổi khi edit)
-        const txns = groups[dateStr].slice().sort((a, b) => {
-            // So sánh theo id (mới hơn = id lớn hơn)
-            if (a.id < b.id) return 1;
-            if (a.id > b.id) return -1;
-            return 0;
-        });
+        // Dùng thứ tự trong mảng transactions (append-only) → reverse = mới lên đầu
+        // Cách này đúng với mọi định dạng id (txn_, sepay_, adj_) và không thay đổi khi edit
+        const txns = groups[dateStr].slice().reverse();
+
         const dayTotal = txns.reduce((s,t) => s + (t.type==='income' ? t.amount : -t.amount), 0);
         const totalColor = dayTotal >= 0 ? '#3b82f6' : '#ef4444';
         const totalStr = (dayTotal >= 0 ? '+' : '') + new Intl.NumberFormat('vi-VN').format(dayTotal);
