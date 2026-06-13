@@ -76,11 +76,11 @@ const SETTING_OPTIONS = {
                   'DD-MM-YYYY', 'MM-DD-YYYY', 'D MMM YYYY']
     },
     totalCurrency: {
-        title: 'Äơn vị tiá»n cho ví Tổng',
+        title: 'Äơn vị tiền cho ví Tổng',
         options: ['VND', 'USD']
     },
     firstDayOfWeek: {
-        title: 'Chá»n ngày đầu tuần',
+        title: 'Chọn ngày đầu tuần',
         options: ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật']
     },
     firstDayOfMonth: {
@@ -88,7 +88,7 @@ const SETTING_OPTIONS = {
         options: Array.from({length: 28}, (_, i) => i + 1)
     },
     firstMonthOfYear: {
-        title: 'Chá»n tháng đầu tiên của năm',
+        title: 'Chọn tháng đầu tiên của năm',
         options: ['Tháng Một','Tháng Hai','Tháng Ba','Tháng Tư','Tháng Năm',
                   'Tháng Sáu','Tháng Bảy','Tháng Tám','Tháng Chín',
                   'Tháng Mưá»i','Tháng Mưá»i Một','Tháng Mưá»i Hai']
@@ -118,7 +118,14 @@ const STORAGE_KEY = 'finance_flow_data';
 function syncData() {
     const data = { wallets, isBalanceVisible, settings, transactions, userCategories, sepayConfig, receivingInfos, budgets };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    if (database) database.ref('user_data').set(data);
+    if (database) {
+        // Đánh dấu đang sync để tránh race condition: on('value') fire ngay sau khi set()
+        window._isSyncing = true;
+        database.ref('user_data').set(data).then(() => {
+            // Cho phép 500ms để Firebase listener ổn định trước khi nhận lại
+            setTimeout(() => { window._isSyncing = false; }, 500);
+        }).catch(() => { window._isSyncing = false; });
+    }
 }
 
 function loadData() {
@@ -140,21 +147,32 @@ function loadData() {
     }
     
     if (database) {
-        database.ref('user_data').once('value').then(s => {
+        // Dùng on('value') để lắng nghe real-time (giao dịch SePay sẽ hiện ngay không cần F5)
+        database.ref('user_data').on('value', s => {
+            // Bỏ qua nếu đang trong quá trình ghi (tránh race condition)
+            if (window._isSyncing) return;
             const data = s.val();
             if (data) {
+                const prevTxnCount = transactions.length;
                 wallets = data.wallets || [];
                 transactions = data.transactions || [];
-        budgets = data.budgets || [];
+                budgets = data.budgets || [];
                 userCategories = data.userCategories || userCategories;
                 settings = data.settings || settings;
                 sepayConfig = data.sepayConfig || sepayConfig;
                 receivingInfos = data.receivingInfos || [];
-                renderAll();
+                renderAll(true);
+                // Nếu có giao dịch mới từ SePay, re-render budget page nếu đang xem
+                if (transactions.length !== prevTxnCount) {
+                    if (document.getElementById('page-budgets') && document.getElementById('page-budgets').classList.contains('active')) {
+                        renderBudgetsPage();
+                    }
+                }
             }
         });
     }
 }
+
 
 // === ICON LIBRARY ===
 const ICONS = ['💰', '💳', '📋', '💴', '💵', '💲', '💸', '🔍', '📅', '📊', '✈️', '✨', '🛍️', '🍕', '🏠', '💊', '🎓', '🎮', '❤️', '🏢', '🚗', '🚲', '🥦', '🎁', '🎞️', '🎨', '⚽', '🏖️', '💻', '🔥', '💡', '🔌', '👔', '👗', '🍼', '🐶'];
@@ -427,7 +445,11 @@ function renderTxnList(period) {
         const dayName = DAY_NAMES[d.getDay()];
         const monthName = MONTH_NAMES[d.getMonth()];
         const year = d.getFullYear();
-        const txns = groups[dateStr];
+        // Sắp xếp giao dịch trong cùng ngày: mới nhất lên trên
+        // Dùng thứ tự trong mảng transactions (append-only) → reverse = mới lên đầu
+        // Cách này đúng với mọi định dạng id (txn_, sepay_, adj_) và không thay đổi khi edit
+        const txns = groups[dateStr].slice().reverse();
+
         const dayTotal = txns.reduce((s,t) => s + (t.type==='income' ? t.amount : -t.amount), 0);
         const totalColor = dayTotal >= 0 ? '#3b82f6' : '#ef4444';
         const totalStr = (dayTotal >= 0 ? '+' : '') + new Intl.NumberFormat('vi-VN').format(dayTotal);
@@ -480,7 +502,7 @@ function renderSelectWalletList() {
     let html = `
         <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; margin-bottom:16px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
             <div style="display:flex; align-items:center; padding:16px; cursor:pointer; background:${currentTxnWalletIndex === -1 ? '#f0fdf4' : 'white'};" onclick="selectTxnWalletFilter(-1)">
-                <div style="width:44px; height:44px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; font-size:24px; margin-right:12px;">ðŸŒ</div>
+                <div style="width:44px; height:44px; border-radius:50%; background:#e5e7eb; display:flex; align-items:center; justify-content:center; margin-right:12px;"><i class="fas fa-layer-group" style="color:#6b7280; font-size:20px;"></i></div>
                 <div style="flex:1;">
                     <div style="font-size:16px; font-weight:700; color:#000;">Tổng cộng</div>
                     <div style="font-size:13px; color:#6b7280;">${new Intl.NumberFormat('vi-VN').format(totalBalance)} ${currency}</div>
@@ -488,7 +510,7 @@ function renderSelectWalletList() {
                 ${currentTxnWalletIndex === -1 ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
             </div>
         </div>
-        <div style="font-size:11px; color:#9ca3af; font-weight:600; margin-bottom:8px; padding-left:4px; letter-spacing:0.5px; text-transform:uppercase;">TÃNH VÃ€O Tá»”NG</div>
+        <div style="font-size:11px; color:#9ca3af; font-weight:600; margin-bottom:8px; padding-left:4px; letter-spacing:0.5px; text-transform:uppercase;">TÍNH VÀO TỔNG</div>
         <div class="card" style="padding:0; border-radius:12px; background:white; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
     `;
 
@@ -648,7 +670,7 @@ function updateSelectedWalletDisplay() {
     } else {
         if(iconEl) iconEl.innerText = '💰';
         if(nameEl) {
-            nameEl.innerText = 'Chá»n ví';
+            nameEl.innerText = 'Chọn ví';
             nameEl.style.color = '#9ca3af';
         }
         if(currEl) currEl.innerText = settings.totalCurrency || 'VND';
@@ -674,7 +696,7 @@ function updateSelectedCategoryDisplay() {
             iconEl.style.background = '#e5e7eb';
         }
         if(nameEl) {
-            nameEl.innerText = 'Chá»n nhóm';
+            nameEl.innerText = 'Chọn nhóm';
             nameEl.style.color = '#9ca3af';
         }
     }
@@ -821,7 +843,7 @@ function checkTxnValid() {
     }
 }
 
-function saveTransaction() {
+async function saveTransaction() {
     const id = document.getElementById('editTxnId').value;
     const amountStr = document.getElementById('txnAmount').value.replace(/\./g, '').replace(/,/g, '');
     const amount = parseFloat(amountStr) || 0;
@@ -832,7 +854,7 @@ function saveTransaction() {
     
     if (!amount || !date || !walletId || !selectedCategory) return;
 
-    const isIncome = currentTxnType === 'income' || (currentTxnType === 'debt' && (selectedCategory.name === 'Äi vay' || selectedCategory.name === 'Thu nợ'));
+    const isIncome = currentTxnType === 'income' || (currentTxnType === 'debt' && (selectedCategory.name === 'Đi vay' || selectedCategory.name === 'Thu nợ'));
 
     const oldTxn = id ? transactions.find(t => t.id === id) : null;
 
@@ -847,11 +869,11 @@ function saveTransaction() {
     };
 
     if (id) {
-        const oldTxn = transactions.find(t => t.id === id);
-        if (oldTxn) {
-            const oldIsIncome = oldTxn.type === 'income' || (oldTxn.type === 'debt' && (oldTxn.category === 'Äi vay' || oldTxn.category === 'Thu nợ'));
-            const w = wallets.find(x => x.id === oldTxn.walletId);
-            if (w) w.balance += oldIsIncome ? -oldTxn.amount : oldTxn.amount;
+        const existingTxn = transactions.find(t => t.id === id);
+        if (existingTxn) {
+            const oldIsIncome = existingTxn.type === 'income' || (existingTxn.type === 'debt' && (existingTxn.category === 'Đi vay' || existingTxn.category === 'Thu nợ'));
+            const w = wallets.find(x => x.id === existingTxn.walletId);
+            if (w) w.balance += oldIsIncome ? -existingTxn.amount : existingTxn.amount;
         }
         transactions = transactions.filter(t => t.id !== id);
     }
@@ -865,7 +887,7 @@ function saveTransaction() {
     
     // Only notify if it's a new transaction
     if (!id) {
-        sendTelegramNotification(txn, targetWallet);
+        await sendTelegramNotification(txn, targetWallet);
     }
     
     syncData();
@@ -878,19 +900,22 @@ function saveTransaction() {
 function deleteTransaction() {
     const id = document.getElementById('editTxnId').value;
     if (!id || !confirm('Xóa giao dịch này?')) return;
-    const t = transactions.find(x => x.id === id);
-    if (t) {
-        const isIncome = t.type === 'income' || (t.type === 'debt' && (t.category === 'Äi vay' || t.category === 'Thu nợ'));
-        const w = wallets.find(x => x.id === t.walletId);
-        if (w) w.balance += isIncome ? -t.amount : t.amount;
+    
+    // Đóng popup và chuyển trang ngay lập tức, trước khi xử lý để tránh user bấm nhầm nút Lưu
+    switchPage('transactions');
+    
+    const txnToDelete = transactions.find(x => x.id === id);
+    if (txnToDelete) {
+        const isIncome = txnToDelete.type === 'income' || (txnToDelete.type === 'debt' && (txnToDelete.category === 'Đi vay' || txnToDelete.category === 'Thu nợ'));
+        const w = wallets.find(x => x.id === txnToDelete.walletId);
+        if (w) w.balance += isIncome ? -txnToDelete.amount : txnToDelete.amount;
     }
     transactions = transactions.filter(x => x.id !== id);
     syncData();
-    renderAll();
-    checkBudgetsThreshold(txn);
-    showToast('Đã lưu giao dịch!', 'success');
-    switchPage('transactions');
+    renderAll(true);
+    showToast('Đã xóa giao dịch!', 'success');
 }
+
 
 // === ADD WALLET PAGE ===
 function openAddWallet() {
@@ -1536,21 +1561,537 @@ async function sendTelegramNotification(txn, wallet) {
     const walletName = wallet ? wallet.name : 'Chua ro vi';
     const txId = txn.id || '';
     
-    var msg = 'BIEN DONG SO DU "' + walletName + '"\n';
-    msg += sign + ' ' + amountStr + '\n';
-    msg += 'NOI DUNG: "' + (txn.note || txn.category || '') + '"\n';
-    msg += 'SO DU VI: "' + walletBalanceStr + '"\n';
-    msg += 'TONG SO DU: "' + totalBalanceStr + '"';
+    // Xac dinh nhom: uu tien nhom con, sau do nhom cha, sau do ten vi
+    let categoryLabel = walletName;
+    if (txn.categoryId || txn.category) {
+        const allCatsForNotif = [].concat(userCategories.expense || [], userCategories.income || [], userCategories.debt || []);
+        let matchedCat = allCatsForNotif.find(c => c.id === txn.categoryId && c.parentId);
+        if (!matchedCat) matchedCat = allCatsForNotif.find(c => c.id === txn.categoryId);
+        if (!matchedCat && txn.category) matchedCat = allCatsForNotif.find(c => c.name === txn.category);
+        if (matchedCat) categoryLabel = matchedCat.name;
+        else if (txn.category) categoryLabel = txn.category;
+    }
+
+    // Icon phan loai giao dich
+    const txIcon = isIncome ? '💰' : '💸';
+    const arrowIcon = isIncome ? '⬆️' : '⬇️';
+    const signIcon = isIncome ? '➕' : '➖';
+
+    var msg = (isIncome ? '🟢' : '🔴') + ' BIEN DONG SO DU ' + (isIncome ? '(THU)' : '(CHI)') + '\n';
+    msg += '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n';
+    msg += '💳 Vi:   ' + walletName + '\n';
+    msg += '🏷️ Nhom: ' + categoryLabel + '\n';
+    msg += '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n';
+    msg += signIcon + '  ' + (isIncome ? '+' : '-') + amountStr + '\n';
+    msg += '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n';
+    msg += '📝 ND:   ' + (txn.note || txn.category || 'Khong ro') + '\n';
+    msg += '💰 SDu:  ' + walletBalanceStr + '\n';
+    msg += '🏦 Tong: ' + totalBalanceStr;
     if (txId) msg += '\n#id_' + txId;
     
     try {
-        await fetch('https://api.telegram.org/bot' + botToken + '/sendMessage', {
+        const res = await fetch('https://api.telegram.org/bot' + botToken + '/sendMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ chat_id: chatId, text: msg })
         });
+        if (!res.ok) {
+            const errBody = await res.json().catch(() => ({}));
+            console.error('Telegram API error:', res.status, errBody.description || '');
+        }
     } catch(err) {
         console.error('Failed to send Telegram notif:', err);
+    }
+}
+
+// === SEPAY SYNC ===
+function openSePaySync() {
+    if (!sepayConfig) {
+        sepayConfig = { apiToken: '', proxyUrl: '', mappings: [], lastSyncIds: [] };
+    }
+    document.getElementById('sepayApiToken').value = sepayConfig.apiToken || '';
+    document.getElementById('sepayProxyUrl').value = sepayConfig.proxyUrl || '';
+    renderSePayMappings();
+    const logEl = document.getElementById('sepaySyncLog');
+    if (logEl) logEl.style.display = 'none';
+    switchPage('sepay');
+}
+
+function saveSePayConfig() {
+    sepayConfig.apiToken = document.getElementById('sepayApiToken').value.trim();
+    sepayConfig.proxyUrl = document.getElementById('sepayProxyUrl').value.trim();
+    syncData();
+}
+
+function toggleSePayConfig() {
+    const section = document.getElementById('sepayConfigSection');
+    const btn = document.getElementById('btnToggleConfig');
+    if (!section) return;
+    const isHidden = section.style.display === 'none';
+    section.style.display = isHidden ? 'block' : 'none';
+    if (btn) btn.innerText = isHidden ? 'Ẩn cấu hình' : 'Cấu hình';
+}
+
+function renderSePayMappings() {
+    const list = document.getElementById('sepayMappingList');
+    if (!list) return;
+    
+    let html = '';
+    html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <button onclick="fetchSePayBankAccounts()" style="background:#f3f4f6; border:none; padding:8px 12px; border-radius:8px; font-size:13px; font-weight:500; color:#4b5563; cursor:pointer;"><i class="fas fa-cloud-download-alt"></i> Tải DS Tài khoản</button>
+        <button onclick="openSePayGuide()" style="background:#3b82f6; border:none; padding:8px 12px; border-radius:8px; font-size:13px; font-weight:500; color:white; cursor:pointer;"><i class="fas fa-book-open"></i> Hướng dẫn</button>
+    </div>`;
+
+    if (!sepayConfig.mappings || sepayConfig.mappings.length === 0) {
+        list.innerHTML = html + '<div style="padding:12px; color:#9ca3af; font-size:13px; text-align:center;">Chưa có mapping nào.</div>';
+        return;
+    }
+    
+    html += sepayConfig.mappings.map((m, i) => {
+        const wallet = wallets.find(w => w.id === m.walletId);
+        const walletName = wallet ? (wallet.emoji + ' ' + wallet.name) : 'Chọn ví';
+        const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+        const cat = allCats.find(c => c.id === m.categoryId);
+        const catName = cat ? (cat.icon + ' ' + cat.name) : 'Chọn nhóm';
+        
+        let bankInputHtml = '';
+        if (sepayConfig.bankAccounts && sepayConfig.bankAccounts.length > 0) {
+            const options = sepayConfig.bankAccounts.map(acc => {
+                const accNo = acc.account_number || acc.bank_account || acc.id;
+                const bankName = acc.bank_name || 'Ngân hàng';
+                const isSelected = m.bankAcc === accNo;
+                return `<option value="${accNo}" ${isSelected ? 'selected' : ''}>${bankName} - ${accNo}</option>`;
+            }).join('');
+            
+            const hasCustomVal = m.bankAcc && !sepayConfig.bankAccounts.find(a => (a.account_number || a.bank_account || a.id) === m.bankAcc);
+            const customOption = hasCustomVal ? `<option value="${m.bankAcc}" selected>${m.bankAcc}</option>` : '';
+            
+            bankInputHtml = `<select onchange="updateSePayMapping(${i},'bankAcc',this.value)" style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; outline:none; box-sizing:border-box; margin-bottom:8px; background:white;">
+                <option value="">-- Chọn số tài khoản --</option>
+                ${options}
+                ${customOption}
+            </select>`;
+        } else {
+            bankInputHtml = `<input type="text" value="${m.bankAcc||''}" onchange="updateSePayMapping(${i},'bankAcc',this.value)" placeholder="VD: 0123456789" style="width:100%; border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; outline:none; box-sizing:border-box; margin-bottom:8px;">`;
+        }
+        
+        return `
+        <div style="background:white; border-radius:12px; margin-bottom:10px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:13px; font-weight:600; color:#1f2937;">Mapping #${i+1}</div>
+                <button onclick="removeSePayMapping(${i})" style="background:none; border:none; color:#ef4444; font-size:13px; cursor:pointer;"><i class="fas fa-trash"></i></button>
+            </div>
+            <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Số tài khoản nhận</div>
+            ${bankInputHtml}
+            <div style="display:flex; gap:8px;">
+                <div style="flex:1;">
+                    <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Ví nhận</div>
+                    <div onclick="openSePayWalletPicker(${i})" style="border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; cursor:pointer; background:white;">${walletName}</div>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-size:12px; color:#6b7280; margin-bottom:4px;">Nhóm</div>
+                    <div onclick="openSePayCategoryPicker(${i})" style="border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; font-size:13px; cursor:pointer; background:white;">${catName}</div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+    
+    list.innerHTML = html;
+}
+
+function addSePayMapping() {
+    if (!sepayConfig.mappings) sepayConfig.mappings = [];
+    sepayConfig.mappings.push({ bankAcc: '', walletId: null, categoryId: null });
+    syncData();
+    renderSePayMappings();
+}
+
+// --- ADJUST BALANCE LOGIC ---
+let adjustBalanceSelectedWalletId = null;
+
+function openAdjustBalanceOverlay() {
+    if (wallets.length === 0) {
+        alert('Vui lòng tạo ví trước.');
+        return;
+    }
+    
+    // Auto select current wallet if we are in a specific wallet view
+    if (currentTxnWalletIndex > 0) {
+        const w = wallets[currentTxnWalletIndex - 1];
+        if (w) selectAdjustBalanceWallet(w.id);
+        document.getElementById('adjustBalanceWalletSelector').style.display = 'none';
+    } else {
+        // If viewing all wallets, auto select default or first
+        const defaultW = wallets.find(w => w.isDefault) || wallets[0];
+        selectAdjustBalanceWallet(defaultW.id);
+        document.getElementById('adjustBalanceWalletSelector').style.display = 'flex';
+    }
+    
+    document.getElementById('adjustBalanceExclude').checked = true;
+    document.getElementById('adjustBalanceOverlay').style.display = 'flex';
+}
+
+function closeAdjustBalanceOverlay() {
+    document.getElementById('adjustBalanceOverlay').style.display = 'none';
+}
+
+function openAdjustBalanceWalletPicker() {
+    const list = document.getElementById('adjustBalanceWalletList');
+    list.innerHTML = wallets.map(w => `
+        <div onclick="selectAdjustBalanceWallet('${w.id}')" style="padding:16px; border-bottom:1px solid #f3f4f6; display:flex; align-items:center; gap:12px; cursor:pointer;">
+            <div style="font-size:24px;">${w.emoji}</div>
+            <div style="flex:1;">
+                <div style="font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
+                <div style="font-size:13px; color:#6b7280;">${formatMoney(w.balance)} đ</div>
+            </div>
+            ${w.id === adjustBalanceSelectedWalletId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
+        </div>
+    `).join('');
+    document.getElementById('adjustBalanceWalletPickerOverlay').style.display = 'flex';
+}
+
+function selectAdjustBalanceWallet(id) {
+    const w = wallets.find(x => x.id === id);
+    if (!w) return;
+    adjustBalanceSelectedWalletId = id;
+    document.getElementById('adjustBalanceWalletIcon').innerText = w.emoji;
+    document.getElementById('adjustBalanceWalletName').innerText = w.name;
+    document.getElementById('adjustBalanceCurrency').innerText = w.currency || 'VND';
+    document.getElementById('adjustBalanceAmount').value = new Intl.NumberFormat('vi-VN').format(w.balance);
+    document.getElementById('adjustBalanceWalletPickerOverlay').style.display = 'none';
+}
+
+function saveAdjustedBalance() {
+    if (!adjustBalanceSelectedWalletId) {
+        alert('Vui lòng chọn ví.');
+        return;
+    }
+    const w = wallets.find(x => x.id === adjustBalanceSelectedWalletId);
+    if (!w) return;
+
+    const valStr = document.getElementById('adjustBalanceAmount').value.replace(/\./g, '').trim();
+    // Cho phép điều chỉnh về 0đ: kiểm tra chuỗi rỗng trước, sau đó parse
+    if (valStr === '') {
+        alert('Vui lòng nhập số dư mới.');
+        return;
+    }
+    const newBalance = parseFloat(valStr);
+    if (isNaN(newBalance)) {
+        alert('Số dư không hợp lệ.');
+        return;
+    }
+
+    const diff = newBalance - w.balance;
+    if (diff === 0) {
+        closeAdjustBalanceOverlay();
+        return;
+    }
+
+    const isIncome = diff > 0;
+    const amount = Math.abs(diff);
+    const excluded = document.getElementById('adjustBalanceExclude').checked;
+    
+    // Find category
+    let allCats = [].concat(userCategories.expense || [], userCategories.income || [], userCategories.debt || []);
+    let cat = null;
+    if (isIncome) {
+        cat = allCats.find(c => c.name.toLowerCase() === 'khoản thu khác' || c.name.toLowerCase() === 'thu nhập khác') || (userCategories.income && userCategories.income[0]);
+    } else {
+        cat = allCats.find(c => c.name.toLowerCase() === 'chi phí khác' || c.name.toLowerCase() === 'chi khác') || (userCategories.expense && userCategories.expense[0]);
+    }
+
+    const type = isIncome ? 'income' : 'expense';
+    const finalCatName = cat ? cat.name : (isIncome ? 'Thu nhập khác' : 'Chi phí khác');
+    const finalCatIcon = cat ? cat.icon : (isIncome ? '💵' : '💸');
+    const finalCatColor = cat ? cat.color : (isIncome ? '#10b981' : '#f59e0b');
+
+    const newTxn = {
+        id: 'adj_' + Date.now(),
+        walletId: w.id,
+        categoryId: cat ? cat.id : null,
+        manuallyEdited: true,
+        type: type,
+        amount: amount,
+        category: finalCatName,
+        categoryIcon: finalCatIcon,
+        categoryColor: finalCatColor,
+        note: 'Điều chỉnh số dư',
+        date: new Date().toISOString().split('T')[0],
+        excluded: excluded
+    };
+
+    transactions.push(newTxn);
+    w.balance = newBalance;
+    
+    syncData();
+    renderAll();
+    closeAdjustBalanceOverlay();
+}
+
+function openSePayGuide() {
+    const el = document.getElementById('sepayGuideOverlay');
+    if (el) el.style.display = 'flex';
+}
+
+function closeSePayGuide() {
+    const el = document.getElementById('sepayGuideOverlay');
+    if (el) el.style.display = 'none';
+}
+
+function removeSePayMapping(index) {
+    if (!confirm('Xóa mapping này?')) return;
+    sepayConfig.mappings.splice(index, 1);
+    syncData();
+    renderSePayMappings();
+}
+
+function updateSePayMapping(index, field, value) {
+    if (!sepayConfig.mappings[index]) return;
+    sepayConfig.mappings[index][field] = value;
+    syncData();
+}
+
+function retroUpdateSepayTxns(mappingIndex) {
+    const mapping = sepayConfig.mappings[mappingIndex];
+    if (!mapping || !mapping.bankAcc || !mapping.walletId || !mapping.categoryId) return;
+    const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+    const cat = allCats.find(c => c.id === mapping.categoryId);
+    if (!cat) return;
+    let updated = 0;
+    transactions.forEach(t => {
+        if (t.sepayBankAcc && !t.manuallyEdited) {
+            const bankAcc = String(t.sepayBankAcc).trim();
+            if (bankAcc === String(mapping.bankAcc).trim()) {
+                t.walletId = mapping.walletId;
+                t.categoryId = mapping.categoryId;
+                t.category = cat.name;
+                t.categoryIcon = cat.icon;
+                t.categoryColor = cat.color;
+                updated++;
+            }
+        }
+    });
+    if (updated > 0) {
+        syncData();
+        renderAll();
+        showToast(`Đã cập nhật ${updated} giao dịch!`, 'success');
+    }
+}
+
+async function fetchSePayBankAccounts() {
+    const apiToken = (sepayConfig.apiToken || '').trim();
+    const proxyUrl = (sepayConfig.proxyUrl || '').trim();
+    
+    if (!apiToken || !proxyUrl) {
+        showToast('Vui lòng nhập API Token và Proxy URL', 'error');
+        return;
+    }
+    
+    showToast('Đang tải danh sách tài khoản...', 'info');
+    try {
+        const url = proxyUrl + '?token=' + encodeURIComponent(apiToken) + '&action=bank-accounts';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        console.log("SePay Bank Accounts raw response:", data);
+        
+        let accounts = [];
+        
+        if (data.bank_accounts && Array.isArray(data.bank_accounts)) {
+            accounts = data.bank_accounts;
+        } else if (data.transactions && Array.isArray(data.transactions)) {
+            // Fallback: extract unique bank accounts from recent transactions
+            const uniqueAccs = {};
+            data.transactions.forEach(t => {
+                const accNo = t.account_number || t.bankAccountNumber || t.bankAccount;
+                const bankName = t.bank_brand_name || t.bankName || 'Ngân hàng';
+                if (accNo && !uniqueAccs[accNo]) {
+                    uniqueAccs[accNo] = {
+                        account_number: accNo,
+                        bank_name: bankName
+                    };
+                }
+            });
+            accounts = Object.values(uniqueAccs);
+        } else if (Array.isArray(data)) {
+            accounts = data;
+        } else {
+            accounts = data.accounts || data.data || data.items || [];
+        }
+        
+        if (Array.isArray(accounts) && accounts.length > 0) {
+            sepayConfig.bankAccounts = accounts;
+            syncData();
+            renderSePayMappings();
+            showToast(`Đã tải ${accounts.length} tài khoản`, 'success');
+            // Remove the alert for success cases
+        } else {
+            showToast('Không tìm thấy tài khoản nào', 'info');
+            alert("Không tìm thấy tài khoản. Dữ liệu trả về:\n" + JSON.stringify(data).substring(0, 500));
+        }
+    } catch (err) {
+        console.error('Lỗi tải danh sách tài khoản:', err);
+        showToast('Lỗi tải tài khoản: ' + err.message, 'error');
+    }
+}
+
+let _sepayPickerIndex = -1;
+
+function openSePayWalletPicker(index) {
+    _sepayPickerIndex = index;
+    const overlay = document.getElementById('txnWalletPickerOverlay');
+    const list = document.getElementById('txnWalletPickerList');
+    if (!overlay || !list) return;
+    const currentId = sepayConfig.mappings[index]?.walletId;
+    list.innerHTML = wallets.map(w => `
+        <div onclick="selectSePayWallet('${w.id}')" style="display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${w.id === currentId ? '#f0fdf4' : 'transparent'};">
+            <div style="font-size:24px;">${w.emoji||'💰'}</div>
+            <div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">${w.name}</div>
+            ${w.id === currentId ? '<i class="fas fa-check" style="color:#10b981;"></i>' : ''}
+        </div>
+    `).join('');
+    overlay.style.display = 'flex';
+}
+
+function selectSePayWallet(id) {
+    if (_sepayPickerIndex >= 0 && sepayConfig.mappings[_sepayPickerIndex]) {
+        sepayConfig.mappings[_sepayPickerIndex].walletId = id;
+        syncData();
+        renderSePayMappings();
+    }
+    document.getElementById('txnWalletPickerOverlay').style.display = 'none';
+    _sepayPickerIndex = -1;
+}
+
+function openSePayCategoryPicker(index) {
+    _sepayPickerIndex = index;
+    const overlay = document.getElementById('txnCategoryPickerOverlay');
+    const list = document.getElementById('txnCategoryPickerList');
+    if (!overlay || !list) return;
+    const currentId = sepayConfig.mappings[index]?.categoryId;
+    const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+    list.innerHTML = generateCategoryListHTML(allCats, currentId, 'selectSePayCategory');
+    overlay.style.display = 'flex';
+}
+
+function selectSePayCategory(id) {
+    if (_sepayPickerIndex >= 0 && sepayConfig.mappings[_sepayPickerIndex]) {
+        sepayConfig.mappings[_sepayPickerIndex].categoryId = id;
+        syncData();
+        renderSePayMappings();
+        retroUpdateSepayTxns(_sepayPickerIndex);
+    }
+    document.getElementById('txnCategoryPickerOverlay').style.display = 'none';
+    _sepayPickerIndex = -1;
+}
+
+async function runSePaySync(silent = false) {
+    const btn = document.getElementById('btnRunSePaySync');
+    const logEl = document.getElementById('sepaySyncLog');
+    const apiToken = (sepayConfig.apiToken || '').trim();
+    const proxyUrl = (sepayConfig.proxyUrl || '').trim();
+
+    if (!apiToken || !proxyUrl) {
+        if (logEl) { logEl.style.display = 'block'; logEl.innerText = 'Vui lòng nhập API Token và Proxy URL.'; }
+        return;
+    }
+
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang đồng bộ...'; }
+    if (logEl && !silent) { logEl.style.display = 'block'; logEl.innerText = 'Đang kết nối SePay...'; }
+
+    try {
+        const lastIds = sepayConfig.lastSyncIds || [];
+        const url = proxyUrl + '?token=' + encodeURIComponent(apiToken);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        const records = data.data || data.transactions || data || [];
+        if (!Array.isArray(records)) throw new Error('Dữ liệu không hợp lệ từ proxy');
+
+        let added = 0;
+        const newIds = [];
+
+        records.forEach(rec => {
+            const recId = String(rec.id || rec.transaction_id || '');
+            if (!recId || lastIds.includes(recId)) return;
+            newIds.push(recId);
+
+            const amount = Math.abs(parseFloat(rec.amount || rec.transferAmount || 0));
+            if (!amount) return;
+
+            const content = (rec.content || rec.description || rec.transactionContent || '').toUpperCase();
+            const bankAcc = rec.bankAccountNumber || rec.bankAccount || rec.accountNumber || '';
+            const dateRaw = rec.transactionDate || rec.created_at || rec.date || new Date().toISOString();
+            const date = dateRaw.split('T')[0] || getTodayStr();
+            const isIn = (parseFloat(rec.amount || rec.transferAmount || 0)) > 0;
+
+            // Find matching mapping
+            let matchedMapping = null;
+            if (sepayConfig.mappings) {
+                matchedMapping = sepayConfig.mappings.find(m =>
+                    m.bankAcc && String(m.bankAcc).trim() === String(bankAcc).trim() && m.walletId && m.categoryId
+                );
+            }
+
+            const allCats = [...(userCategories.expense||[]), ...(userCategories.income||[]), ...(userCategories.debt||[])];
+            let cat, walletId;
+
+            if (matchedMapping) {
+                cat = allCats.find(c => c.id === matchedMapping.categoryId);
+                walletId = matchedMapping.walletId;
+            }
+
+            if (!cat) {
+                const defaultCatName = isIn ? 'Thu nhập khác' : 'Chi khác';
+                cat = allCats.find(c => c.name === defaultCatName) || allCats[0];
+            }
+            if (!walletId) {
+                const defaultWallet = wallets.find(w => w.isDefault) || wallets[0];
+                walletId = defaultWallet ? defaultWallet.id : null;
+            }
+            if (!walletId || !cat) return;
+
+            const txnId = 'sepay_' + recId;
+            if (transactions.find(t => t.id === txnId)) return;
+
+            const txn = {
+                id: txnId,
+                walletId,
+                type: isIn ? 'income' : 'expense',
+                amount,
+                category: cat.name,
+                categoryIcon: cat.icon,
+                categoryColor: cat.color,
+                categoryId: cat.id,
+                note: rec.content || rec.description || '',
+                date,
+                excluded: false,
+                sepayBankAcc: bankAcc,
+                manuallyEdited: false
+            };
+
+            const wallet = wallets.find(w => w.id === walletId);
+            if (wallet) wallet.balance += isIn ? amount : -amount;
+            transactions.push(txn);
+            added++;
+        });
+
+        sepayConfig.lastSyncIds = [...lastIds, ...newIds].slice(-200);
+        syncData();
+        if (added > 0) renderAll();
+
+        const msg = added > 0 ? `Đồng bộ xong: +${added} giao dịch mới.` : 'Không có giao dịch mới.';
+        if (logEl && !silent) logEl.innerText = msg;
+        if (!silent) showToast(msg, added > 0 ? 'success' : 'info');
+
+    } catch (err) {
+        const errMsg = 'Lỗi: ' + (err.message || 'Không kết nối được');
+        if (logEl && !silent) logEl.innerText = errMsg;
+        if (!silent) showToast(errMsg, 'error');
+        console.error('SePay sync error:', err);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync"></i> Đồng bộ ngay'; }
     }
 }
 
@@ -1614,7 +2155,7 @@ function renderReceivingInfoList() {
     if (filteredInfos.length === 0) {
         listEl.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#9ca3af; font-size:14px; width:100%;">
             <div style="font-size:40px; margin-bottom:12px;">📅‡</div>
-            Chưa có thông tin nhận tiá»n nào
+            Chưa có thông tin nhận tiền nào
         </div>`;
         dotsEl.innerHTML = '';
         return;
@@ -1813,7 +2354,7 @@ function saveReceivingInfo() {
 }
 
 function deleteReceivingInfo() {
-    const confirmDelete = confirm('Bạn có chắc chắn muốn xóa thông tin nhận tiá»n này?');
+    const confirmDelete = confirm('Bạn có chắc chắn muốn xóa thông tin nhận tiền này?');
     if (!confirmDelete) return;
     
     const idxStr = document.getElementById('editReceivingId').value;
@@ -1842,16 +2383,22 @@ function getBudgetCategoryIds(categoryId) {
 }
 
 function getBudgetSpent(b) {
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
+    // Sử dụng kỳ của người dùng (theo firstDayOfMonth) thay vì calendar month cứng
+    const periods = getPeriods();
+    const now = new Date();
+    // Tìm kỳ hiện tại
+    const currentPeriod = periods.find(p => now >= p.start && now <= new Date(p.end.getTime() + 86399999))
+                          || periods[3]; // fallback kỳ giữa
+    const sStr = getLocalDateStr(currentPeriod.start);
+    const eStr = getLocalDateStr(currentPeriod.end);
+
     const matchIds = getBudgetCategoryIds(b.categoryId);
     let spent = 0;
     transactions.forEach(t => {
         if (t.type !== 'expense') return;
         if (t.excluded) return;
-        const tDate = new Date(t.date);
-        if (tDate.getMonth() !== currentMonth || tDate.getFullYear() !== currentYear) return;
+        // So sánh theo chuỗi date (YYYY-MM-DD) để tránh lỗi timezone
+        if (t.date < sStr || t.date > eStr) return;
         let catMatch = false;
         if (b.categoryId === 'all') {
             catMatch = true;
@@ -1867,11 +2414,13 @@ function getBudgetSpent(b) {
     return spent;
 }
 
+
 function renderBudgetsPage() {
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
     const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    // Tính đúng daysLeft (bao gồm cả hôm nay)
     const daysLeft = lastDayOfMonth - today.getDate();
 
     let totalBudget = 0;
@@ -1883,8 +2432,18 @@ function renderBudgetsPage() {
 
     const allBudgets = budgets || [];
     
+    // Lọc ngân sách theo tháng hiện tại:
+    // - Budget có isRepeating=true: luôn hiển thị (tự reset vì getBudgetSpent chỉ tính tháng hiện tại)
+    // - Budget có isRepeating=false: chỉ hiển thị nếu được tạo trong tháng/năm hiện tại
+    const monthFilteredBudgets = allBudgets.filter(b => {
+        if (b.isRepeating) return true; // Budget lặp: luôn hiển thị
+        if (!b.createdAt) return true;  // Không có createdAt: cứ hiển thị (tương thích dữ liệu cũ)
+        const created = new Date(b.createdAt);
+        return created.getMonth() === currentMonth && created.getFullYear() === currentYear;
+    });
+
     // Filter budgets by the global wallet filter on the dashboard
-    const filteredBudgets = allBudgets.filter(b => {
+    const filteredBudgets = monthFilteredBudgets.filter(b => {
         if (typeof budgetGlobalWalletFilter === 'undefined' || budgetGlobalWalletFilter === 'all') return true;
         return !b.walletId || b.walletId === 'all' || b.walletId === budgetGlobalWalletFilter;
     });
@@ -1955,7 +2514,7 @@ function openAddBudget() {
     document.getElementById('editBudgetId').value = '';
     document.getElementById('budgetAmount').value = '';
     document.getElementById('budgetCatId').value = '';
-    document.getElementById('budgetCategoryName').innerText = 'Chá»n nhóm';
+    document.getElementById('budgetCategoryName').innerText = 'Chọn nhóm';
     document.getElementById('budgetCategoryIcon').innerHTML = '<i class="fas fa-question"></i>';
     document.getElementById('budgetCategoryIcon').style.background = '#e5e7eb';
     document.getElementById('budgetCategoryIcon').style.color = '#9ca3af';
@@ -1984,8 +2543,8 @@ function saveBudget() {
     const isRepeat = document.getElementById('budgetRepeat').checked;
     const walletId = document.getElementById('budgetWalletId') ? document.getElementById('budgetWalletId').value : 'all';
 
-    if (!catId) return alert('Vui lòng chá»n nhóm chi tiêu!');
-    if (!amount || amount <= 0) return alert('Vui lòng nhập số tiá»n hợp lệ!');
+    if (!catId) return alert('Vui lòng chọn nhóm chi tiêu!');
+    if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền hợp lệ!');
 
     if (id) {
         const b = budgets.find(x => x.id === id);
@@ -2027,20 +2586,21 @@ function openBudgetDetail(id) {
     const name = catObj ? catObj.name : 'Tổng cộng';
     const color = catObj ? catObj.color : '#10b981';
 
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-    const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const daysLeft = lastDayOfMonth - today.getDate();
-    const daysPassed = today.getDate();
+    // Dung ky nguoi dung (firstDayOfMonth) thay vi calendar month cung
+    const _prs = getPeriods();
+    const _now = new Date();
+    const currentPeriod = _prs.find(p => _now >= p.start && _now <= new Date(p.end.getTime() + 86399999)) || _prs[3];
+    const periodStart = currentPeriod.start;
+    const periodEnd = currentPeriod.end;
+    const totalDays = Math.max(1, Math.round((periodEnd.getTime() - periodStart.getTime()) / 86400000) + 1);
+    const daysPassed = Math.max(1, Math.round((_now.getTime() - periodStart.getTime()) / 86400000) + 1);
+    const daysLeft = Math.max(0, Math.round((periodEnd.getTime() - _now.getTime()) / 86400000));
 
     const spent = getBudgetSpent(b);
-
     const remain = b.amount - spent;
     let percent = (spent / b.amount) * 100;
     if (percent > 100) percent = 100;
-    
-    let timePercent = (daysPassed / lastDayOfMonth) * 100;
+    let timePercent = Math.min(100, (daysPassed / totalDays) * 100);
 
     document.getElementById('detailBudgetIcon').innerHTML = icon;
     document.getElementById('detailBudgetIcon').style.background = color;
@@ -2054,14 +2614,13 @@ function openBudgetDetail(id) {
     document.getElementById('detailBudgetTodayMarker').style.left = timePercent + '%';
     document.getElementById('detailBudgetTodayText').style.left = timePercent + '%';
 
-    const monthStr = (currentMonth + 1).toString().padStart(2, '0');
-    document.getElementById('detailBudgetDateRange').innerText = `01/${monthStr} - ${lastDayOfMonth}/${monthStr}`;
+    document.getElementById('detailBudgetDateRange').innerText = formatDate(periodStart) + ' - ' + formatDate(periodEnd);
     document.getElementById('detailBudgetDaysLeft').innerText = `Còn ${daysLeft} ngày`;
     document.getElementById('detailBudgetRepeatText').innerText = b.isRepeating ? 'Ngân sách được tự động lặp lại ở kỳ hạn tiếp theo.' : 'Ngân sách không lặp lại.';
 
     const recDaily = remain > 0 && daysLeft > 0 ? remain / daysLeft : 0;
     const actualDaily = daysPassed > 0 ? spent / daysPassed : 0;
-    const projected = actualDaily * lastDayOfMonth;
+    const projected = actualDaily * totalDays;
 
     document.getElementById('detailBudgetRecDaily').innerText = formatMoney(Math.round(recDaily));
     document.getElementById('detailBudgetActualDaily').innerText = formatMoney(Math.round(actualDaily));
@@ -2117,7 +2676,7 @@ function openBudgetWalletPicker() {
     let listHtml = '';
     
     const allCheck = currentWalletId === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">🌍</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
+    listHtml += `<div onclick="selectBudgetWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${currentWalletId === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:20px; display:flex; align-items:center; justify-content:center; width:22px; color:#9ca3af;"><i class="fas fa-layer-group"></i></div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = currentWalletId === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
@@ -2130,7 +2689,7 @@ function openBudgetWalletPicker() {
     overlay.innerHTML = `
         <div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;">
-                <h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n ví</h3>
+                <h3 style="font-size:16px; font-weight:700; margin:0;">Chọn ví</h3>
                 <button onclick="closeBudgetWalletPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button>
             </div>
             <div style="flex:1; overflow-y:auto;">${listHtml}</div>
@@ -2164,7 +2723,7 @@ function openBudgetGlobalWalletPicker() {
     
     let listHtml = '';
     const allCheck = budgetGlobalWalletFilter === 'all' ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
-    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:22px;">🌍</div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
+    listHtml += `<div onclick="selectBudgetGlobalWallet('all')" style="display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid #f3f4f6; cursor:pointer; background:${budgetGlobalWalletFilter === 'all' ? '#f0fdf4' : 'transparent'};"><div style="font-size:20px; display:flex; align-items:center; justify-content:center; width:22px; color:#9ca3af;"><i class="fas fa-layer-group"></i></div><div style="flex:1; font-size:15px; font-weight:500; color:#1f2937;">Tổng cộng</div>${allCheck}</div>`;
     
     wallets.forEach(w => {
         const check = budgetGlobalWalletFilter === w.id ? '<i class="fas fa-check" style="color:#10b981; font-size:14px;"></i>' : '';
@@ -2224,7 +2783,7 @@ function openBudgetPeriodPicker() {
     const overlay = document.createElement('div');
     overlay.id = 'budgetPeriodOverlay';
     overlay.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); z-index:4000; justify-content:center; align-items:center;';
-    overlay.innerHTML = '<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);"><div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;"><h3 style="font-size:16px; font-weight:700; margin:0;">Chá»n giai đoạn</h3><button onclick="closeBudgetPeriodPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">âœ•</button></div><div style="flex:1; overflow-y:auto;">' + listHtml + '</div></div>';
+    overlay.innerHTML = '<div style="background:white; width:90%; max-width:380px; border-radius:20px; padding:0 0 20px 0; max-height:70vh; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.2);"><div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px 14px; border-bottom:1px solid #f3f4f6; flex-shrink:0;"><h3 style="font-size:16px; font-weight:700; margin:0;">Chọn giai đoạn</h3><button onclick="closeBudgetPeriodPicker()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;"><i class="fas fa-times"></i></button></div><div style="flex:1; overflow-y:auto;">' + listHtml + '</div></div>';
     overlay.addEventListener('click', function(e) { if (e.target === overlay) closeBudgetPeriodPicker(); });
     document.body.appendChild(overlay);
 }
