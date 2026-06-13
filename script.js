@@ -938,7 +938,9 @@ function saveWallet() {
     const excluded = document.getElementById('walletExclude').checked;
     const isDefault = document.getElementById('walletDefault').checked;
     if (!name) {
-        document.getElementById('walletName').focus();
+        if (window.self === window.top) {
+            document.getElementById('walletName').focus();
+        }
         return;
     }
     
@@ -1582,7 +1584,9 @@ function toggleReceivingSearch() {
     const searchInput = document.getElementById('receivingSearchInput');
     if (searchContainer.style.display === 'none') {
         searchContainer.style.display = 'block';
-        searchInput.focus();
+        if (window.self === window.top) {
+            searchInput.focus();
+        }
     } else {
         searchContainer.style.display = 'none';
         searchInput.value = '';
